@@ -206,7 +206,6 @@ public class AudioServiceBinder extends Service implements MediaPlayer.OnPrepare
             audioPlayer.setDataSource(getContext(), trackUri);
             audioPlayer.setOnPreparedListener(this);
             audioPlayer.prepareAsync();
-            Log.d("AudioServiceBinder:playSong()","Song seems to be " + audioPlayer.getDuration());
         } catch (Exception e) {
             Log.e("MUSIC SERVICE", "Error setting data source", e);
         }
@@ -222,6 +221,7 @@ public class AudioServiceBinder extends Service implements MediaPlayer.OnPrepare
     @Override
     public void onPrepared(MediaPlayer mp) {
         Log.d("MediaPlayer","Playing a track");
+        Log.d("MediaPlayer","Song seems to be " + audioPlayer.getDuration());
         mp.start();
     }
 
