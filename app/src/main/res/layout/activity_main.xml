@@ -7,8 +7,8 @@
         android:layout_width="match_parent"
         android:layout_height="match_parent" /> -->
 
-    <androidx.recyclerview.widget.RecyclerView
-        android:id="@+id/list1"
+    <ListView
+        android:id="@+id/songList"
         android:layout_width="match_parent"
         android:layout_height="match_parent" />
 

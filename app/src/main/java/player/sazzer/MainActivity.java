@@ -1,9 +1,8 @@
 package player.sazzer;
 
 import android.Manifest;
-import android.app.Activity;
 import android.content.ComponentName;
-import android.content.ContentUris;
+import android.content.ContentResolver;
 import android.content.Context;
 import android.content.Intent;
 import android.content.ServiceConnection;
@@ -12,33 +11,28 @@ import android.database.Cursor;
 import android.net.Uri;
 import android.os.Bundle;
 import android.os.IBinder;
-import android.provider.MediaStore;
 import android.util.Log;
-import android.view.LayoutInflater;
 import android.view.View;
-import android.view.ViewGroup;
-import android.widget.TextView;
+import android.widget.ListView;
 import android.widget.Toast;
 
 import androidx.annotation.NonNull;
 import androidx.annotation.Nullable;
 import androidx.appcompat.app.AppCompatActivity;
-import androidx.recyclerview.widget.DividerItemDecoration;
-import androidx.recyclerview.widget.LinearLayoutManager;
-import androidx.recyclerview.widget.RecyclerView;
 import android.widget.MediaController.MediaPlayerControl;
 
 import player.sazzer.AudioServiceBinder.MusicBinder;
 
-import java.util.LinkedList;
-import java.util.List;
+import java.io.IOException;
+import java.util.ArrayList;
 
 public class MainActivity extends AppCompatActivity implements MediaPlayerControl {
     public static final int REQUEST_CODE = 1001;
     public static final int REQUEST_CODE_EXTERNAL_STORAGE = 1002;
 
-    // Hay que iniciar el RecyclerView para mostrar los elementos.
-    RecyclerView lv;
+    Intent playIntent = null;
+
+    ArrayList<Song> songList;
 
     private AudioServiceBinder musicSrv;
 
@@ -48,8 +42,9 @@ public class MainActivity extends AppCompatActivity implements MediaPlayerContro
         public void onServiceConnected(ComponentName name, IBinder service) {
             MusicBinder binder = (MusicBinder) service;
             musicSrv = binder.getService();
-            //musicSrv.setList(songList);
+            musicSrv.setList(songList);
             //musicBound = true;
+            Log.d("musicConnection","Service Connected");
         }
 
         @Override
@@ -63,9 +58,7 @@ public class MainActivity extends AppCompatActivity implements MediaPlayerContro
         super.onCreate(savedInstanceState);
         setContentView(R.layout.activity_main);
 
-        lv = findViewById (R.id.list1);
-        lv.setLayoutManager (new LinearLayoutManager (getBaseContext(), RecyclerView.VERTICAL, false));
-        lv.addItemDecoration (new DividerItemDecoration (getBaseContext (), DividerItemDecoration.VERTICAL));
+        musicSrv = new AudioServiceBinder();
 
         // Hay que pedir el elemento para cargar los audios.
         // Si no, entonces tendremos un error/choque debido a la estancia de acceso ilegal de archivos.
@@ -75,14 +68,70 @@ public class MainActivity extends AppCompatActivity implements MediaPlayerContro
                     new String [] { Manifest.permission.READ_EXTERNAL_STORAGE },
                     REQUEST_CODE_EXTERNAL_STORAGE
             );
-        } else {
-            loadAudios ();
         }
 
+        ListView songView = findViewById(R.id.songList);
+        songList = new ArrayList<>();
+
+        getSongList();
+
+        ListadoMusica listMusica = new ListadoMusica(this, songList);
+        songView.setAdapter(listMusica);
+
+        musicSrv.setList(songList);
     }
 
-    public void songPicked(View view) {
-        Log.d("MainActivity","Set Song");
+    @Override
+    protected void onStart() {
+        Log.d("onStart","Starting");
+        super.onStart();
+        musicSrv.setContext(getApplicationContext());
+        if (playIntent == null) {
+            Log.d("onStart","Intent is null, starting service.");
+            playIntent = new Intent(this, AudioServiceBinder.class);
+            bindService(playIntent, musicConnection, Context.BIND_AUTO_CREATE);
+            startService(playIntent);
+            Log.d("onStart","Done with setup of services.");
+        }
+    }
+
+    @Override
+    protected void onDestroy() {
+        stopService(playIntent);
+        musicSrv = null;
+        super.onDestroy();
+    }
+
+    public void getSongList() {
+        ContentResolver musicResolver = getContentResolver();
+        // Vamos a buscar música que está en la memoria externa.
+        // TODO (probablemente: Preguntar luego por ubicaciones especiales, para que la gente pueda
+        // colocar su propia música.
+        Uri musicUri = android.provider.MediaStore.Audio.Media.EXTERNAL_CONTENT_URI;
+
+        Cursor musicCursor = musicResolver.query(musicUri, null, null, null, null);
+
+        // Hora de buscar
+        if (musicCursor != null && musicCursor.moveToFirst()) {
+            int titleColumn = musicCursor.getColumnIndex
+                    (android.provider.MediaStore.Audio.Media.TITLE);
+            int idColumn = musicCursor.getColumnIndex
+                    (android.provider.MediaStore.Audio.Media._ID);
+            int artistColumn = musicCursor.getColumnIndex
+                    (android.provider.MediaStore.Audio.Media.ARTIST);
+
+            do {
+                long thisId = musicCursor.getLong(idColumn);
+                String thisTitle = musicCursor.getString(titleColumn);
+                String thisArtist = musicCursor.getString(artistColumn);
+                songList.add(new Song(thisId, thisTitle, thisArtist));
+            }
+            while (musicCursor.moveToNext());
+        }
+    }
+
+    public void songPicked(View view) throws IOException {
+        Log.d("MainActivity","Set Song: " + (view.getTag().toString()));
         musicSrv.setSong(Integer.parseInt(view.getTag().toString()));
         musicSrv.playSong();
         /*
@@ -94,6 +143,7 @@ public class MainActivity extends AppCompatActivity implements MediaPlayerContro
         */
     }
 
+    /*
     void loadAudios () {
         String [] columns = {
                 MediaStore.Audio.Artists._ID,
@@ -132,10 +182,8 @@ public class MainActivity extends AppCompatActivity implements MediaPlayerContro
         }
 
         cursor.close ();
-
-        ListadoMusica adapter = new ListadoMusica (getApplicationContext(), artists);
-        lv.setAdapter (adapter);
     }
+    */
 
     @Override
     public void onRequestPermissionsResult (int requestCode, @NonNull String[] permissions, @NonNull int[] grantResults) {
@@ -149,7 +197,7 @@ public class MainActivity extends AppCompatActivity implements MediaPlayerContro
                 break;
             case REQUEST_CODE_EXTERNAL_STORAGE:
                 if (grantResults.length > 0 && grantResults [0] == PackageManager.PERMISSION_GRANTED) {
-                    loadAudios ();
+                    //loadAudios ();
                 }
         }
     }

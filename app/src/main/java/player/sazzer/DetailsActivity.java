@@ -74,10 +74,10 @@ public class DetailsActivity extends Activity {
         ImageButton button = findViewById( R.id.Accion );
         button.setOnClickListener( v -> {
             if (audioServiceBinder.isPlaying()) {
-                audioServiceBinder.pauseAudio();
+                //audioServiceBinder.pauseAudio();
                 button.setImageResource( R.drawable.ic_play_arrow_black_48dp );
             } else {
-                audioServiceBinder.startAudio();
+                //audioServiceBinder.startAudio();
                 button.setImageResource( R.drawable.ic_pause_black_48dp );
             }
         });
@@ -117,9 +117,9 @@ public class DetailsActivity extends Activity {
         @Override
         public void onProgressChanged (SeekBar seekBar, int i, boolean b) {
             if (b) {
-                audioServiceBinder.pauseAudio();
+                //audioServiceBinder.pauseAudio();
                 audioServiceBinder.setProgress( i );
-                audioServiceBinder.startAudio();
+                //audioServiceBinder.startAudio();
             }
         }
 

@@ -10,10 +10,12 @@ import android.net.Uri;
 import android.os.Binder;
 import android.os.IBinder;
 import android.os.PowerManager;
+import android.text.TextUtils;
 import android.util.Log;
 
 import androidx.annotation.Nullable;
 
+import java.io.IOException;
 import java.util.ArrayList;
 
 public class AudioServiceBinder extends Service implements MediaPlayer.OnPreparedListener,MediaPlayer.OnErrorListener,MediaPlayer.OnCompletionListener {
@@ -22,13 +24,13 @@ public class AudioServiceBinder extends Service implements MediaPlayer.OnPrepare
     private Uri audioFileUri = null;
 
     // El reproductor mismo para reproducir contenido.
-    private MediaPlayer audioPlayer = null;
+    private MediaPlayer audioPlayer = new MediaPlayer();
 
     // Contexto, necesario para interactuar externalmente.
     private Context context = null;
 
     // Contenedor para las canciones siguientes.
-    private ArrayList<Song> songs;
+    private ArrayList<Song> songs = new ArrayList<>();
 
     private String songTitle = "";
 
@@ -38,13 +40,14 @@ public class AudioServiceBinder extends Service implements MediaPlayer.OnPrepare
 
     private final IBinder musicBind = new MusicBinder();
 
-    public Context getContext() { return context; }
+    //public Context getContext() { return context; }
     public void setContext(Context context) { this.context = context; }
-    public Uri getAudioFileUri() { return audioFileUri; }
+    //public Uri getAudioFileUri() { return audioFileUri; }
     public void setAudioFileUri(Uri audioFileUri) { this.audioFileUri = audioFileUri; }
     public void setProgress( int ms ) { this.audioPlayer.seekTo(ms); }
-    public MediaPlayer GetPlayer() { return audioPlayer; }
+    //public MediaPlayer GetPlayer() { return audioPlayer; }
 
+    /*
     public void startAudio()
     {
         initAudioPlayer();
@@ -67,6 +70,7 @@ public class AudioServiceBinder extends Service implements MediaPlayer.OnPrepare
             destroyAudioPlayer();
         }
     }
+    */
 
     public boolean isPlaying()
     {
@@ -111,6 +115,7 @@ public class AudioServiceBinder extends Service implements MediaPlayer.OnPrepare
     }
 
     // Destruye el reprodutor.
+    /*
     public void destroyAudioPlayer()
     {
         if(audioPlayer!=null)
@@ -123,6 +128,7 @@ public class AudioServiceBinder extends Service implements MediaPlayer.OnPrepare
             audioPlayer = null;
         }
     }
+    */
 
     // Regresa el progreso.
     public int getCurrentAudioPosition()
@@ -168,7 +174,22 @@ public class AudioServiceBinder extends Service implements MediaPlayer.OnPrepare
         songPosn = songIndex;
     }
 
-    public void playSong() {
+    public void setList( ArrayList<Song> canciones )
+    {
+        this.songs = canciones;
+    }
+
+    public Context getContext()
+    {
+        return this.context;
+    }
+
+    public void SetContext( Context s )
+    {
+        this.context = s;
+    }
+
+    public void playSong() throws IOException {
         audioPlayer.reset();
         Song playSong = songs.get(songPosn);
         songTitle = playSong.getTitle();
@@ -176,13 +197,19 @@ public class AudioServiceBinder extends Service implements MediaPlayer.OnPrepare
         Uri trackUri = ContentUris.withAppendedId(
                 android.provider.MediaStore.Audio.Media.EXTERNAL_CONTENT_URI,
                 currSong);
+
+        if( TextUtils.isEmpty(trackUri.toString()) )
+            return;
+
+        Log.d("AudioServiceBinder:playSong()","Looking for song in " + trackUri.toString());
         try {
-            audioPlayer.setDataSource(getApplicationContext(), trackUri);
+            audioPlayer.setDataSource(getContext(), trackUri);
+            audioPlayer.setOnPreparedListener(this);
+            audioPlayer.prepareAsync();
+            Log.d("AudioServiceBinder:playSong()","Song seems to be " + audioPlayer.getDuration());
         } catch (Exception e) {
             Log.e("MUSIC SERVICE", "Error setting data source", e);
         }
-
-        audioPlayer.prepareAsync();
     }
 
     // Comienzan acciones de Override.
@@ -194,6 +221,7 @@ public class AudioServiceBinder extends Service implements MediaPlayer.OnPrepare
 
     @Override
     public void onPrepared(MediaPlayer mp) {
+        Log.d("MediaPlayer","Playing a track");
         mp.start();
     }
 
