@@ -9,7 +9,6 @@ import android.media.MediaPlayer;
 import android.net.Uri;
 import android.os.Binder;
 import android.os.IBinder;
-import android.os.PowerManager;
 import android.text.TextUtils;
 import android.util.Log;
 
@@ -21,7 +20,7 @@ import java.util.ArrayList;
 public class AudioServiceBinder extends Service implements MediaPlayer.OnPreparedListener,MediaPlayer.OnErrorListener,MediaPlayer.OnCompletionListener {
 
     // Guarda la ubicacion del archivo
-    private Uri audioFileUri = null;
+    // private Uri audioFileUri = null;
 
     // El reproductor mismo para reproducir contenido.
     private MediaPlayer audioPlayer = new MediaPlayer();
@@ -38,12 +37,12 @@ public class AudioServiceBinder extends Service implements MediaPlayer.OnPrepare
 
     public final int UPDATE_AUDIO_PROGRESS_BAR = 1;
 
-    private final IBinder musicBind = new MusicBinder();
+    //private final IBinder musicBind = new MusicBinder();
 
     //public Context getContext() { return context; }
     public void setContext(Context context) { this.context = context; }
     //public Uri getAudioFileUri() { return audioFileUri; }
-    public void setAudioFileUri(Uri audioFileUri) { this.audioFileUri = audioFileUri; }
+    //public void setAudioFileUri(Uri audioFileUri) { this.audioFileUri = audioFileUri; }
     public void setProgress( int ms ) { this.audioPlayer.seekTo(ms); }
     //public MediaPlayer GetPlayer() { return audioPlayer; }
 
@@ -87,48 +86,14 @@ public class AudioServiceBinder extends Service implements MediaPlayer.OnPrepare
         initAudioPlayer();
     }
 
-    private void initAudioPlayer()
+    public void initAudioPlayer()
     {
-        audioPlayer.setWakeMode(getApplicationContext(), PowerManager.PARTIAL_WAKE_LOCK);
+        //audioPlayer.setWakeMode(getContext(), PowerManager.PARTIAL_WAKE_LOCK);
         audioPlayer.setAudioStreamType(AudioManager.STREAM_MUSIC);
         audioPlayer.setOnPreparedListener(this);
         audioPlayer.setOnCompletionListener(this);
         audioPlayer.setOnErrorListener(this);
-        /*
-        try {
-            if (audioPlayer == null) {
-                audioPlayer = new MediaPlayer();
-
-                if( TextUtils.isEmpty(getAudioFileUri().toString()) )
-                    return;
-
-                audioPlayer.setDataSource(getContext(), getAudioFileUri());
-
-                audioPlayer.prepare();
-
-            }
-        }catch(IOException ex)
-        {
-            ex.printStackTrace();
-        }
-        */
     }
-
-    // Destruye el reprodutor.
-    /*
-    public void destroyAudioPlayer()
-    {
-        if(audioPlayer!=null)
-        {
-            if(audioPlayer.isPlaying())
-            {
-                audioPlayer.stop();
-            }
-            audioPlayer.release();
-            audioPlayer = null;
-        }
-    }
-    */
 
     // Regresa el progreso.
     public int getCurrentAudioPosition()
@@ -184,11 +149,6 @@ public class AudioServiceBinder extends Service implements MediaPlayer.OnPrepare
         return this.context;
     }
 
-    public void SetContext( Context s )
-    {
-        this.context = s;
-    }
-
     public void playSong() throws IOException {
         audioPlayer.reset();
         Song playSong = songs.get(songPosn);
@@ -204,7 +164,6 @@ public class AudioServiceBinder extends Service implements MediaPlayer.OnPrepare
         Log.d("AudioServiceBinder:playSong()","Looking for song in " + trackUri.toString());
         try {
             audioPlayer.setDataSource(getContext(), trackUri);
-            audioPlayer.setOnPreparedListener(this);
             audioPlayer.prepareAsync();
         } catch (Exception e) {
             Log.e("MUSIC SERVICE", "Error setting data source", e);
@@ -215,6 +174,7 @@ public class AudioServiceBinder extends Service implements MediaPlayer.OnPrepare
     @Nullable
     @Override
     public IBinder onBind(Intent intent) {
+        onCreate();
         return null;
     }
 

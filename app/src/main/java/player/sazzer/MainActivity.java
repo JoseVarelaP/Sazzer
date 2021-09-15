@@ -86,6 +86,7 @@ public class MainActivity extends AppCompatActivity implements MediaPlayerContro
         Log.d("onStart","Starting");
         super.onStart();
         musicSrv.setContext(getApplicationContext());
+        musicSrv.initAudioPlayer();
         if (playIntent == null) {
             Log.d("onStart","Intent is null, starting service.");
             playIntent = new Intent(this, AudioServiceBinder.class);

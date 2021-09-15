@@ -39,7 +39,7 @@ public class DetailsActivity extends Activity {
         TextView Nombre = findViewById( R.id.songName );
         TextView Artista = findViewById( R.id.artistName );
 
-        audioServiceBinder.setAudioFileUri(mediaUri);
+        //audioServiceBinder.setAudioFileUri(mediaUri);
         createAudioProgressbarUpdater();
 
         //backgroundAudioProgress = findViewById( R.id.backgroundaudioprogress );
