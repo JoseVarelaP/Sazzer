@@ -42,7 +42,7 @@ public class DetailsActivity extends Activity {
         audioServiceBinder.setAudioFileUri(mediaUri);
         createAudioProgressbarUpdater();
 
-        backgroundAudioProgress = findViewById( R.id.backgroundaudioprogress );
+        //backgroundAudioProgress = findViewById( R.id.backgroundaudioprogress );
 
         audioServiceBinder.setContext(getApplicationContext());
         audioServiceBinder.startAudio();
@@ -140,7 +140,7 @@ public class DetailsActivity extends Activity {
                         if( audioServiceBinder != null) {
                             int progAct =audioServiceBinder.getAudioProgress();
 
-                            backgroundAudioProgress.setProgress(progAct*10);
+                            //backgroundAudioProgress.setProgress(progAct*10);
                         }
                     }
                 }
