@@ -42,6 +42,7 @@ class ListadoMusica extends BaseAdapter {
         // Obten objetos
         TextView nombreCancion = (TextView) vista.findViewById(R.id.nombreCancion);
         TextView nombreArtista = (TextView) vista.findViewById(R.id.nombreArtista);
+        TextView nombreAlbum = (TextView) vista.findViewById(R.id.nombreAlbum);
 
         // Agarra la canción para el objeto actual...
         Song canc = canciones.get(position);
@@ -50,6 +51,7 @@ class ListadoMusica extends BaseAdapter {
         // unica.
         nombreCancion.setText( canc.getTitle() );
         nombreArtista.setText( canc.getArtist() );
+        nombreAlbum.setText( canc.getAlbum() );
         vista.setTag(position);
 
         // Todo listo, regresa el objeto.
