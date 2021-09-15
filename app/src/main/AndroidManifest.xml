@@ -27,11 +27,7 @@
 
         <activity android:name=".DetailsActivity" android:screenOrientation="sensor"/>
 
-        <service
-            android:name="player.sazzer.AudioService"
-            android:enabled="true"
-            android:exported="true"/>
-
+        <service android:name=".AudioServiceBinder"/>
     </application>
 
 </manifest>

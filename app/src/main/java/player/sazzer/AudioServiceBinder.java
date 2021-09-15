@@ -1,16 +1,22 @@
 package player.sazzer;
 
+import android.app.Service;
+import android.content.ContentUris;
 import android.content.Context;
+import android.content.Intent;
+import android.media.AudioManager;
 import android.media.MediaPlayer;
 import android.net.Uri;
 import android.os.Binder;
-import android.text.TextUtils;
+import android.os.IBinder;
+import android.os.PowerManager;
+import android.util.Log;
 
-import androidx.core.app.NotificationCompat;
+import androidx.annotation.Nullable;
 
-import java.io.IOException;
+import java.util.ArrayList;
 
-public class AudioServiceBinder extends Binder {
+public class AudioServiceBinder extends Service implements MediaPlayer.OnPreparedListener,MediaPlayer.OnErrorListener,MediaPlayer.OnCompletionListener {
 
     // Guarda la ubicacion del archivo
     private Uri audioFileUri = null;
@@ -21,7 +27,16 @@ public class AudioServiceBinder extends Binder {
     // Contexto, necesario para interactuar externalmente.
     private Context context = null;
 
+    // Contenedor para las canciones siguientes.
+    private ArrayList<Song> songs;
+
+    private String songTitle = "";
+
+    int songPosn = 0;
+
     public final int UPDATE_AUDIO_PROGRESS_BAR = 1;
+
+    private final IBinder musicBind = new MusicBinder();
 
     public Context getContext() { return context; }
     public void setContext(Context context) { this.context = context; }
@@ -61,8 +76,21 @@ public class AudioServiceBinder extends Binder {
         return false;
     }
 
+    public void onCreate()
+    {
+        super.onCreate();
+        audioPlayer = new MediaPlayer();
+        initAudioPlayer();
+    }
+
     private void initAudioPlayer()
     {
+        audioPlayer.setWakeMode(getApplicationContext(), PowerManager.PARTIAL_WAKE_LOCK);
+        audioPlayer.setAudioStreamType(AudioManager.STREAM_MUSIC);
+        audioPlayer.setOnPreparedListener(this);
+        audioPlayer.setOnCompletionListener(this);
+        audioPlayer.setOnErrorListener(this);
+        /*
         try {
             if (audioPlayer == null) {
                 audioPlayer = new MediaPlayer();
@@ -79,6 +107,7 @@ public class AudioServiceBinder extends Binder {
         {
             ex.printStackTrace();
         }
+        */
     }
 
     // Destruye el reprodutor.
@@ -127,5 +156,54 @@ public class AudioServiceBinder extends Binder {
             ret = (currAudioPosition * 100) / totalAudioDuration;
         }
         return ret;
+    }
+
+    public class MusicBinder extends Binder {
+        AudioServiceBinder getService() {
+            return AudioServiceBinder.this;
+        }
+    }
+
+    public void setSong(int songIndex) {
+        songPosn = songIndex;
+    }
+
+    public void playSong() {
+        audioPlayer.reset();
+        Song playSong = songs.get(songPosn);
+        songTitle = playSong.getTitle();
+        long currSong = playSong.getId();
+        Uri trackUri = ContentUris.withAppendedId(
+                android.provider.MediaStore.Audio.Media.EXTERNAL_CONTENT_URI,
+                currSong);
+        try {
+            audioPlayer.setDataSource(getApplicationContext(), trackUri);
+        } catch (Exception e) {
+            Log.e("MUSIC SERVICE", "Error setting data source", e);
+        }
+
+        audioPlayer.prepareAsync();
+    }
+
+    // Comienzan acciones de Override.
+    @Nullable
+    @Override
+    public IBinder onBind(Intent intent) {
+        return null;
+    }
+
+    @Override
+    public void onPrepared(MediaPlayer mp) {
+        mp.start();
+    }
+
+    @Override
+    public void onCompletion(MediaPlayer mp) {
+
+    }
+
+    @Override
+    public boolean onError(MediaPlayer mp, int what, int extra) {
+        return false;
     }
 }

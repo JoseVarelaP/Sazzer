@@ -2,14 +2,18 @@ package player.sazzer;
 
 import android.Manifest;
 import android.app.Activity;
+import android.content.ComponentName;
 import android.content.ContentUris;
 import android.content.Context;
 import android.content.Intent;
+import android.content.ServiceConnection;
 import android.content.pm.PackageManager;
 import android.database.Cursor;
 import android.net.Uri;
 import android.os.Bundle;
+import android.os.IBinder;
 import android.provider.MediaStore;
+import android.util.Log;
 import android.view.LayoutInflater;
 import android.view.View;
 import android.view.ViewGroup;
@@ -18,26 +22,41 @@ import android.widget.Toast;
 
 import androidx.annotation.NonNull;
 import androidx.annotation.Nullable;
+import androidx.appcompat.app.AppCompatActivity;
 import androidx.recyclerview.widget.DividerItemDecoration;
 import androidx.recyclerview.widget.LinearLayoutManager;
 import androidx.recyclerview.widget.RecyclerView;
+import android.widget.MediaController.MediaPlayerControl;
+
+import player.sazzer.AudioServiceBinder.MusicBinder;
 
 import java.util.LinkedList;
 import java.util.List;
 
-class AudioModel {
-    long id;
-    String songTitle;
-    String songPath;
-    String songArtist;
-}
-
-public class MainActivity extends Activity {
+public class MainActivity extends AppCompatActivity implements MediaPlayerControl {
     public static final int REQUEST_CODE = 1001;
     public static final int REQUEST_CODE_EXTERNAL_STORAGE = 1002;
 
     // Hay que iniciar el RecyclerView para mostrar los elementos.
     RecyclerView lv;
+
+    private AudioServiceBinder musicSrv;
+
+    private ServiceConnection musicConnection = new ServiceConnection() {
+
+        @Override
+        public void onServiceConnected(ComponentName name, IBinder service) {
+            MusicBinder binder = (MusicBinder) service;
+            musicSrv = binder.getService();
+            //musicSrv.setList(songList);
+            //musicBound = true;
+        }
+
+        @Override
+        public void onServiceDisconnected(ComponentName name) {
+            //musicBound = false;
+        }
+    };
 
     @Override
     protected void onCreate(@Nullable Bundle savedInstanceState) {
@@ -62,6 +81,19 @@ public class MainActivity extends Activity {
 
     }
 
+    public void songPicked(View view) {
+        Log.d("MainActivity","Set Song");
+        musicSrv.setSong(Integer.parseInt(view.getTag().toString()));
+        musicSrv.playSong();
+        /*
+        if (playbackPaused) {
+            setController();
+            playbackPaused = false;
+        }
+        controller.show(0);
+        */
+    }
+
     void loadAudios () {
         String [] columns = {
                 MediaStore.Audio.Artists._ID,
@@ -75,26 +107,28 @@ public class MainActivity extends Activity {
         Cursor cursor =  getBaseContext().getContentResolver().query (MediaStore.Audio.Media.EXTERNAL_CONTENT_URI, columns, null, null, order);
         if (cursor == null) return;
 
-        LinkedList<AudioModel> artists = new LinkedList<> ();
+        LinkedList<Song> artists = new LinkedList<> ();
 
         for (int i = 0; i < cursor.getCount (); i++) {
             cursor.moveToPosition (i);
-            AudioModel audioModel = new AudioModel ();
+            long sId;
+            String sTitle,sArtist;
 
             int index = cursor.getColumnIndexOrThrow(MediaStore.Audio.Media._ID);
-            long id = cursor.getLong(index);
-            audioModel.id = id;
+            //long id = cursor.getLong(index);
+            sId = cursor.getLong(index);
 
             index = cursor.getColumnIndexOrThrow(MediaStore.Audio.Media.ARTIST);
-            audioModel.songArtist = cursor.getString(index);
+            sArtist = cursor.getString(index);
 
             index = cursor.getColumnIndexOrThrow(MediaStore.Audio.Media.TITLE);
-            audioModel.songTitle = cursor.getString(index);
+            sTitle = cursor.getString(index);
 
-            index = cursor.getColumnIndexOrThrow(MediaStore.Audio.Media.DISPLAY_NAME);
-            audioModel.songPath = cursor.getString(index);
+            //index = cursor.getColumnIndexOrThrow(MediaStore.Audio.Media.DISPLAY_NAME);
+            //audioModel.songPath = cursor.getString(index);
 
-            artists.add (audioModel);
+            Song cSong = new Song (sId, sTitle, sArtist);
+            artists.add (cSong);
         }
 
         cursor.close ();
@@ -131,14 +165,69 @@ public class MainActivity extends Activity {
     protected void onActivityResult(int requestCode, int resultCode, Intent data) {
         super.onActivityResult(requestCode, resultCode, data);
     }
+
+    @Override
+    public void start() {
+
+    }
+
+    @Override
+    public void pause() {
+
+    }
+
+    @Override
+    public int getDuration() {
+        return 0;
+    }
+
+    @Override
+    public int getCurrentPosition() {
+        return 0;
+    }
+
+    @Override
+    public void seekTo(int pos) {
+
+    }
+
+    @Override
+    public boolean isPlaying() {
+        return false;
+    }
+
+    @Override
+    public int getBufferPercentage() {
+        return 0;
+    }
+
+    @Override
+    public boolean canPause() {
+        return false;
+    }
+
+    @Override
+    public boolean canSeekBackward() {
+        return false;
+    }
+
+    @Override
+    public boolean canSeekForward() {
+        return false;
+    }
+
+    @Override
+    public int getAudioSessionId() {
+        return 0;
+    }
 }
 
 // Clase personalizada que se utilizara en Recycler view.
 class ListadoMusica extends RecyclerView.Adapter<ListadoMusica.MyViewHolder> {
     private Context context;
-    private List<AudioModel> data;
+    private List<Song> data;
 
-    public ListadoMusica (Context context, List<AudioModel> data) {
+    public ListadoMusica (Context context, List<Song> data) {
         this.data = data;
         this.context = context;
     }
@@ -152,26 +241,26 @@ class ListadoMusica extends RecyclerView.Adapter<ListadoMusica.MyViewHolder> {
 
     @Override
     public void onBindViewHolder (@NonNull MyViewHolder holder, int position) {
-        holder.text1.setText(data.get(position).songTitle);
-        holder.text2.setText(data.get(position).songArtist);
+        holder.text1.setText(data.get(position).getTitle());
+        holder.text2.setText(data.get(position).getArtist());
         holder.tvUbicacion.setText("null");
-        holder.tvUbicacion.setText(data.get(position).songPath);
+        //holder.tvUbicacion.setText(data.get(position).songPath);
 
         holder.itemView.setOnClickListener (v -> {
             Uri contentUri = ContentUris.withAppendedId (
                     MediaStore.Audio.Media.EXTERNAL_CONTENT_URI,
-                    data.get (position).id
+                    data.get (position).getId()
             );
 
             // Reinicia el reproductor para reproducir el nuevo audio.
-
-
+            /*
             Intent intent = new Intent( context, DetailsActivity.class );
             intent.putExtra( "audioURL", contentUri.toString() );
             intent.putExtra( "nombreCancion", data.get (position).songTitle );
             intent.putExtra( "nombreArtista", data.get (position).songArtist );
             intent.addFlags(Intent.FLAG_ACTIVITY_NEW_TASK);
             context.startActivity( intent );
+            */
         });
     }
 

@@ -45,10 +45,11 @@ public class DetailsActivity extends Activity {
         //backgroundAudioProgress = findViewById( R.id.backgroundaudioprogress );
 
         audioServiceBinder.setContext(getApplicationContext());
-        audioServiceBinder.startAudio();
+        //audioServiceBinder.startAudio();
 
         // Esto deberia quedar aqui?
         // (Problablemente puede estar en el servicio tambien)
+        /*
         audioServiceBinder.GetPlayer().setOnPreparedListener (mediaPlayer -> {
             posThread = new Thread (() -> {
                 try {
@@ -65,6 +66,7 @@ public class DetailsActivity extends Activity {
             sbProgress.setMax ( audioServiceBinder.getTotalAudioDuration() );
             posThread.start ();
         });
+        */
 
         Nombre.setText( nCancion );
         Artista.setText( nArtista );
