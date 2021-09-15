@@ -7,24 +7,24 @@
     android:padding="10dp">
 
     <TextView
-        android:id="@+id/tvItem"
+        android:id="@+id/nombreCancion"
         android:layout_width="match_parent"
         android:layout_height="wrap_content"
-        android:text="SongName"
+        android:text="@string/nameSong"
         android:textSize="6pt" />
 
     <TextView
-        android:id="@+id/tvUbicacion"
+        android:id="@+id/nombreAlbum"
         android:layout_width="match_parent"
         android:layout_height="wrap_content"
-        android:text="SongName"
+        android:text="@string/nameAlbum"
         android:textSize="4pt" />
 
-    <TextView android:id="@+id/tvItem2"
+    <TextView android:id="@+id/nombreArtista"
         android:layout_width="match_parent"
         android:layout_height="wrap_content"
         android:textSize="6pt"
-        android:text="Artistname"
+        android:text="@string/nameArtist"
         />
 
 </LinearLayout>
