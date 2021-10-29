@@ -22,7 +22,6 @@ import com.google.gson.reflect.TypeToken;
 
 import java.io.File;
 import java.io.IOException;
-import java.lang.reflect.Array;
 import java.lang.reflect.Type;
 import java.util.ArrayList;
 import java.util.List;
@@ -35,9 +34,6 @@ public class AudioServiceBinder extends Service implements MediaPlayer.OnPrepare
 
     // El reproductor mismo para reproducir contenido.
     private MediaPlayer audioPlayer;
-
-    // Contexto, necesario para interactuar externalmente.
-    private Context context = null;
 
     // Contenedor para las canciones siguientes.
     private ArrayList<Song> songs = new ArrayList<>();
@@ -56,7 +52,7 @@ public class AudioServiceBinder extends Service implements MediaPlayer.OnPrepare
     private int songPosn = 0;
 
     //public Context getContext() { return context; }
-    public void setContext(Context context) { this.context = context; }
+    //public void setContext(Context context) { this.context = context; }
     //public Uri getAudioFileUri() { return audioFileUri; }
     //public void setAudioFileUri(Uri audioFileUri) { this.audioFileUri = audioFileUri; }
     public void setProgress( int ms ) { this.audioPlayer.seekTo(ms); }
@@ -78,7 +74,8 @@ public class AudioServiceBinder extends Service implements MediaPlayer.OnPrepare
         //Log.d("runBinderUpdater","Song now is at " + getAudioProgress() + "%");
         manager.updateSong( songs.get(songPosn), getAudioProgress(), this );
 
-        Intent broadcastIntent = new Intent();
+        //Intent broadcastIntent = new Intent();
+        Intent broadcastIntent = MusicHelpers.sendToDetailedSongInfo(getApplicationContext(), songs.get(songPosn), this);
         broadcastIntent.setAction(DetailsActivity.mBroadcasterAudioAction);
         broadcastIntent.putExtra("Progress", getCurrentAudioPosition());
         broadcastIntent.putExtra("TotalTime", getTotalAudioDuration());
@@ -90,12 +87,7 @@ public class AudioServiceBinder extends Service implements MediaPlayer.OnPrepare
     void refresh(int mil)
     {
         final Handler handler = new Handler();
-        final Runnable runnable = new Runnable() {
-            @Override
-            public void run() {
-                updateContent();
-            }
-        };
+        final Runnable runnable = this::updateContent;
 
         handler.postDelayed(runnable,mil);
     }
@@ -186,21 +178,9 @@ public class AudioServiceBinder extends Service implements MediaPlayer.OnPrepare
         songPosn = songIndex;
     }
 
-    public Song getSong( int songIndex ) {
-        if( songIndex > this.songs.size() )
-            return null;
-
-        return this.songs.get(songIndex);
-    }
-
     public void setList( ArrayList<Song> canciones )
     {
         this.songs = canciones;
-    }
-
-    public Context getContext()
-    {
-        return this.context;
     }
 
     public void playSong() throws IOException {
@@ -220,8 +200,8 @@ public class AudioServiceBinder extends Service implements MediaPlayer.OnPrepare
         Log.d("AudioServiceBinder:playSong()","Looking for song in " + trackUri.toString());
         try {
             audioPlayer.setDataSource(getApplicationContext(), trackUri);
-            audioPlayer.prepare();
-            audioPlayer.start();
+            audioPlayer.prepareAsync();
+
             curPlayerState = PlayerState.PLAYER_LOADING;
 
             // Create the manager to send the notification.
@@ -236,7 +216,6 @@ public class AudioServiceBinder extends Service implements MediaPlayer.OnPrepare
     @Override
     public int onStartCommand(Intent intent, int flags, int startId) {
         Toast.makeText(this, "Service Started", Toast.LENGTH_LONG).show();
-        audioPlayer = new MediaPlayer();
         return START_STICKY;
     }
 
@@ -298,21 +277,21 @@ public class AudioServiceBinder extends Service implements MediaPlayer.OnPrepare
                 case AUDIO_SERVICE_ACTION_UPDATE_PROGRESS:
                 {
                     int Progress = intent.getIntExtra("Audio.SeekProgress",-1);
-                    if( intent.getBooleanExtra("Audio.TogglePlay",false) ){
-                        Log.d("Audio.TogglePlay","Requested. Music from player " + audioPlayer + " is on state " + audioPlayer.isPlaying());
-                        //boolean needsPause = false;
-                        if( audioPlayer.isPlaying() )
-                            audioPlayer.pause();
-
-                        Intent broadcastIntent = new Intent();
-                        broadcastIntent.setAction(DetailsActivity.mBroadcasterAudioAction);
-                        //broadcastIntent.putExtra("needsPause", needsPause);
-                    }
+                    Log.d("Audio.SeekProgress", String.valueOf(Progress));
 
                     if( Progress > -1 )
                     {
-                        setProgress( Progress );
+                        setProgress( (Progress * getTotalAudioDuration()) / 100 );
                     }
+                    break;
+                }
+
+                case AUDIO_SERVICE_ACTION_TOGGLE_PLAY:
+                {
+                    if( audioPlayer.isPlaying() )
+                        audioPlayer.pause();
+                    else
+                        audioPlayer.start();
                     break;
                 }
             }
@@ -332,7 +311,7 @@ public class AudioServiceBinder extends Service implements MediaPlayer.OnPrepare
         broadcastIntent.putExtra("songName", track.getTitle());
         broadcastIntent.putExtra("songArtist", track.getArtist());
         broadcastIntent.putExtra("songArt", track.getAlbumArt());
-        context.sendBroadcast(broadcastIntent);
+        getApplicationContext().sendBroadcast(broadcastIntent);
 
         mp.start();
     }
@@ -346,7 +325,8 @@ public class AudioServiceBinder extends Service implements MediaPlayer.OnPrepare
             if( manager != null )
                 manager.cancelNotification();
 
-        setSong(songPosn+1);
+        songPosn++;
+        setSong(songPosn);
 
         try {
             playSong();

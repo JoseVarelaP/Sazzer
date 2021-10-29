@@ -21,18 +21,16 @@ import androidx.annotation.NonNull;
 import androidx.annotation.Nullable;
 
 public class DetailsActivity extends Activity {
-    private Handler audioProgressUpdateHandler = null;
+    //private Handler audioProgressUpdateHandler = null;
     MediaPlayer player;
-    boolean isPlaying = false;
     SeekBar sbProgress;
     ImageButton button;
 
-    private BroadcastReceiver musicDataReciever = new BroadcastReceiver() {
+    private final BroadcastReceiver musicDataReciever = new BroadcastReceiver() {
         @Override
         public void onReceive(Context context, Intent intent) {
             Bundle extras = intent.getExtras();
-            //
-            // Log.d("DetailsActivity","Got a receive here!");
+
             if( extras == null )
                 return;
 
@@ -44,11 +42,8 @@ public class DetailsActivity extends Activity {
                 button.setImageResource(R.drawable.ic_pause_black_48dp);
             }
 
-            //String updateAction = extras.getString("AudioDriver.ProgressBar.Update");
-            //if( !updateAction.isEmpty() )
             int songProgress = extras.getInt("Progress");
             int songMax = extras.getInt("TotalTime");
-            //Log.d("DetailsActivity",Integer.toString(curExtra));
 
             if( sbProgress.getMax() != songMax )
             {
@@ -56,15 +51,6 @@ public class DetailsActivity extends Activity {
             }
 
             sbProgress.setProgress( songProgress );
-            /*
-            if( !curExtra )
-            {
-                Log.d("musicDataReciever","Progress bar update!");
-                //backgroundAudioProgress.setProgress( Integer.parseInt(updateAction) );
-            }
-
-             */
-
         }
     };
 
@@ -108,6 +94,7 @@ public class DetailsActivity extends Activity {
         button.setOnClickListener(v -> {
             Intent forThePlayer = new Intent();
             forThePlayer.setAction(AudioServiceBinder.mBroadcasterServiceBinder);
+            forThePlayer.putExtra("AUDIO_ACTION", AudioServiceAction.AUDIO_SERVICE_ACTION_TOGGLE_PLAY);
             forThePlayer.putExtra("Audio.TogglePlay",true);
             sendBroadcast(forThePlayer);
         });
@@ -127,16 +114,6 @@ public class DetailsActivity extends Activity {
         //outState.putString ("SONG", mediaUri != null ? mediaUri.toString (): "");
         outState.putInt ("PROGRESS", player != null ?  player.getCurrentPosition () : -1);
         outState.putBoolean ("ISPLAYING", player != null && player.isPlaying ());
-
-        /*
-        if ( audioServiceBinder.isPlaying() ) {
-            posThread.interrupt ();
-
-            // audioServiceBinder.stopAudio();
-            // audioServiceBinder.setProgress(0);
-            // audioServiceBinder.destroyAudioPlayer();
-        }
-        */
     }
 
     @Override

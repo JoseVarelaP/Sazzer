@@ -53,16 +53,13 @@ public class MainActivity extends AppCompatActivity {
         @Override
         public void onServiceConnected(ComponentName name, IBinder service) {
             MusicBinder binder = (MusicBinder) service;
-            musicSrv = binder.getService();
-            musicSrv.setList(songList);
-            //musicBound = true;
+            //musicSrv = binder.getService();
+            //musicSrv.setList(songList);
             Log.d("musicConnection","Service Connected");
         }
 
         @Override
-        public void onServiceDisconnected(ComponentName name) {
-            //musicBound = false;
-        }
+        public void onServiceDisconnected(ComponentName name) {}
     };
 
     @Override
@@ -70,7 +67,7 @@ public class MainActivity extends AppCompatActivity {
         super.onCreate(savedInstanceState);
         setContentView(R.layout.activity_main);
 
-        musicSrv = new AudioServiceBinder();
+        //musicSrv = new AudioServiceBinder();
 
         // Hay que pedir el elemento para cargar los audios.
         // Si no, entonces tendremos un error/choque debido a la estancia de acceso ilegal de archivos.
@@ -96,17 +93,16 @@ public class MainActivity extends AppCompatActivity {
         ListadoMusica listMusica = new ListadoMusica(this, songList);
         songView.setAdapter(listMusica);
 
-        musicSrv.setList(songList);
+        //musicSrv.setList(songList);
     }
 
     @Override
     protected void onStart() {
         Log.d("onStart","Starting");
         super.onStart();
-        musicSrv.setContext(getApplicationContext());
         if (playIntent == null) {
             Log.d("onStart","Intent is null, starting service.");
-            playIntent = new Intent(this, musicSrv.getClass());
+            playIntent = new Intent(this, AudioServiceBinder.class);
             bindService(playIntent, musicConnection, Context.BIND_AUTO_CREATE);
             startService(playIntent);
             Log.d("onStart","Done with setup of services.");
@@ -172,10 +168,6 @@ public class MainActivity extends AppCompatActivity {
     public void songPicked(View view) throws IOException {
         Log.d("MainActivity","Set Song: " + (view.getTag().toString()));
         int songNum = Integer.parseInt(view.getTag().toString());
-
-        //musicSrv.setSong(songNum);
-        //musicSrv.playSong();
-        musicSrv.setContext(getApplicationContext());
 
         Gson gson = new Gson();
         String jsonMusica = gson.toJson(songList);
