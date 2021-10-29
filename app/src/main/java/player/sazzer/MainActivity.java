@@ -1,14 +1,18 @@
 package player.sazzer;
 
 import android.Manifest;
+import android.app.NotificationChannel;
+import android.app.NotificationManager;
 import android.content.ComponentName;
 import android.content.ContentResolver;
+import android.content.ContentUris;
 import android.content.Context;
 import android.content.Intent;
 import android.content.ServiceConnection;
 import android.content.pm.PackageManager;
 import android.database.Cursor;
 import android.net.Uri;
+import android.os.Build;
 import android.os.Bundle;
 import android.os.IBinder;
 import android.provider.MediaStore;
@@ -36,6 +40,8 @@ public class MainActivity extends AppCompatActivity implements MediaPlayerContro
     ArrayList<Song> songList;
 
     private AudioServiceBinder musicSrv;
+
+    NotificationManager notificationManager;
 
     private ServiceConnection musicConnection = new ServiceConnection() {
 
@@ -111,6 +117,19 @@ public class MainActivity extends AppCompatActivity implements MediaPlayerContro
         // colocar su propia música.
         Uri musicUri = android.provider.MediaStore.Audio.Media.EXTERNAL_CONTENT_URI;
 
+        // Check if we can create the notification channel to show it.
+        if(Build.VERSION.SDK_INT >= Build.VERSION_CODES.O )
+        {
+            NotificationChannel channel = new NotificationChannel(NowPlayingManager.CHANNEL_ID,
+                    "Now Playing", NotificationManager.IMPORTANCE_LOW);
+
+            notificationManager = getSystemService(NotificationManager.class);
+            if( notificationManager != null )
+            {
+                notificationManager.createNotificationChannel(channel);
+            }
+        }
+
         Cursor musicCursor = musicResolver.query(musicUri, null, null, null, null);
 
         // Hora de buscar
@@ -123,13 +142,18 @@ public class MainActivity extends AppCompatActivity implements MediaPlayerContro
                     (android.provider.MediaStore.Audio.Media.ARTIST);
             int albumColumn = musicCursor.getColumnIndex
                     (MediaStore.Audio.Media.ALBUM);
+            int albumId = musicCursor.getColumnIndex
+                    (MediaStore.Audio.Media.ALBUM_ID);
+
+            Uri sArtworkUri = Uri.parse("content://media/external/audio/albumart");
+            Uri albumArtUri = ContentUris.withAppendedId(sArtworkUri, albumId);
 
             do {
                 long thisId = musicCursor.getLong(idColumn);
                 String thisTitle = musicCursor.getString(titleColumn);
                 String thisArtist = musicCursor.getString(artistColumn);
                 String thisAlbum = musicCursor.getString(albumColumn);
-                songList.add(new Song(thisId, thisTitle, thisArtist, thisAlbum));
+                songList.add(new Song(thisId, thisTitle, thisArtist, thisAlbum, albumArtUri));
             }
             while (musicCursor.moveToNext());
         }
@@ -139,6 +163,8 @@ public class MainActivity extends AppCompatActivity implements MediaPlayerContro
         Log.d("MainActivity","Set Song: " + (view.getTag().toString()));
         musicSrv.setSong(Integer.parseInt(view.getTag().toString()));
         musicSrv.playSong();
+
+        NowPlayingManager.createNotification(MainActivity.this, songList.get( Integer.parseInt(view.getTag().toString()) ), 1, songList.size()-1 );
         /*
         if (playbackPaused) {
             setController();

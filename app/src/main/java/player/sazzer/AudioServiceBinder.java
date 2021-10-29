@@ -149,6 +149,10 @@ public class AudioServiceBinder extends Service implements MediaPlayer.OnPrepare
         return this.context;
     }
 
+    public Song getCurrentSong() {
+        return songs.get(songPosn);
+    }
+
     public void playSong() throws IOException {
         audioPlayer.reset();
         Song playSong = songs.get(songPosn);
@@ -165,6 +169,7 @@ public class AudioServiceBinder extends Service implements MediaPlayer.OnPrepare
         try {
             audioPlayer.setDataSource(getContext(), trackUri);
             audioPlayer.prepareAsync();
+
         } catch (Exception e) {
             Log.e("MUSIC SERVICE", "Error setting data source", e);
         }
