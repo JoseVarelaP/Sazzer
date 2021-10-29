@@ -176,6 +176,7 @@ public class DetailsActivity extends Activity {
         public void onStopTrackingTouch (SeekBar seekBar) {
             Intent forThePlayer = new Intent();
             forThePlayer.setAction(AudioServiceBinder.mBroadcasterServiceBinder);
+            forThePlayer.putExtra("AUDIO_ACTION", AudioServiceAction.AUDIO_SERVICE_ACTION_UPDATE_PROGRESS);
             forThePlayer.putExtra("Audio.SeekProgress",seekBar.getProgress());
             sendBroadcast(forThePlayer);
         }

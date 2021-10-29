@@ -182,12 +182,13 @@ public class MainActivity extends AppCompatActivity {
 
         Intent intent = new Intent();
         intent.setAction(AudioServiceBinder.mBroadcasterServiceBinder);
+        intent.putExtra("AUDIO_ACTION", AudioServiceAction.AUDIO_SERVICE_ACTION_UPDATE_BINDER);
         intent.putExtra("Audio.SongArray", jsonMusica);
         sendBroadcast(intent);
 
         intent = new Intent();
         intent.setAction(AudioServiceBinder.mBroadcasterServiceBinder);
-        //intent.putExtra("Audio.SongArray", jsonMusica);
+        intent.putExtra("AUDIO_ACTION", AudioServiceAction.AUDIO_SERVICE_ACTION_UPDATE_BINDER);
         intent.putExtra("Audio.SongID", songNum);
         intent.putExtra("Audio.PlaySong", true);
         sendBroadcast(intent);

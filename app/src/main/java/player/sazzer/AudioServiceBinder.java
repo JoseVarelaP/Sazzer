@@ -34,7 +34,7 @@ public class AudioServiceBinder extends Service implements MediaPlayer.OnPrepare
     public static String mBroadcasterServiceBinder = "player.sazzer.action.UPDATE_AUDIOBINDER";
 
     // El reproductor mismo para reproducir contenido.
-    private MediaPlayer audioPlayer = new MediaPlayer();
+    private MediaPlayer audioPlayer;
 
     // Contexto, necesario para interactuar externalmente.
     private Context context = null;
@@ -109,7 +109,7 @@ public class AudioServiceBinder extends Service implements MediaPlayer.OnPrepare
         filter.addAction(mBroadcasterServiceBinder);
         this.registerReceiver(mReceiver,filter);
 
-        //audioPlayer = new MediaPlayer();
+        audioPlayer = new MediaPlayer();
 
         Log.d("AudioPlayerCheck",String.format("%s",audioPlayer));
         initAudioPlayer();
@@ -246,65 +246,75 @@ public class AudioServiceBinder extends Service implements MediaPlayer.OnPrepare
         @Override
         public void onReceive(Context context, Intent intent) {
             Log.d("AudioPlayerCheck",String.format("%s",audioPlayer));
-            String action = intent.getAction();
+            //String action = intent.getAction();
             Log.d("AudioServiceBinder","reciever's onReceive was called.");
 
-            String newsongsStr = intent.getStringExtra("Audio.SongArray");
+            AudioServiceAction Action = (AudioServiceAction) intent.getSerializableExtra("AUDIO_ACTION");
 
-            //Log.d("newsongsStr",newsongsStr);
-
-            if( newsongsStr != null && !newsongsStr.isEmpty() ) {
-                Gson gson = new Gson();
-
-                Type type = new TypeToken<List<Song>>(){}.getType();
-                List<Song> newsongs = gson.fromJson(newsongsStr, type);
-
-                if( newsongs.isEmpty() )
+            switch (Action) {
+                case AUDIO_SERVICE_ACTION_UPDATE_BINDER:
                 {
-                    Log.e("BroacastReciever", "The given array is empty.");
-                    return;
-                } else {
-                    Log.w("BroacastReciever", "Obtained the array.");
-                    songs = (ArrayList<Song>) newsongs;
+                    String newsongsStr = intent.getStringExtra("Audio.SongArray");
+
+                    if( newsongsStr != null && !newsongsStr.isEmpty() ) {
+                        Gson gson = new Gson();
+
+                        Type type = new TypeToken<List<Song>>(){}.getType();
+                        List<Song> newsongs = gson.fromJson(newsongsStr, type);
+
+                        if( newsongs.isEmpty() )
+                        {
+                            Log.e("BroacastReciever", "The given array is empty.");
+                            return;
+                        } else {
+                            Log.w("BroacastReciever", "Obtained the array.");
+                            songs = (ArrayList<Song>) newsongs;
+                        }
+                    }
+
+                    if( intent.getIntExtra("Audio.SongID",-1) != -1 )
+                    {
+                        if( songs.size() > 0 )
+                            setSong(intent.getIntExtra("Audio.SongID",-1));
+                        else {
+                            Log.e("BroacastReciever", "The song array is empty.");
+                            return;
+                        }
+                    }
+
+                    if( intent.getBooleanExtra("Audio.PlaySong",false) )
+                    {
+                        Log.d("Broadcast","Playing new song");
+                        try {
+                            playSong();
+                        } catch (IOException e) {
+                            e.printStackTrace();
+                        }
+                        return;
+                    }
+                    break;
                 }
-            }
 
-            if( intent.getIntExtra("Audio.SongID",-1) != -1 )
-            {
-                if( songs.size() > 0 )
-                    setSong(intent.getIntExtra("Audio.SongID",-1));
-                else {
-                    Log.e("BroacastReciever", "The song array is empty.");
-                    return;
+                case AUDIO_SERVICE_ACTION_UPDATE_PROGRESS:
+                {
+                    int Progress = intent.getIntExtra("Audio.SeekProgress",-1);
+                    if( intent.getBooleanExtra("Audio.TogglePlay",false) ){
+                        Log.d("Audio.TogglePlay","Requested. Music from player " + audioPlayer + " is on state " + audioPlayer.isPlaying());
+                        //boolean needsPause = false;
+                        if( audioPlayer.isPlaying() )
+                            audioPlayer.pause();
+
+                        Intent broadcastIntent = new Intent();
+                        broadcastIntent.setAction(DetailsActivity.mBroadcasterAudioAction);
+                        //broadcastIntent.putExtra("needsPause", needsPause);
+                    }
+
+                    if( Progress > -1 )
+                    {
+                        setProgress( Progress );
+                    }
+                    break;
                 }
-            }
-
-            if( intent.getBooleanExtra("Audio.PlaySong",false) )
-            {
-                Log.d("Broadcast","Playing new song");
-                try {
-                    playSong();
-                } catch (IOException e) {
-                    e.printStackTrace();
-                }
-                return;
-            }
-
-            int Progress = intent.getIntExtra("Audio.SeekProgress",-1);
-            if( intent.getBooleanExtra("Audio.TogglePlay",false) ){
-                Log.d("Audio.TogglePlay","Requested. Music from player " + audioPlayer + " is on state " + audioPlayer.isPlaying());
-                //boolean needsPause = false;
-                if( audioPlayer.isPlaying() )
-                    audioPlayer.pause();
-
-                Intent broadcastIntent = new Intent();
-                broadcastIntent.setAction(DetailsActivity.mBroadcasterAudioAction);
-                //broadcastIntent.putExtra("needsPause", needsPause);
-            }
-
-            if( Progress > -1 )
-            {
-                setProgress( Progress );
             }
         }
     };
