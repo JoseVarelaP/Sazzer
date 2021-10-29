@@ -12,6 +12,7 @@ import android.content.Intent;
 import android.content.ServiceConnection;
 import android.content.pm.PackageManager;
 import android.database.Cursor;
+import android.media.MediaMetadataRetriever;
 import android.net.Uri;
 import android.os.Build;
 import android.os.Bundle;
@@ -44,7 +45,7 @@ public class MainActivity extends AppCompatActivity implements MediaPlayerContro
 
     NotificationManager notificationManager;
 
-    private ServiceConnection musicConnection = new ServiceConnection() {
+    private final ServiceConnection musicConnection = new ServiceConnection() {
 
         @Override
         public void onServiceConnected(ComponentName name, IBinder service) {
@@ -142,16 +143,19 @@ public class MainActivity extends AppCompatActivity implements MediaPlayerContro
             int artistColumn = musicCursor.getColumnIndex(MediaStore.Audio.Media.ARTIST);
             int albumColumn = musicCursor.getColumnIndex(MediaStore.Audio.Media.ALBUM);
             int albumId = musicCursor.getColumnIndex(MediaStore.Audio.Media.ALBUM_ID);
+            int column_index = musicCursor.getColumnIndexOrThrow(MediaStore.Audio.Media.DATA);
 
             Uri sArtworkUri = Uri.parse("content://media/external/audio/albumart");
             Uri albumArtUri = ContentUris.withAppendedId(sArtworkUri, albumId);
 
             do {
                 long thisId = musicCursor.getLong(idColumn);
+                String pathId = musicCursor.getString(column_index);
+
                 String thisTitle = musicCursor.getString(titleColumn);
                 String thisArtist = musicCursor.getString(artistColumn);
                 String thisAlbum = musicCursor.getString(albumColumn);
-                songList.add(new Song(thisId, thisTitle, thisArtist, thisAlbum, albumArtUri));
+                songList.add(new Song(thisId, thisTitle, thisArtist, thisAlbum, pathId));
             }
             while (musicCursor.moveToNext());
         }

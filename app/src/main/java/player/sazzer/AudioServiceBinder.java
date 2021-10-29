@@ -164,7 +164,7 @@ public class AudioServiceBinder extends Service implements MediaPlayer.OnPrepare
             return;
 
         if( manager == null )
-            manager = new NowPlayingManager( getContext(), null );
+            manager = new NowPlayingManager( getContext() );
 
         Log.d("AudioServiceBinder:playSong()","Looking for song in " + trackUri.toString());
         try {

@@ -7,24 +7,21 @@ public class Song {
     private String title;
     private String artist;
     private String album;
-    private Uri albumArt;
+    private String albumArt;
 
-    Song(long songID, String songTitle, String songArtist, String songAlbum, Uri albumArt)
+    Song(long songID, String songTitle, String songArtist, String songAlbum, String albumArt)
     {
         this.id = songID;
         this.title = songTitle;
         this.artist = songArtist;
         this.album = songAlbum;
+        this.albumArt = albumArt;
 
-        if( albumArt != null )
-        {
-            this.albumArt = albumArt;
-        }
     }
 
     long getId() { return this.id; }
     String getTitle() { return this.title; }
     String getArtist() { return this.artist; }
     String getAlbum() { return this.album; }
-    Uri getAlbumArt() { return this.albumArt; }
+    String getAlbumArt() { return this.albumArt; }
 }

@@ -7,7 +7,9 @@ import android.net.Uri;
 import android.os.Bundle;
 import android.os.Message;
 import android.os.Handler;
+import android.util.Log;
 import android.widget.ImageButton;
+import android.widget.ImageView;
 import android.widget.SeekBar;
 import android.widget.TextView;
 import android.widget.ProgressBar;
@@ -16,7 +18,7 @@ import androidx.annotation.NonNull;
 import androidx.annotation.Nullable;
 
 public class DetailsActivity extends Activity {
-    private AudioServiceBinder audioServiceBinder = null;
+    AudioServiceBinder audioServiceBinder;
     private Handler audioProgressUpdateHandler = null;
     private ProgressBar backgroundAudioProgress;
     MediaPlayer player;
@@ -26,37 +28,43 @@ public class DetailsActivity extends Activity {
     @Override
     protected void onNewIntent(Intent intent) {
 
+        //Log.d("onNewIntent","Loading from intent");
         String nCancion = intent.getStringExtra("songName");
         String nArtista = intent.getStringExtra("songArtist");
+        String nArt = intent.getStringExtra("songArt");
 
         TextView Nombre = findViewById( R.id.songName );
         TextView Artista = findViewById( R.id.artistName );
+        ImageView albumArt = findViewById( R.id.imageCover );
 
         Nombre.setText( nCancion );
         Artista.setText( nArtista );
+        albumArt.setImageBitmap( MusicHelpers.getAlbumImage(nArt) );
 
         super.onNewIntent(intent);
     }
 
     @Override
     protected void onCreate (@Nullable Bundle savedInstanceState) {
-        super.onCreate (savedInstanceState);
-        setContentView (R.layout.activity_details);
+        super.onCreate(savedInstanceState);
+        Log.d("onCreate", "Creating new screen");
+        setContentView(R.layout.activity_details);
+        onNewIntent(this.getIntent());
 
-        SeekBar sbProgress = findViewById (R.id.sbProgress);
-        sbProgress.setOnSeekBarChangeListener (new MySeekBarChangeListener ());
+        SeekBar sbProgress = findViewById(R.id.sbProgress);
+        sbProgress.setOnSeekBarChangeListener(new MySeekBarChangeListener());
 
         //audioServiceBinder = new AudioServiceBinder();
 
         //mediaUri = Uri.parse(getIntent().getStringExtra("audioURL"));
-        String nCancion = getIntent().getStringExtra("songName");
-        String nArtista = getIntent().getStringExtra("songArtist");
+        //String nCancion = getIntent().getStringExtra("songName");
+        //String nArtista = getIntent().getStringExtra("songArtist");
 
-        TextView Nombre = findViewById( R.id.songName );
-        TextView Artista = findViewById( R.id.artistName );
+        //TextView Nombre = findViewById( R.id.songName );
+        //TextView Artista = findViewById( R.id.artistName );
 
         //audioServiceBinder.setAudioFileUri(mediaUri);
-        createAudioProgressbarUpdater();
+        //createAudioProgressbarUpdater();
 
         //backgroundAudioProgress = findViewById( R.id.backgroundaudioprogress );
 
@@ -84,17 +92,17 @@ public class DetailsActivity extends Activity {
         });
         */
 
-        Nombre.setText( nCancion );
-        Artista.setText( nArtista );
+        //Nombre.setText( nCancion );
+        //Artista.setText( nArtista );
 
-        ImageButton button = findViewById( R.id.Accion );
-        button.setOnClickListener( v -> {
+        ImageButton button = findViewById(R.id.Accion);
+        button.setOnClickListener(v -> {
             if (audioServiceBinder.isPlaying()) {
                 //audioServiceBinder.pauseAudio();
-                button.setImageResource( R.drawable.ic_play_arrow_black_48dp );
+                button.setImageResource(R.drawable.ic_play_arrow_black_48dp);
             } else {
                 //audioServiceBinder.startAudio();
-                button.setImageResource( R.drawable.ic_pause_black_48dp );
+                button.setImageResource(R.drawable.ic_pause_black_48dp);
             }
         });
 
@@ -114,6 +122,7 @@ public class DetailsActivity extends Activity {
         outState.putInt ("PROGRESS", player != null ?  player.getCurrentPosition () : -1);
         outState.putBoolean ("ISPLAYING", player != null && player.isPlaying ());
 
+        /*
         if ( audioServiceBinder.isPlaying() ) {
             posThread.interrupt ();
 
@@ -121,6 +130,7 @@ public class DetailsActivity extends Activity {
             // audioServiceBinder.setProgress(0);
             // audioServiceBinder.destroyAudioPlayer();
         }
+        */
     }
 
     @Override

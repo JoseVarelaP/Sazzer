@@ -23,7 +23,7 @@
             </intent-filter>
         </activity>
 
-        <activity android:name=".DetailsActivity" android:screenOrientation="sensor"/>
+        <activity android:name=".DetailsActivity" android:launchMode="singleTop" android:screenOrientation="sensor"/>
 
         <service android:name=".AudioServiceBinder"/>
     </application>
