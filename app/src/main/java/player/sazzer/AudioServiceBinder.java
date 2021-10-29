@@ -31,7 +31,7 @@ public class AudioServiceBinder extends Service implements MediaPlayer.OnPrepare
     // Contenedor para las canciones siguientes.
     private ArrayList<Song> songs = new ArrayList<>();
 
-    private String songTitle = "";
+    //private String songTitle = "";
 
     private NowPlayingManager manager;
 
@@ -47,31 +47,6 @@ public class AudioServiceBinder extends Service implements MediaPlayer.OnPrepare
     //public void setAudioFileUri(Uri audioFileUri) { this.audioFileUri = audioFileUri; }
     public void setProgress( int ms ) { this.audioPlayer.seekTo(ms); }
     //public MediaPlayer GetPlayer() { return audioPlayer; }
-
-    /*
-    public void startAudio()
-    {
-        initAudioPlayer();
-        if(audioPlayer!=null) {
-            audioPlayer.start();
-        }
-    }
-
-    public void pauseAudio()
-    {
-        if(audioPlayer!=null) {
-            audioPlayer.pause();
-        }
-    }
-
-    public void stopAudio()
-    {
-        if(audioPlayer!=null) {
-            audioPlayer.stop();
-            destroyAudioPlayer();
-        }
-    }
-    */
 
     public boolean isPlaying()
     {
@@ -154,7 +129,7 @@ public class AudioServiceBinder extends Service implements MediaPlayer.OnPrepare
     public void playSong() throws IOException {
         audioPlayer.reset();
         Song playSong = songs.get(songPosn);
-        songTitle = playSong.getTitle();
+        //songTitle = playSong.getTitle();
         long currSong = playSong.getId();
         Uri trackUri = ContentUris.withAppendedId(
                 android.provider.MediaStore.Audio.Media.EXTERNAL_CONTENT_URI,

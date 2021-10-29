@@ -3,11 +3,11 @@ package player.sazzer;
 import android.net.Uri;
 
 public class Song {
-    private long id;
-    private String title;
-    private String artist;
-    private String album;
-    private String albumArt;
+    private final long id;
+    private final String title;
+    private final String artist;
+    private final String album;
+    private final String albumArt;
 
     Song(long songID, String songTitle, String songArtist, String songAlbum, String albumArt)
     {

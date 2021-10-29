@@ -147,7 +147,7 @@ public class MainActivity extends AppCompatActivity {
             int idColumn = musicCursor.getColumnIndex(MediaStore.Audio.Media._ID);
             int artistColumn = musicCursor.getColumnIndex(MediaStore.Audio.Media.ARTIST);
             int albumColumn = musicCursor.getColumnIndex(MediaStore.Audio.Media.ALBUM);
-            int albumId = musicCursor.getColumnIndex(MediaStore.Audio.Media.ALBUM_ID);
+            //int albumId = musicCursor.getColumnIndex(MediaStore.Audio.Media.ALBUM_ID);
             int column_index = musicCursor.getColumnIndexOrThrow(MediaStore.Audio.Media.DATA);
 
             do {
@@ -161,6 +161,10 @@ public class MainActivity extends AppCompatActivity {
             }
             while (musicCursor.moveToNext());
         }
+
+        // Needs to be closed to avoid memory leak.
+        if(musicCursor != null)
+            musicCursor.close();
     }
 
     public void songPicked(View view) throws IOException {

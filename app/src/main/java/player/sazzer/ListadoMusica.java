@@ -10,9 +10,10 @@ import android.widget.TextView;
 import java.util.List;
 
 // Clase personalizada que se utilizara en Recycler view.
+// ??: Make this a Recycler view instead?
 class ListadoMusica extends BaseAdapter {
-    private LayoutInflater InfoCan;
-    private List<Song> canciones;
+    private final LayoutInflater InfoCan;
+    private final List<Song> canciones;
 
     ListadoMusica (Context context, List<Song> listaCanciones) {
         this.canciones = listaCanciones;
