@@ -26,7 +26,7 @@ public class NowPlayingManager implements Serializable {
     //public static final String ACTION_PLAY = "PLAY";
 
     private Notification notification;
-    private Context parent;
+    private final Context parent;
 
     private RemoteViews remoteView;
     NotificationManagerCompat NMC;
@@ -41,36 +41,10 @@ public class NowPlayingManager implements Serializable {
 
     public void updateSong( Song track )
     {
-        // TODO: Made album art compatible
-        Bitmap bitmap = null;
-
-        bitmap = MusicHelpers.getAlbumImage( track.getAlbumArt() );
-
-        /*
-        try {
-            bitmap = MediaStore.Images.Media.getBitmap(
-                    parent.getContentResolver(), track.getAlbumArt());
-            bitmap = Bitmap.createScaledBitmap(bitmap, 30, 30, true);
-            bitmap = getAlbumImage( track.getAlbumArt() );
-        } catch (FileNotFoundException exception) {
-            exception.printStackTrace();
-            bitmap = BitmapFactory.decodeResource(parent.getResources(),
-                    R.drawable.default_cover);
-        } catch (IOException e) {
-            e.printStackTrace();
-        }
-        */
-
-        //remoteView = new RemoteViews(parent.getPackageName(), R.layout.notificationview);
-
-        //setListeners(remoteView);
+        Bitmap bitmap = MusicHelpers.getAlbumImage( track.getAlbumArt() );
 
         // Create an intent that will move to the detailed song info screen.
-        Intent intent = new Intent(parent, DetailsActivity.class);
-        intent.setFlags(Intent.FLAG_ACTIVITY_NEW_TASK);
-        intent.putExtra("songName", track.getTitle());
-        intent.putExtra("songArtist", track.getArtist());
-        intent.putExtra("songArt", track.getAlbumArt());
+        Intent intent = MusicHelpers.sendToDetailedSongInfo(parent, track);
 
         // If more than one contact-specific PendingIntent will be outstanding at once, and they need to have separate extras,
         // it has to contain something to make it unique.
@@ -88,6 +62,8 @@ public class NowPlayingManager implements Serializable {
                 .setLargeIcon(bitmap)
                 .setOnlyAlertOnce(true)
                 .setShowWhen(false)
+                .setSilent(true)
+                .setPriority(NotificationCompat.PRIORITY_LOW)
                 .setContentIntent(showSongIntent)
                 .setAutoCancel(false)
                 .setTicker("something")
