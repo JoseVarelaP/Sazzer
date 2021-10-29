@@ -3,6 +3,7 @@ package player.sazzer;
 import android.Manifest;
 import android.app.NotificationChannel;
 import android.app.NotificationManager;
+import android.app.PendingIntent;
 import android.content.ComponentName;
 import android.content.ContentResolver;
 import android.content.ContentUris;
@@ -80,7 +81,8 @@ public class MainActivity extends AppCompatActivity implements MediaPlayerContro
         ListView songView = findViewById(R.id.songList);
         songList = new ArrayList<>();
 
-        getSongList();
+        //getSongList(MediaStore.Audio.Media.INTERNAL_CONTENT_URI);
+        getSongList(MediaStore.Audio.Media.EXTERNAL_CONTENT_URI);
 
         ListadoMusica listMusica = new ListadoMusica(this, songList);
         songView.setAdapter(listMusica);
@@ -110,12 +112,14 @@ public class MainActivity extends AppCompatActivity implements MediaPlayerContro
         super.onDestroy();
     }
 
-    public void getSongList() {
+    public void getSongList(Uri musicUri) {
         ContentResolver musicResolver = getContentResolver();
         // Vamos a buscar música que está en la memoria externa.
         // TODO (probablemente: Preguntar luego por ubicaciones especiales, para que la gente pueda
         // colocar su propia música.
-        Uri musicUri = android.provider.MediaStore.Audio.Media.EXTERNAL_CONTENT_URI;
+
+        String selection = MediaStore.Audio.Media.IS_MUSIC + "!= 0";
+        String sortOrder = MediaStore.Audio.Media.TITLE + " ASC";
 
         // Check if we can create the notification channel to show it.
         if(Build.VERSION.SDK_INT >= Build.VERSION_CODES.O )
@@ -124,26 +128,20 @@ public class MainActivity extends AppCompatActivity implements MediaPlayerContro
                     "Now Playing", NotificationManager.IMPORTANCE_LOW);
 
             notificationManager = getSystemService(NotificationManager.class);
-            if( notificationManager != null )
-            {
+            if( notificationManager != null ) {
                 notificationManager.createNotificationChannel(channel);
             }
         }
 
-        Cursor musicCursor = musicResolver.query(musicUri, null, null, null, null);
+        Cursor musicCursor = musicResolver.query(musicUri, null, selection, null, sortOrder);
 
         // Hora de buscar
         if (musicCursor != null && musicCursor.moveToFirst()) {
-            int titleColumn = musicCursor.getColumnIndex
-                    (android.provider.MediaStore.Audio.Media.TITLE);
-            int idColumn = musicCursor.getColumnIndex
-                    (android.provider.MediaStore.Audio.Media._ID);
-            int artistColumn = musicCursor.getColumnIndex
-                    (android.provider.MediaStore.Audio.Media.ARTIST);
-            int albumColumn = musicCursor.getColumnIndex
-                    (MediaStore.Audio.Media.ALBUM);
-            int albumId = musicCursor.getColumnIndex
-                    (MediaStore.Audio.Media.ALBUM_ID);
+            int titleColumn = musicCursor.getColumnIndex(MediaStore.Audio.Media.TITLE);
+            int idColumn = musicCursor.getColumnIndex(MediaStore.Audio.Media._ID);
+            int artistColumn = musicCursor.getColumnIndex(MediaStore.Audio.Media.ARTIST);
+            int albumColumn = musicCursor.getColumnIndex(MediaStore.Audio.Media.ALBUM);
+            int albumId = musicCursor.getColumnIndex(MediaStore.Audio.Media.ALBUM_ID);
 
             Uri sArtworkUri = Uri.parse("content://media/external/audio/albumart");
             Uri albumArtUri = ContentUris.withAppendedId(sArtworkUri, albumId);
@@ -163,8 +161,6 @@ public class MainActivity extends AppCompatActivity implements MediaPlayerContro
         Log.d("MainActivity","Set Song: " + (view.getTag().toString()));
         musicSrv.setSong(Integer.parseInt(view.getTag().toString()));
         musicSrv.playSong();
-
-        NowPlayingManager.createNotification(MainActivity.this, songList.get( Integer.parseInt(view.getTag().toString()) ), 1, songList.size()-1 );
         /*
         if (playbackPaused) {
             setController();

@@ -33,6 +33,8 @@ public class AudioServiceBinder extends Service implements MediaPlayer.OnPrepare
 
     private String songTitle = "";
 
+    private NowPlayingManager manager;
+
     int songPosn = 0;
 
     public final int UPDATE_AUDIO_PROGRESS_BAR = 1;
@@ -149,10 +151,6 @@ public class AudioServiceBinder extends Service implements MediaPlayer.OnPrepare
         return this.context;
     }
 
-    public Song getCurrentSong() {
-        return songs.get(songPosn);
-    }
-
     public void playSong() throws IOException {
         audioPlayer.reset();
         Song playSong = songs.get(songPosn);
@@ -165,10 +163,16 @@ public class AudioServiceBinder extends Service implements MediaPlayer.OnPrepare
         if( TextUtils.isEmpty(trackUri.toString()) )
             return;
 
+        if( manager == null )
+            manager = new NowPlayingManager( getContext(), null );
+
         Log.d("AudioServiceBinder:playSong()","Looking for song in " + trackUri.toString());
         try {
             audioPlayer.setDataSource(getContext(), trackUri);
             audioPlayer.prepareAsync();
+
+            // Create the manager to send the notification.
+            manager.updateSong( songs.get(songPosn) );
 
         } catch (Exception e) {
             Log.e("MUSIC SERVICE", "Error setting data source", e);

@@ -1,19 +1,20 @@
 package player.sazzer;
 
-import android.app.Application;
+import android.app.Activity;
 import android.app.Notification;
-import android.app.NotificationChannel;
-import android.app.NotificationManager;
+import android.app.PendingIntent;
 import android.content.Context;
+import android.content.Intent;
 import android.graphics.Bitmap;
 import android.graphics.BitmapFactory;
 import android.media.MediaMetadataRetriever;
 import android.os.Build;
 import android.provider.MediaStore;
-import android.support.v4.media.session.MediaSessionCompat;
+import android.widget.RemoteViews;
 
 import androidx.core.app.NotificationCompat;
 import androidx.core.app.NotificationManagerCompat;
+import androidx.fragment.app.Fragment;
 
 import java.io.FileNotFoundException;
 import java.io.IOException;
@@ -24,7 +25,11 @@ public class NowPlayingManager {
     public static final String ACTION_PREV = "PREVIOUS";
     public static final String ACTION_PLAY = "PLAY";
 
-    public static Notification notification;
+    private Notification notification;
+    private Context parent;
+
+    private RemoteViews remoteView;
+    NotificationManagerCompat NMC;
 
     private static Bitmap getAlbumImage(String path) {
         android.media.MediaMetadataRetriever mmr = new MediaMetadataRetriever();
@@ -34,52 +39,61 @@ public class NowPlayingManager {
         return null;
     }
 
-    public static void createNotification(Context context, Song track, int pos, int size) {
+    public NowPlayingManager(Context context, AudioServiceBinder service) {
+        this.parent = context;
         if(Build.VERSION.SDK_INT >= Build.VERSION_CODES.O)
         {
-            NotificationManagerCompat NMC = NotificationManagerCompat.from(context);
-            //MediaSessionCompat MSessionCompat = new MediaSessionCompat( context, "tag" );
-
-            // TODO: Made album art compatible
-            // Bitmap icon = BitmapFactory.decodeResource( context.getResources(), track.getAlbumArt() );
-            Bitmap bitmap = null;
-            //String pathID = track.getAlbumArt();
-
-            //bitmap = getAlbumImage( track.getAlbumArt() );
-            try {
-                bitmap = MediaStore.Images.Media.getBitmap(
-                        context.getContentResolver(), track.getAlbumArt());
-                bitmap = Bitmap.createScaledBitmap(bitmap, 30, 30, true);
-                bitmap = getAlbumImage( track.getAlbumArt().getPath() );
-            } catch (FileNotFoundException exception) {
-                exception.printStackTrace();
-                bitmap = BitmapFactory.decodeResource(context.getResources(),
-                        R.drawable.default_cover);
-            } catch (IOException e) {
-                e.printStackTrace();
-            }
-
-            notification = new NotificationCompat.Builder(context, CHANNEL_ID)
-                    .setSmallIcon(R.drawable.ic_play_arrow_black_48dp)
-                    .setContentTitle(track.getTitle())
-                    .setContentText(track.getArtist())
-                    .setContentInfo(track.getAlbum())
-                    .setLargeIcon(bitmap)
-                    .setOnlyAlertOnce(true)
-                    .setShowWhen(false)
-                    .setPriority(NotificationCompat.PRIORITY_HIGH)
-                    .build();
-
-            NMC.notify(1, notification);
-            /*
-            NotificationChannel Notif1 = new NotificationChannel(
-                    CHANNEL_ID_1, "Channel(1)", NotificationManager.IMPORTANCE_HIGH);
-
-            Notif1.setDescription("Description ofChannel");
-
-            NotificationManager Manager = getSystemService(NotificationManager.class);
-            Manager.createNotificationChannel(Notif1);
-            */
+            NMC = NotificationManagerCompat.from(context);
         }
+    }
+
+    public void updateSong( Song track )
+    {
+        // TODO: Made album art compatible
+        Bitmap bitmap = null;
+        try {
+            bitmap = MediaStore.Images.Media.getBitmap(
+                    parent.getContentResolver(), track.getAlbumArt());
+            bitmap = Bitmap.createScaledBitmap(bitmap, 30, 30, true);
+            bitmap = getAlbumImage( track.getAlbumArt().getPath() );
+        } catch (FileNotFoundException exception) {
+            exception.printStackTrace();
+            bitmap = BitmapFactory.decodeResource(parent.getResources(),
+                    R.drawable.default_cover);
+        } catch (IOException e) {
+            e.printStackTrace();
+        }
+
+        //remoteView = new RemoteViews(parent.getPackageName(), R.layout.notificationview);
+
+        //setListeners(remoteView);
+
+        // Create an intent that will move to the detailed song info screen.
+        Intent intent = new Intent(parent, DetailsActivity.class);
+        intent.setFlags(Intent.FLAG_ACTIVITY_NEW_TASK);
+        intent.putExtra("songName", track.getTitle());
+        intent.putExtra("songArtist", track.getArtist());
+        PendingIntent showSongIntent = PendingIntent.getActivity(parent, 0, intent, 0);
+
+        notification = new NotificationCompat.Builder(parent, CHANNEL_ID)
+                .setSmallIcon(R.drawable.ic_play_arrow_black_48dp)
+                .setOngoing(true)
+                .setContentTitle(track.getTitle())
+                .setContentText(track.getArtist())
+                .setSubText(track.getAlbum())
+                .setLargeIcon(bitmap)
+                .setOnlyAlertOnce(true)
+                .setShowWhen(false)
+                .setContentIntent(showSongIntent)
+                .setAutoCancel(false)
+                .setTicker("something")
+                .build();
+
+        NMC.notify(1, notification);
+    }
+
+    public void cancelNotification()
+    {
+        NMC.cancel(2);
     }
 }
