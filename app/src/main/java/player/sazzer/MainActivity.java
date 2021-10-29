@@ -33,7 +33,7 @@ import player.sazzer.AudioServiceBinder.MusicBinder;
 import java.io.IOException;
 import java.util.ArrayList;
 
-public class MainActivity extends AppCompatActivity implements MediaPlayerControl {
+public class MainActivity extends AppCompatActivity {
     public static final int REQUEST_CODE = 1001;
     public static final int REQUEST_CODE_EXTERNAL_STORAGE = 1002;
 
@@ -77,8 +77,13 @@ public class MainActivity extends AppCompatActivity implements MediaPlayerContro
                     new String [] { Manifest.permission.READ_EXTERNAL_STORAGE },
                     REQUEST_CODE_EXTERNAL_STORAGE
             );
+        } else {
+            GenerateMainSongList();
         }
+    }
 
+    protected void GenerateMainSongList()
+    {
         ListView songView = findViewById(R.id.songList);
         songList = new ArrayList<>();
 
@@ -120,7 +125,7 @@ public class MainActivity extends AppCompatActivity implements MediaPlayerContro
         // colocar su propia música.
 
         String selection = MediaStore.Audio.Media.IS_MUSIC + "!= 0";
-        String sortOrder = MediaStore.Audio.Media.TITLE + " ASC";
+        String sortOrder = MediaStore.Audio.Media.ALBUM + " ASC, " + MediaStore.Audio.Media.TRACK + " ASC";
 
         // Check if we can create the notification channel to show it.
         if(Build.VERSION.SDK_INT >= Build.VERSION_CODES.O )
@@ -145,9 +150,6 @@ public class MainActivity extends AppCompatActivity implements MediaPlayerContro
             int albumId = musicCursor.getColumnIndex(MediaStore.Audio.Media.ALBUM_ID);
             int column_index = musicCursor.getColumnIndexOrThrow(MediaStore.Audio.Media.DATA);
 
-            Uri sArtworkUri = Uri.parse("content://media/external/audio/albumart");
-            Uri albumArtUri = ContentUris.withAppendedId(sArtworkUri, albumId);
-
             do {
                 long thisId = musicCursor.getLong(idColumn);
                 String pathId = musicCursor.getString(column_index);
@@ -165,56 +167,7 @@ public class MainActivity extends AppCompatActivity implements MediaPlayerContro
         Log.d("MainActivity","Set Song: " + (view.getTag().toString()));
         musicSrv.setSong(Integer.parseInt(view.getTag().toString()));
         musicSrv.playSong();
-        /*
-        if (playbackPaused) {
-            setController();
-            playbackPaused = false;
-        }
-        controller.show(0);
-        */
     }
-
-    /*
-    void loadAudios () {
-        String [] columns = {
-                MediaStore.Audio.Artists._ID,
-                MediaStore.Audio.Artists.ARTIST,
-                MediaStore.Audio.Media.TITLE,
-                MediaStore.Audio.Media.DISPLAY_NAME,
-        };
-
-        String order = MediaStore.Audio.Media.DEFAULT_SORT_ORDER;
-
-        Cursor cursor =  getBaseContext().getContentResolver().query (MediaStore.Audio.Media.EXTERNAL_CONTENT_URI, columns, null, null, order);
-        if (cursor == null) return;
-
-        LinkedList<Song> artists = new LinkedList<> ();
-
-        for (int i = 0; i < cursor.getCount (); i++) {
-            cursor.moveToPosition (i);
-            long sId;
-            String sTitle,sArtist;
-
-            int index = cursor.getColumnIndexOrThrow(MediaStore.Audio.Media._ID);
-            //long id = cursor.getLong(index);
-            sId = cursor.getLong(index);
-
-            index = cursor.getColumnIndexOrThrow(MediaStore.Audio.Media.ARTIST);
-            sArtist = cursor.getString(index);
-
-            index = cursor.getColumnIndexOrThrow(MediaStore.Audio.Media.TITLE);
-            sTitle = cursor.getString(index);
-
-            //index = cursor.getColumnIndexOrThrow(MediaStore.Audio.Media.DISPLAY_NAME);
-            //audioModel.songPath = cursor.getString(index);
-
-            Song cSong = new Song (sId, sTitle, sArtist);
-            artists.add (cSong);
-        }
-
-        cursor.close ();
-    }
-    */
 
     @Override
     public void onRequestPermissionsResult (int requestCode, @NonNull String[] permissions, @NonNull int[] grantResults) {
@@ -228,7 +181,7 @@ public class MainActivity extends AppCompatActivity implements MediaPlayerContro
                 break;
             case REQUEST_CODE_EXTERNAL_STORAGE:
                 if (grantResults.length > 0 && grantResults [0] == PackageManager.PERMISSION_GRANTED) {
-                    //loadAudios ();
+                    GenerateMainSongList ();
                 }
         }
     }
@@ -243,60 +196,5 @@ public class MainActivity extends AppCompatActivity implements MediaPlayerContro
     @Override
     protected void onActivityResult(int requestCode, int resultCode, Intent data) {
         super.onActivityResult(requestCode, resultCode, data);
-    }
-
-    @Override
-    public void start() {
-
-    }
-
-    @Override
-    public void pause() {
-
-    }
-
-    @Override
-    public int getDuration() {
-        return 0;
-    }
-
-    @Override
-    public int getCurrentPosition() {
-        return 0;
-    }
-
-    @Override
-    public void seekTo(int pos) {
-
-    }
-
-    @Override
-    public boolean isPlaying() {
-        return false;
-    }
-
-    @Override
-    public int getBufferPercentage() {
-        return 0;
-    }
-
-    @Override
-    public boolean canPause() {
-        return false;
-    }
-
-    @Override
-    public boolean canSeekBackward() {
-        return false;
-    }
-
-    @Override
-    public boolean canSeekForward() {
-        return false;
-    }
-
-    @Override
-    public int getAudioSessionId() {
-        return 0;
     }
 }
