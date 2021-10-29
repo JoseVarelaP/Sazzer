@@ -2,29 +2,32 @@
 <LinearLayout xmlns:android="http://schemas.android.com/apk/res/android"
     android:orientation="vertical"
     android:layout_width="match_parent"
-    android:layout_height="match_parent"
-    >
+    android:layout_height="match_parent">
+
     <RelativeLayout
         android:layout_width="match_parent"
         android:layout_height="wrap_content"
         android:layout_weight="1">
 
-        <ListView
-            android:id="@+id/songList"
+        <ImageView
+            android:id="@+id/button_image"
+            android:src="@drawable/default_cover"
             android:layout_width="match_parent"
             android:layout_height="match_parent" />
+
     </RelativeLayout>
 
     <RelativeLayout
         android:layout_width="match_parent"
         android:layout_height="wrap_content"
-        android:layout_weight="10">
+        android:layout_weight="4">
 
-        <include layout="@layout/bar_mainmenubuttons"
+        <TextView
+            android:id="@+id/button_name"
+            android:text="Testing String"
+            android:textAlignment="center"
             android:layout_width="match_parent"
-            android:layout_height="match_parent"
-            android:layout_below="@id/songList"
-            />
+            android:layout_height="match_parent" />
     </RelativeLayout>
 
 </LinearLayout>
