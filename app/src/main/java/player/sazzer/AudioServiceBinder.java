@@ -196,7 +196,16 @@ public class AudioServiceBinder extends Service implements MediaPlayer.OnPrepare
 
     @Override
     public void onCompletion(MediaPlayer mp) {
-
+        // Is there a song available to play next?
+        if ( songs.get( songPosn+1 ) != null )
+        {
+            setSong( songPosn+1 );
+            try {
+                playSong();
+            } catch (IOException e) {
+                e.printStackTrace();
+            }
+        }
     }
 
     @Override
