@@ -3,35 +3,28 @@
     android:orientation="vertical"
     android:layout_width="match_parent"
     android:layout_height="wrap_content"
+    android:onClick="songPicked"
     android:padding="10dp">
 
-    <RelativeLayout
-        android:orientation="vertical"
+    <TextView
+        android:id="@+id/nombreCancion"
         android:layout_width="match_parent"
-        android:layout_height="wrap_content">
+        android:layout_height="wrap_content"
+        android:text="@string/nameSong"
+        android:textSize="6pt" />
 
-        <TextView
-            android:id="@+id/tvItem"
-            android:layout_width="match_parent"
-            android:layout_height="wrap_content"
-            android:text="SongName"
-            android:textSize="6pt" />
+    <TextView
+        android:id="@+id/nombreAlbum"
+        android:layout_width="match_parent"
+        android:layout_height="wrap_content"
+        android:text="@string/nameAlbum"
+        android:textSize="4pt" />
 
-        <TextView
-            android:id="@+id/tvUbicacion"
-            android:layout_width="match_parent"
-            android:layout_height="wrap_content"
-            android:layout_below="@id/tvItem"
-            android:text="SongName"
-            android:textSize="4pt" />
-
-        <TextView android:id="@+id/tvItem2"
-            android:layout_width="match_parent"
-            android:layout_height="wrap_content"
-            android:layout_below="@id/tvUbicacion"
-            android:textSize="6pt"
-            android:text="Artistname"
-            />
-    </RelativeLayout>
+    <TextView android:id="@+id/nombreArtista"
+        android:layout_width="match_parent"
+        android:layout_height="wrap_content"
+        android:textSize="6pt"
+        android:text="@string/nameArtist"
+        />
 
 </LinearLayout>

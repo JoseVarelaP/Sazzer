@@ -1,0 +1,7 @@
+<?xml version="1.0" encoding="utf-8"?>
+<resources>
+    <string name="app_name">Sazzer</string>
+    <string name="nameSong">Canción</string>
+    <string name="nameArtist">Artista</string>
+    <string name="nameAlbum">Album</string>
+</resources>
