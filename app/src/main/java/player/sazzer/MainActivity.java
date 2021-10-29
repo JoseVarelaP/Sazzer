@@ -17,6 +17,7 @@ import android.net.Uri;
 import android.os.Build;
 import android.os.Bundle;
 import android.os.IBinder;
+import android.os.Parcelable;
 import android.provider.MediaStore;
 import android.util.Log;
 import android.view.View;
@@ -27,6 +28,8 @@ import androidx.annotation.NonNull;
 import androidx.annotation.Nullable;
 import androidx.appcompat.app.AppCompatActivity;
 import android.widget.MediaController.MediaPlayerControl;
+
+import com.google.gson.Gson;
 
 import player.sazzer.AudioServiceBinder.MusicBinder;
 
@@ -101,10 +104,9 @@ public class MainActivity extends AppCompatActivity {
         Log.d("onStart","Starting");
         super.onStart();
         musicSrv.setContext(getApplicationContext());
-        musicSrv.initAudioPlayer();
         if (playIntent == null) {
             Log.d("onStart","Intent is null, starting service.");
-            playIntent = new Intent(this, AudioServiceBinder.class);
+            playIntent = new Intent(this, musicSrv.getClass());
             bindService(playIntent, musicConnection, Context.BIND_AUTO_CREATE);
             startService(playIntent);
             Log.d("onStart","Done with setup of services.");
@@ -169,8 +171,30 @@ public class MainActivity extends AppCompatActivity {
 
     public void songPicked(View view) throws IOException {
         Log.d("MainActivity","Set Song: " + (view.getTag().toString()));
-        musicSrv.setSong(Integer.parseInt(view.getTag().toString()));
-        musicSrv.playSong();
+        int songNum = Integer.parseInt(view.getTag().toString());
+
+        //musicSrv.setSong(songNum);
+        //musicSrv.playSong();
+        musicSrv.setContext(getApplicationContext());
+
+        Gson gson = new Gson();
+        String jsonMusica = gson.toJson(songList);
+
+        Intent intent = new Intent();
+        intent.setAction(AudioServiceBinder.mBroadcasterServiceBinder);
+        intent.putExtra("Audio.SongArray", jsonMusica);
+        sendBroadcast(intent);
+
+        intent = new Intent();
+        intent.setAction(AudioServiceBinder.mBroadcasterServiceBinder);
+        //intent.putExtra("Audio.SongArray", jsonMusica);
+        intent.putExtra("Audio.SongID", songNum);
+        intent.putExtra("Audio.PlaySong", true);
+        sendBroadcast(intent);
+
+        Intent nt = MusicHelpers.sendToDetailedSongInfo(MainActivity.this, songList.get(songNum), musicSrv);
+        nt.setFlags(Intent.FLAG_ACTIVITY_NEW_TASK | Intent.FLAG_ACTIVITY_SINGLE_TOP);
+        startActivity(nt);
     }
 
     @Override

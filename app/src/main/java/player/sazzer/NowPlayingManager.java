@@ -21,14 +21,9 @@ import java.io.Serializable;
 
 public class NowPlayingManager implements Serializable {
     public static final String CHANNEL_ID = "CHANNEL_1";
-    //public static final String ACTION_NEXT = "NEXT";
-    //public static final String ACTION_PREV = "PREVIOUS";
-    //public static final String ACTION_PLAY = "PLAY";
 
     private Notification notification;
     private final Context parent;
-
-    private RemoteViews remoteView;
     NotificationManagerCompat NMC;
 
     public NowPlayingManager(Context context) {
@@ -39,30 +34,27 @@ public class NowPlayingManager implements Serializable {
         }
     }
 
-    public void updateSong( Song track )
+    public void updateSong( Song track, int percentage, AudioServiceBinder bind )
     {
         Bitmap bitmap = MusicHelpers.getAlbumImage( track.getAlbumArt() );
 
         // Create an intent that will move to the detailed song info screen.
-        Intent intent = MusicHelpers.sendToDetailedSongInfo(parent, track);
+        Intent intent = MusicHelpers.sendToDetailedSongInfo(parent, track, bind);
 
-        // If more than one contact-specific PendingIntent will be outstanding at once, and they need to have separate extras,
-        // it has to contain something to make it unique.
-        //intent.setAction("action"+System.currentTimeMillis());
-
-        Log.d("NowPlayingManager",String.format("Created a new intent with the following data: %s by %s", track.getTitle(), track.getArtist()));
-        PendingIntent showSongIntent = PendingIntent.getActivity(parent, 0, intent, PendingIntent.FLAG_UPDATE_CURRENT);
+        //Log.d("NowPlayingManager",String.format("Created a new intent with the following data: %s by %s", track.getTitle(), track.getArtist()));
+        PendingIntent showSongIntent = PendingIntent.getActivity(parent, 0, intent, PendingIntent.FLAG_IMMUTABLE | PendingIntent.FLAG_UPDATE_CURRENT);
 
         notification = new NotificationCompat.Builder(parent, CHANNEL_ID)
                 .setSmallIcon(R.drawable.ic_play_arrow_black_48dp)
                 .setOngoing(true)
                 .setContentTitle(track.getTitle())
                 .setContentText(track.getArtist())
-                .setSubText(track.getAlbum())
+                .setSubText(track.getAlbum() + " " + percentage)
                 .setLargeIcon(bitmap)
                 .setOnlyAlertOnce(true)
                 .setShowWhen(false)
                 .setSilent(true)
+                .setProgress( intent.getIntExtra("TotalTime", 0) , intent.getIntExtra("Progress", 0), false )
                 .setPriority(NotificationCompat.PRIORITY_LOW)
                 .setContentIntent(showSongIntent)
                 .setAutoCancel(false)
@@ -74,6 +66,6 @@ public class NowPlayingManager implements Serializable {
 
     public void cancelNotification()
     {
-        NMC.cancel(2);
+        NMC.cancel(1);
     }
 }

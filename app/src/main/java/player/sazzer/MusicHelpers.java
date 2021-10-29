@@ -7,6 +7,7 @@ import android.graphics.BitmapFactory;
 import android.media.MediaMetadataRetriever;
 
 import androidx.annotation.NonNull;
+import androidx.annotation.Nullable;
 
 public class MusicHelpers {
     /**
@@ -29,13 +30,20 @@ public class MusicHelpers {
      * @param track Current song that will be used to fill information
      * @return The intent to be used on a related PendingIntent.
      */
-    public static Intent sendToDetailedSongInfo( Context context, @NonNull Song track )
+    public static Intent sendToDetailedSongInfo(Context context, @NonNull Song track, @Nullable AudioServiceBinder binder)
     {
         Intent intent = new Intent(context, DetailsActivity.class);
-        intent.setFlags(Intent.FLAG_ACTIVITY_NEW_TASK);
+        intent.setFlags(Intent.FLAG_ACTIVITY_NEW_TASK | Intent.FLAG_ACTIVITY_SINGLE_TOP);
         intent.putExtra("songName", track.getTitle());
         intent.putExtra("songArtist", track.getArtist());
         intent.putExtra("songArt", track.getAlbumArt());
+
+        if( binder != null )
+        {
+            intent.putExtra("Progress", binder.getCurrentAudioPosition());
+            intent.putExtra("TotalTime", binder.getTotalAudioDuration());
+        }
+
         return intent;
     }
 }

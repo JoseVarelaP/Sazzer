@@ -23,9 +23,23 @@
             </intent-filter>
         </activity>
 
-        <activity android:name=".DetailsActivity" android:launchMode="singleTop" android:screenOrientation="sensor"/>
+        <activity
+            android:exported="true"
+            android:name=".DetailsActivity"
+            android:launchMode="singleTop"
+            android:screenOrientation="sensor">
+            <intent-filter>
+                <action android:name="player.sazzer.action.UPDATE_PROGRESS"/>
+            </intent-filter>
+        </activity>
 
-        <service android:name=".AudioServiceBinder"/>
+        <service
+            android:exported="false"
+            android:name=".AudioServiceBinder">
+            <intent-filter>
+                <action android:name="player.sazzer.action.UPDATE_AUDIOBINDER"/>
+            </intent-filter>
+        </service>
     </application>
 
 </manifest>

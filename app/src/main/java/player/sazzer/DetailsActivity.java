@@ -1,7 +1,10 @@
 package player.sazzer;
 
 import android.app.Activity;
+import android.content.BroadcastReceiver;
+import android.content.Context;
 import android.content.Intent;
+import android.content.IntentFilter;
 import android.media.MediaPlayer;
 import android.net.Uri;
 import android.os.Bundle;
@@ -18,12 +21,56 @@ import androidx.annotation.NonNull;
 import androidx.annotation.Nullable;
 
 public class DetailsActivity extends Activity {
-    AudioServiceBinder audioServiceBinder;
     private Handler audioProgressUpdateHandler = null;
-    private ProgressBar backgroundAudioProgress;
     MediaPlayer player;
-    Thread posThread;
-    Uri mediaUri;
+    boolean isPlaying = false;
+    SeekBar sbProgress;
+    ImageButton button;
+
+    private BroadcastReceiver musicDataReciever = new BroadcastReceiver() {
+        @Override
+        public void onReceive(Context context, Intent intent) {
+            Bundle extras = intent.getExtras();
+            //
+            // Log.d("DetailsActivity","Got a receive here!");
+            if( extras == null )
+                return;
+
+            if( extras.getBoolean("needsPause",false) )
+            {
+                button.setImageResource(R.drawable.ic_play_arrow_black_48dp);
+                return;
+            } else {
+                button.setImageResource(R.drawable.ic_pause_black_48dp);
+            }
+
+            //String updateAction = extras.getString("AudioDriver.ProgressBar.Update");
+            //if( !updateAction.isEmpty() )
+            int songProgress = extras.getInt("Progress");
+            int songMax = extras.getInt("TotalTime");
+            //Log.d("DetailsActivity",Integer.toString(curExtra));
+
+            if( sbProgress.getMax() != songMax )
+            {
+                sbProgress.setMax(songMax);
+            }
+
+            sbProgress.setProgress( songProgress );
+            /*
+            if( !curExtra )
+            {
+                Log.d("musicDataReciever","Progress bar update!");
+                //backgroundAudioProgress.setProgress( Integer.parseInt(updateAction) );
+            }
+
+             */
+
+        }
+    };
+
+    private IntentFilter mIntentFilter;
+
+    public static final String mBroadcasterAudioAction = "player.sazzer.action.UPDATE_PROGRESS";
 
     @Override
     protected void onNewIntent(Intent intent) {
@@ -51,59 +98,18 @@ public class DetailsActivity extends Activity {
         setContentView(R.layout.activity_details);
         onNewIntent(this.getIntent());
 
-        SeekBar sbProgress = findViewById(R.id.sbProgress);
+        sbProgress = findViewById(R.id.sbProgress);
         sbProgress.setOnSeekBarChangeListener(new MySeekBarChangeListener());
 
-        //audioServiceBinder = new AudioServiceBinder();
+        mIntentFilter = new IntentFilter();
+        mIntentFilter.addAction(mBroadcasterAudioAction);
 
-        //mediaUri = Uri.parse(getIntent().getStringExtra("audioURL"));
-        //String nCancion = getIntent().getStringExtra("songName");
-        //String nArtista = getIntent().getStringExtra("songArtist");
-
-        //TextView Nombre = findViewById( R.id.songName );
-        //TextView Artista = findViewById( R.id.artistName );
-
-        //audioServiceBinder.setAudioFileUri(mediaUri);
-        //createAudioProgressbarUpdater();
-
-        //backgroundAudioProgress = findViewById( R.id.backgroundaudioprogress );
-
-        //audioServiceBinder.setContext(getApplicationContext());
-        //audioServiceBinder.startAudio();
-
-        // Esto deberia quedar aqui?
-        // (Problablemente puede estar en el servicio tambien)
-        /*
-        audioServiceBinder.GetPlayer().setOnPreparedListener (mediaPlayer -> {
-            posThread = new Thread (() -> {
-                try {
-                    if( audioServiceBinder != null ) {
-                        while ( audioServiceBinder.isPlaying() ) {
-                            Thread.sleep(1000);
-                            if( audioServiceBinder != null )
-                                sbProgress.setProgress(audioServiceBinder.getCurrentAudioPosition());
-                        }
-                    }
-                } catch (InterruptedException in) { in.printStackTrace (); }
-            });
-
-            sbProgress.setMax ( audioServiceBinder.getTotalAudioDuration() );
-            posThread.start ();
-        });
-        */
-
-        //Nombre.setText( nCancion );
-        //Artista.setText( nArtista );
-
-        ImageButton button = findViewById(R.id.Accion);
+        button = findViewById(R.id.Accion);
         button.setOnClickListener(v -> {
-            if (audioServiceBinder.isPlaying()) {
-                //audioServiceBinder.pauseAudio();
-                button.setImageResource(R.drawable.ic_play_arrow_black_48dp);
-            } else {
-                //audioServiceBinder.startAudio();
-                button.setImageResource(R.drawable.ic_pause_black_48dp);
-            }
+            Intent forThePlayer = new Intent();
+            forThePlayer.setAction(AudioServiceBinder.mBroadcasterServiceBinder);
+            forThePlayer.putExtra("Audio.TogglePlay",true);
+            sendBroadcast(forThePlayer);
         });
 
     }
@@ -139,6 +145,14 @@ public class DetailsActivity extends Activity {
     @Override
     protected void onResume() {
         super.onResume ();
+        //IntentFilter intentFilter = new IntentFilter(mBroadcasterAudioAction);
+        this.registerReceiver(musicDataReciever, mIntentFilter);
+    }
+
+    @Override
+    protected void onPause() {
+        super.onPause();
+        this.unregisterReceiver(musicDataReciever);
     }
 
     @Override
@@ -150,7 +164,7 @@ public class DetailsActivity extends Activity {
         public void onProgressChanged (SeekBar seekBar, int i, boolean b) {
             if (b) {
                 //audioServiceBinder.pauseAudio();
-                audioServiceBinder.setProgress( i );
+                //audioServiceBinder.setProgress( i );
                 //audioServiceBinder.startAudio();
             }
         }
@@ -159,26 +173,12 @@ public class DetailsActivity extends Activity {
         public void onStartTrackingTouch (SeekBar seekBar) {}
 
         @Override
-        public void onStopTrackingTouch (SeekBar seekBar) {}
-
-    }
-
-    private void createAudioProgressbarUpdater()
-    {
-        if(audioProgressUpdateHandler==null) {
-            audioProgressUpdateHandler = new Handler() {
-                @Override
-                public void handleMessage(Message msg) {
-                    if (msg.what == audioServiceBinder.UPDATE_AUDIO_PROGRESS_BAR) {
-
-                        if( audioServiceBinder != null) {
-                            int progAct =audioServiceBinder.getAudioProgress();
-
-                            //backgroundAudioProgress.setProgress(progAct*10);
-                        }
-                    }
-                }
-            };
+        public void onStopTrackingTouch (SeekBar seekBar) {
+            Intent forThePlayer = new Intent();
+            forThePlayer.setAction(AudioServiceBinder.mBroadcasterServiceBinder);
+            forThePlayer.putExtra("Audio.SeekProgress",seekBar.getProgress());
+            sendBroadcast(forThePlayer);
         }
+
     }
 }
