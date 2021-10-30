@@ -10,21 +10,21 @@
         android:id="@+id/nombreCancion"
         android:layout_width="match_parent"
         android:layout_height="wrap_content"
-        android:text="@string/nameSong"
+        android:textColor="@color/colorText"
         android:textSize="6pt" />
 
     <TextView
         android:id="@+id/nombreAlbum"
         android:layout_width="match_parent"
         android:layout_height="wrap_content"
-        android:text="@string/nameAlbum"
+        android:textColor="@color/colorText"
         android:textSize="4pt" />
 
     <TextView android:id="@+id/nombreArtista"
         android:layout_width="match_parent"
         android:layout_height="wrap_content"
+        android:textColor="@color/colorText"
         android:textSize="6pt"
-        android:text="@string/nameArtist"
         />
 
 </LinearLayout>
