@@ -18,8 +18,8 @@ public class Song {
     }
 
     long getId() { return this.id; }
-    String getTitle() { return this.title; }
-    String getArtist() { return this.artist; }
-    String getAlbum() { return this.album; }
-    String getAlbumArt() { return this.albumArt; }
+    public String getTitle() { return this.title; }
+    public String getArtist() { return this.artist; }
+    public String getAlbum() { return this.album; }
+    public String getAlbumArt() { return this.albumArt; }
 }

@@ -139,7 +139,7 @@ public class DetailsActivity extends Activity {
         playList.setColorFilter( R.color.nowPlayingbuttonColor );
         playList.setOnClickListener(v -> {
             Log.d("PlayList", "Starting playlist area");
-            finish();
+            sendBroadcast( MusicHelpers.quickIntentFromAction(AudioServiceAction.AUDIO_SERVICE_ACTION_EXPORT_QUEUE_TO_PLAYLIST) );
         });
 
         ImageView record = findViewById(R.id.recordSongButton);
@@ -190,9 +190,6 @@ public class DetailsActivity extends Activity {
         public void onProgressChanged (SeekBar seekBar, int i, boolean b) {
             if (b) {
                 curVal = i;
-                //audioServiceBinder.pauseAudio();
-                //audioServiceBinder.setProgress( i );
-                //audioServiceBinder.startAudio();
             }
         }
 

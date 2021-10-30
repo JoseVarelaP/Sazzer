@@ -1,10 +1,12 @@
 package player.sazzer;
 
 import android.content.Context;
+import android.media.Image;
 import android.view.LayoutInflater;
 import android.view.View;
 import android.view.ViewGroup;
 import android.widget.BaseAdapter;
+import android.widget.ImageView;
 import android.widget.LinearLayout;
 import android.widget.TextView;
 import java.util.List;
@@ -41,6 +43,7 @@ class ListadoMusica extends BaseAdapter {
         // resultar en situaciones raras.
         LinearLayout vista = (LinearLayout) InfoCan.inflate(R.layout.list_item, parent, false);
         // Obten objetos
+        ImageView imgSong = (ImageView) vista.findViewById(R.id.coverImage);
         TextView nombreCancion = (TextView) vista.findViewById(R.id.nombreCancion);
         TextView nombreArtista = (TextView) vista.findViewById(R.id.nombreArtista);
         TextView nombreAlbum = (TextView) vista.findViewById(R.id.nombreAlbum);
@@ -53,6 +56,7 @@ class ListadoMusica extends BaseAdapter {
         nombreCancion.setText( canc.getTitle() );
         nombreArtista.setText( canc.getArtist() );
         nombreAlbum.setText( canc.getAlbum() );
+        imgSong.setImageBitmap( MusicHelpers.getAlbumImage(canc.getAlbumArt()) );
         vista.setTag(position);
 
         // Todo listo, regresa el objeto.

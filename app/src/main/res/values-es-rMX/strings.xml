@@ -7,4 +7,6 @@
     <string name="playSong">Reproducir</string>
     <string name="prevSong">Canción Anterior</string>
     <string name="nextSong">Canción Siguiente</string>
+    <string name="playListAction">Abrir Cola</string>
+    <string name="recordVoice">Grabar Voz</string>
 </resources>

@@ -75,4 +75,15 @@ public class MusicHelpers {
 
         return intent;
     }
+
+    public static Intent sendToPlaylist(Context context, @NonNull ArrayList<Song> tracks)
+    {
+        Gson gson = new Gson();
+        String jsonMusica = gson.toJson(tracks);
+
+        Intent intent = new Intent(context, PlaylistView.class);
+        intent.setFlags(Intent.FLAG_ACTIVITY_NEW_TASK | Intent.FLAG_ACTIVITY_SINGLE_TOP);
+        intent.putExtra("Audio.SongArray", jsonMusica);
+        return intent;
+    }
 }

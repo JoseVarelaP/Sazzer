@@ -26,6 +26,8 @@ import java.lang.reflect.Type;
 import java.util.ArrayList;
 import java.util.List;
 
+import player.sazzer.Adapters.PlaylistRecyclerViewAdapter;
+
 public class AudioServiceBinder extends Service implements MediaPlayer.OnPreparedListener,MediaPlayer.OnErrorListener,MediaPlayer.OnCompletionListener {
 
     // Guarda la ubicacion del archivo
@@ -331,6 +333,16 @@ public class AudioServiceBinder extends Service implements MediaPlayer.OnPrepare
                         audioPlayer.reset();
                     }
                     songs.clear();
+                    break;
+                }
+
+                case AUDIO_SERVICE_ACTION_EXPORT_QUEUE_TO_PLAYLIST:
+                {
+                    Log.d("AUDIO_SERVICE_ACTION_EXPORT_QUEUE_TO_PLAYLIST","Export to Playlist");
+                    Intent set = MusicHelpers.sendToPlaylist(getApplicationContext(), songs);
+                    startActivity(set);
+                    //getApplicationContext().sendBroadcast(set);
+                    break;
                 }
             }
         }

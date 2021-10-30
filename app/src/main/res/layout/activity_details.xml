@@ -30,6 +30,7 @@
             >
 
             <ImageView
+                android:contentDescription="@string/playListAction"
                 android:id="@+id/playListButton"
                 android:layout_width="0dp"
                 android:layout_height="match_parent"
@@ -42,6 +43,7 @@
                 android:layout_weight="8"/>
 
             <ImageView
+                android:contentDescription="@string/recordVoice"
                 android:id="@+id/recordSongButton"
                 android:src="@drawable/ic_baseline_mic_24"
                 android:layout_width="0dp"
