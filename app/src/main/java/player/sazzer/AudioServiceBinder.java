@@ -298,7 +298,7 @@ public class AudioServiceBinder extends Service implements MediaPlayer.OnPrepare
                     } else {
                         // When pressing the previous song button, usually it goes back to the start
                         // of the song, before actually going to the previous song.
-                        if( getAudioProgress() > 4 )
+                        if( getAudioProgress() > 1 )
                         {
                             setProgress(0);
                             songPosn = oldsum;

@@ -1,5 +1,6 @@
 package player.sazzer;
 
+import android.app.Activity;
 import android.app.Notification;
 import android.app.PendingIntent;
 import android.content.Context;
@@ -19,7 +20,7 @@ import java.io.FileNotFoundException;
 import java.io.IOException;
 import java.io.Serializable;
 
-public class NowPlayingManager implements Serializable {
+public class NowPlayingManager extends Activity implements Serializable {
     public static final String CHANNEL_ID = "CHANNEL_1";
 
     private Notification notification;
@@ -38,10 +39,13 @@ public class NowPlayingManager implements Serializable {
 
     public void updateSong( Song track, int percentage, AudioServiceBinder bind, boolean forceAlbumImageRegen )
     {
-        songHasImage = MusicHelpers.getAlbumImage( track.getAlbumArt() ) != null;
+        //songHasImage = MusicHelpers.getAlbumImage( track.getAlbumArt() ) != null;
 
-        if( (image == null || forceAlbumImageRegen) && songHasImage )
+        if( (image == null || forceAlbumImageRegen) )
             image = MusicHelpers.getAlbumImage( track.getAlbumArt() );
+
+        if( image == null )
+            image = BitmapFactory.decodeResource(getResources(),R.drawable.default_cover);
 
         // Create an intent that will move to the detailed song info screen.
         Intent intent = MusicHelpers.sendToDetailedSongInfo(parent, track, bind);
