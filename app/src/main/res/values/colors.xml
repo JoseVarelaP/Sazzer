@@ -5,5 +5,6 @@
     <color name="colorAccent">#3F86D1</color>
     <color name="colorBG">#FCFCFC</color>
     <color name="colorText">#000000</color>
+    <color name="songNameColor">#FCFCFC</color>
     <color name="artistColor">#6E35EE</color>
 </resources>
