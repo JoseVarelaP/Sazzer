@@ -14,6 +14,7 @@
         tools:ignore="RtlSymmetry" />
 
     <LinearLayout
+        android:id="@+id/songContainer"
         android:orientation="vertical"
         android:layout_width="match_parent"
         android:layout_height="match_parent">

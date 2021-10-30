@@ -336,6 +336,7 @@ public class AudioServiceBinder extends Service implements MediaPlayer.OnPrepare
                 {
                     Log.d("AUDIO_SERVICE_ACTION_EXPORT_QUEUE_TO_PLAYLIST","Export to Playlist");
                     Intent set = MusicHelpers.sendToPlaylist(getApplicationContext(), songs);
+                    set.putExtra("position", songPosn);
                     startActivity(set);
                     //getApplicationContext().sendBroadcast(set);
                     break;

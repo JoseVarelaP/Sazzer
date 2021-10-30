@@ -20,6 +20,7 @@ import player.sazzer.Adapters.PlaylistRecyclerViewAdapter;
 
 public class PlaylistView extends Activity implements PlaylistRecyclerViewAdapter.ItemClickListener {
     PlaylistRecyclerViewAdapter adapter;
+    LinearLayoutManager LLM;
     ArrayList<Song> songs;
     RecyclerView recyclerView;
     @Override
@@ -28,8 +29,9 @@ public class PlaylistView extends Activity implements PlaylistRecyclerViewAdapte
         setContentView(R.layout.activity_playlistview);
 
         // Time to setup the area.
+        LLM = new LinearLayoutManager(this);
         recyclerView = findViewById(R.id.playlistView);
-        recyclerView.setLayoutManager(new LinearLayoutManager(this));
+        recyclerView.setLayoutManager(LLM);
 
         onNewIntent(this.getIntent());
     }
@@ -52,6 +54,12 @@ public class PlaylistView extends Activity implements PlaylistRecyclerViewAdapte
                 adapter = new PlaylistRecyclerViewAdapter(this, songs);
                 adapter.setClickListener(this);
                 recyclerView.setAdapter(adapter);
+
+                int position = intent.getIntExtra("position",-1);
+                if( position != -1 )
+                {
+                    LLM.scrollToPositionWithOffset(position, 180);
+                }
             }
         }
     }
