@@ -7,6 +7,6 @@
     <color name="colorText">#000000</color>
     <color name="songNameColor">#000000</color>
     <color name="nowPlayingbuttonColor">#000000</color>
-    <color name="artistColor">#6E35EE</color>
     <color name="nowPlayingBackgroundColor">#FCFCFC</color>
+    <color name="recordButtonColor">#AEAE00</color>
 </resources>

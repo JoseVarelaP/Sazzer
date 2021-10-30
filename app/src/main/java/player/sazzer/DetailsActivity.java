@@ -135,6 +135,19 @@ public class DetailsActivity extends Activity {
             sendBroadcast( MusicHelpers.quickIntentFromAction(AudioServiceAction.AUDIO_SERVICE_ACTION_NEXT_SONG) );
         });
 
+        ImageView playList = findViewById(R.id.playListButton);
+        playList.setColorFilter( R.color.nowPlayingbuttonColor );
+        playList.setOnClickListener(v -> {
+            Log.d("PlayList", "Starting playlist area");
+            finish();
+        });
+
+        ImageView record = findViewById(R.id.recordSongButton);
+        record.setColorFilter( R.color.recordButtonColor );
+        record.setOnClickListener(v -> {
+            Log.d("Record", "Starting record area");
+            finish();
+        });
     }
 
     @Override

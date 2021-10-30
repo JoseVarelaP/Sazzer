@@ -1,24 +1,53 @@
 <?xml version="1.0" encoding="utf-8"?>
 <LinearLayout xmlns:android="http://schemas.android.com/apk/res/android"
+    xmlns:tools="http://schemas.android.com/tools"
     android:orientation="vertical"
     android:layout_width="match_parent"
     android:layout_height="match_parent">
 
     <ImageView
+        android:contentDescription="@string/nameArtist"
         android:id="@+id/imageCover"
-        android:layout_weight="3"
         android:background="#000000"
         android:layout_width="match_parent"
-        android:layout_height="match_parent"
+        android:layout_height="395dp"
         android:src="@drawable/default_cover"/>
 
     <LinearLayout
         android:orientation="vertical"
         android:layout_width="match_parent"
         android:padding="10dp"
-        android:layout_weight="5"
+        android:weightSum="5"
+        android:layout_weight="1"
         android:background="@color/nowPlayingBackgroundColor"
-        android:layout_height="match_parent">
+        android:layout_height="0dp">
+
+        <LinearLayout
+            android:layout_width="match_parent"
+            android:layout_height="0dp"
+            android:layout_weight="0.5"
+            android:weightSum="10"
+            >
+
+            <ImageView
+                android:id="@+id/playListButton"
+                android:layout_width="0dp"
+                android:layout_height="match_parent"
+                android:src="@drawable/ic_baseline_format_list_bulleted_24"
+                android:layout_weight="1" />
+
+            <View
+                android:layout_width="0dp"
+                android:layout_height="match_parent"
+                android:layout_weight="8"/>
+
+            <ImageView
+                android:id="@+id/recordSongButton"
+                android:src="@drawable/ic_baseline_mic_24"
+                android:layout_width="0dp"
+                android:layout_height="match_parent"
+                android:layout_weight="1"/>
+        </LinearLayout>
 
         <TextView
             android:id="@+id/artistName"
@@ -30,8 +59,9 @@
             android:ellipsize="marquee"
             android:marqueeRepeatLimit="marquee_forever"
             android:scrollHorizontally="true"
-            android:textColor="@color/artistColor"
-            android:layout_height="wrap_content" />
+            android:textColor="@color/colorPrimary"
+            android:layout_weight="0.5"
+            android:layout_height="0dp" />
 
         <TextView
             android:id="@+id/songName"
@@ -44,44 +74,69 @@
             android:textSize="25sp"
             android:scrollHorizontally="true"
             android:textColor="@color/songNameColor"
-            android:layout_height="wrap_content" />
+            android:layout_weight="0.75"
+            android:layout_height="0dp" />
 
         <LinearLayout
             android:orientation="horizontal"
             android:layout_width="match_parent"
             android:layout_height="0dp"
-            android:layout_weight="1"
-            android:showDividers="middle">
+            android:layout_weight="3"
+            android:showDividers="middle"
+            android:weightSum="7"
+            tools:ignore="NestedWeights">
+
+            <View
+                android:layout_width="0dp"
+                android:layout_height="match_parent"
+                android:layout_weight="1"
+                />
 
             <ImageButton android:id="@+id/PrevSong"
                 android:contentDescription="@string/prevSong"
-                android:layout_width="wrap_content"
+                android:layout_width="0dp"
                 android:layout_height="50dp"
-                android:layout_marginEnd="20dp"
-                android:layout_marginStart="50dp"
                 android:layout_gravity="center"
+                android:layout_weight="1"
                 android:background="@null"
                 android:src="@drawable/ic_baseline_skip_previous_24"
                 />
 
+            <View
+                android:layout_width="0dp"
+                android:layout_height="match_parent"
+                android:layout_weight="1"
+                />
+
             <ImageButton android:id="@+id/TogglePlay"
                 android:contentDescription="@string/playSong"
-                android:layout_width="wrap_content"
+                android:layout_width="0dp"
+                android:layout_weight="1"
                 android:layout_height="50dp"
-                android:layout_marginStart="50dp"
                 android:layout_gravity="center"
                 android:background="@null"
                 android:src="@drawable/ic_pause_white_48dp"
                 />
 
+            <View
+                android:layout_width="0dp"
+                android:layout_height="match_parent"
+                android:layout_weight="1"
+                />
+
             <ImageButton android:id="@+id/NextSong"
                 android:contentDescription="@string/nextSong"
-                android:layout_width="wrap_content"
+                android:layout_width="0dp"
+                android:layout_weight="1"
                 android:layout_height="50dp"
-                android:layout_marginStart="70dp"
                 android:layout_gravity="center"
                 android:background="@null"
                 android:src="@drawable/ic_baseline_skip_next_24"
+                />
+            <View
+                android:layout_width="0dp"
+                android:layout_height="match_parent"
+                android:layout_weight="1"
                 />
         </LinearLayout>
 
@@ -96,12 +151,14 @@
             <TextView
                 android:layout_weight="2"
                 android:id="@+id/curTime"
+                android:textStyle="bold"
                 android:textColor="@color/colorText"
                 android:layout_width="wrap_content"
                 android:layout_height="wrap_content"/>
             <TextView
                 android:id="@+id/totalTime"
                 android:layout_weight="2"
+                android:textStyle="bold"
                 android:textAlignment="viewEnd"
                 android:textColor="@color/colorText"
                 android:layout_width="wrap_content"
@@ -111,6 +168,8 @@
         <SeekBar android:id="@+id/sbProgress"
             android:layout_width="match_parent"
             android:layout_weight="0.2"
+            android:progressTint="@color/colorPrimary"
+            android:thumbTint="@color/colorPrimary"
             android:layout_height="wrap_content"
             />
 
