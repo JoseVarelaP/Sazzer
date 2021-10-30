@@ -6,6 +6,7 @@ import android.view.LayoutInflater;
 import android.view.View;
 import android.view.ViewGroup;
 import android.widget.ImageView;
+import android.widget.LinearLayout;
 import android.widget.TextView;
 
 import androidx.annotation.NonNull;
@@ -22,11 +23,13 @@ public class PlaylistRecyclerViewAdapter extends RecyclerView.Adapter<PlaylistRe
     private final ArrayList<Song> mData;
     private final LayoutInflater mInflater;
     private ItemClickListener mClickListener;
+    private final Song current;
 
     // data is passed into the constructor
-    public PlaylistRecyclerViewAdapter(Context context, ArrayList<Song> data) {
+    public PlaylistRecyclerViewAdapter(Context context, ArrayList<Song> data, Song current) {
         this.mInflater = LayoutInflater.from(context);
         this.mData = data;
+        this.current = current;
     }
 
     // inflates the row layout from xml when needed
@@ -41,10 +44,18 @@ public class PlaylistRecyclerViewAdapter extends RecyclerView.Adapter<PlaylistRe
     @Override
     public void onBindViewHolder(ViewHolder holder, int position) {
         Song track = mData.get(position);
+
+        holder.playIcon.setVisibility(View.GONE);
+        if( track != null && track == current )
+        {
+            // TODO: How to transfer it over to getColor()?
+            holder.container.setBackgroundColor( R.color.colorPrimary );
+            holder.playIcon.setVisibility(View.VISIBLE);
+        }
+
         holder.songName.setText( track.getTitle() );
         holder.songArtist.setText( track.getArtist() );
         holder.songAlbum.setText( track.getAlbum() );
-        //holder.songArt.setImageBitmap(MusicHelpers.getAlbumImage( track.getAlbumArt() ));
         holder.songArt.setImageResource(R.drawable.default_cover);
         new MusicHelpers.AlbumImageLoaderAsync(new MusicHelpers.AlbumImageLoaderAsync.Listener() {
             @Override
@@ -67,10 +78,13 @@ public class PlaylistRecyclerViewAdapter extends RecyclerView.Adapter<PlaylistRe
     // stores and recycles views as they are scrolled off screen
     public class ViewHolder extends RecyclerView.ViewHolder implements View.OnClickListener {
         TextView songName,songArtist,songAlbum;
-        ImageView songArt;
+        ImageView songArt,playIcon;
+        LinearLayout container;
 
         ViewHolder(View itemView) {
             super(itemView);
+            container = itemView.findViewById(R.id.songContainer);
+            playIcon = itemView.findViewById(R.id.playIcon);
             songName = itemView.findViewById(R.id.nombreCancion);
             songArtist = itemView.findViewById(R.id.nombreArtista);
             songAlbum = itemView.findViewById(R.id.nombreAlbum);

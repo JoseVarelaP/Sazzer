@@ -51,13 +51,12 @@ public class PlaylistView extends Activity implements PlaylistRecyclerViewAdapte
             {
                 songs = (ArrayList<Song>)newsongs;
 
-                adapter = new PlaylistRecyclerViewAdapter(this, songs);
-                adapter.setClickListener(this);
-                recyclerView.setAdapter(adapter);
-
                 int position = intent.getIntExtra("position",-1);
                 if( position != -1 )
                 {
+                    adapter = new PlaylistRecyclerViewAdapter(this, songs, songs.get(position));
+                    adapter.setClickListener(this);
+                    recyclerView.setAdapter(adapter);
                     LLM.scrollToPositionWithOffset(position, 180);
                 }
             }

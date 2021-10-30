@@ -79,7 +79,7 @@ public class MainActivity extends AppCompatActivity implements PlaylistRecyclerV
         //getSongList(MediaStore.Audio.Media.INTERNAL_CONTENT_URI);
         getSongList(MediaStore.Audio.Media.EXTERNAL_CONTENT_URI);
 
-        PlaylistRecyclerViewAdapter listMusica = new PlaylistRecyclerViewAdapter(this, songList);
+        PlaylistRecyclerViewAdapter listMusica = new PlaylistRecyclerViewAdapter(this, songList, null);
         listMusica.setClickListener(this);
         songView.setAdapter(listMusica);
     }

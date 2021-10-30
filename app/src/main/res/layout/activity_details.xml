@@ -9,8 +9,10 @@
         android:contentDescription="@string/nameArtist"
         android:id="@+id/imageCover"
         android:background="#000000"
+        android:minHeight="390dp"
+        android:maxHeight="390dp"
         android:layout_width="match_parent"
-        android:layout_height="395dp"
+        android:layout_height="wrap_content"
         android:src="@drawable/default_cover"/>
 
     <LinearLayout

@@ -4,17 +4,28 @@
     android:orientation="horizontal"
     android:layout_width="match_parent"
     android:layout_height="wrap_content"
+    android:id="@+id/songContainer"
     android:padding="10dp">
 
-    <ImageView
-        android:id="@+id/coverImage"
+    <RelativeLayout
         android:layout_width="50dp"
-        android:paddingEnd="10dp"
-        android:layout_height="50dp"
-        tools:ignore="RtlSymmetry" />
+        android:layout_height="50dp">
+        <ImageView
+            android:id="@+id/coverImage"
+            android:layout_width="match_parent"
+            android:paddingEnd="10dp"
+            android:layout_height="match_parent"
+            tools:ignore="RtlSymmetry" />
+
+        <ImageView
+            android:id="@+id/playIcon"
+            android:paddingEnd="10dp"
+            android:layout_width="match_parent"
+            android:layout_height="match_parent"
+            android:src="@drawable/ic_play_white_48dp"/>
+    </RelativeLayout>
 
     <LinearLayout
-        android:id="@+id/songContainer"
         android:orientation="vertical"
         android:layout_width="match_parent"
         android:layout_height="match_parent">
