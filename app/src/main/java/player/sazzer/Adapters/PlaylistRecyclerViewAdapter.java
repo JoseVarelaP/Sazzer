@@ -1,9 +1,11 @@
 package player.sazzer.Adapters;
 
 import android.content.Context;
+import android.graphics.Bitmap;
 import android.view.LayoutInflater;
 import android.view.View;
 import android.view.ViewGroup;
+import android.widget.ImageView;
 import android.widget.TextView;
 
 import androidx.annotation.NonNull;
@@ -11,6 +13,7 @@ import androidx.recyclerview.widget.RecyclerView;
 
 import java.util.ArrayList;
 
+import player.sazzer.MusicHelpers;
 import player.sazzer.R;
 import player.sazzer.Song;
 
@@ -41,6 +44,7 @@ public class PlaylistRecyclerViewAdapter extends RecyclerView.Adapter<PlaylistRe
         holder.songName.setText( track.getTitle() );
         holder.songArtist.setText( track.getArtist() );
         holder.songAlbum.setText( track.getAlbum() );
+        holder.songArt.setImageBitmap(MusicHelpers.getAlbumImage( track.getAlbumArt() ));
     }
 
     // total number of rows
@@ -53,12 +57,14 @@ public class PlaylistRecyclerViewAdapter extends RecyclerView.Adapter<PlaylistRe
     // stores and recycles views as they are scrolled off screen
     public class ViewHolder extends RecyclerView.ViewHolder implements View.OnClickListener {
         TextView songName,songArtist,songAlbum;
+        ImageView songArt;
 
         ViewHolder(View itemView) {
             super(itemView);
             songName = itemView.findViewById(R.id.nombreCancion);
             songArtist = itemView.findViewById(R.id.nombreArtista);
             songAlbum = itemView.findViewById(R.id.nombreAlbum);
+            songArt = itemView.findViewById(R.id.coverImage);
             itemView.setOnClickListener(this);
         }
 

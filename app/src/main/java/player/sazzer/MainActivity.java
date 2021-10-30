@@ -26,13 +26,17 @@ import androidx.annotation.Nullable;
 import androidx.appcompat.app.AppCompatActivity;
 import androidx.appcompat.app.AppCompatDelegate;
 import androidx.core.app.ActivityCompat;
+import androidx.recyclerview.widget.LinearLayoutManager;
+import androidx.recyclerview.widget.RecyclerView;
 
 import com.google.gson.Gson;
 
 import java.io.IOException;
 import java.util.ArrayList;
 
-public class MainActivity extends AppCompatActivity {
+import player.sazzer.Adapters.PlaylistRecyclerViewAdapter;
+
+public class MainActivity extends AppCompatActivity implements PlaylistRecyclerViewAdapter.ItemClickListener {
     public static final int REQUEST_CODE_EXTERNAL_STORAGE = 1002;
 
     Intent playIntent = null;
@@ -68,13 +72,15 @@ public class MainActivity extends AppCompatActivity {
 
     protected void GenerateMainSongList()
     {
-        ListView songView = findViewById(R.id.songList);
+        RecyclerView songView = findViewById(R.id.songList);
+        songView.setLayoutManager(new LinearLayoutManager(this));
         songList = new ArrayList<>();
 
         //getSongList(MediaStore.Audio.Media.INTERNAL_CONTENT_URI);
         getSongList(MediaStore.Audio.Media.EXTERNAL_CONTENT_URI);
 
-        ListadoMusica listMusica = new ListadoMusica(this, songList);
+        PlaylistRecyclerViewAdapter listMusica = new PlaylistRecyclerViewAdapter(this, songList);
+        listMusica.setClickListener(this);
         songView.setAdapter(listMusica);
     }
 
@@ -147,9 +153,9 @@ public class MainActivity extends AppCompatActivity {
             musicCursor.close();
     }
 
-    public void songPicked(View view) throws IOException {
-        Log.d("MainActivity","Set Song: " + (view.getTag().toString()));
-        int songNum = Integer.parseInt(view.getTag().toString());
+    @Override
+    public void onItemClick(View view, int position) {
+        Log.d("MainActivity","Set Song: " + position );
 
         // Broadcast a music list reset to the service.
         sendBroadcast( MusicHelpers.quickIntentFromAction(AudioServiceAction.AUDIO_SERVICE_ACTION_CLEAN_QUEUE) );
@@ -159,12 +165,12 @@ public class MainActivity extends AppCompatActivity {
         Intent intent = new Intent();
         intent.setAction(AudioServiceBinder.mBroadcasterServiceBinder);
         intent.putExtra("AUDIO_ACTION", AudioServiceAction.AUDIO_SERVICE_ACTION_UPDATE_SONG_ID);
-        intent.putExtra("Audio.SongID", songNum);
+        intent.putExtra("Audio.SongID", position);
         sendBroadcast(intent);
 
         sendBroadcast( MusicHelpers.quickIntentFromAction(AudioServiceAction.AUDIO_SERVICE_ACTION_PLAY_SONG) );
 
-        Intent nt = MusicHelpers.sendToDetailedSongInfo(MainActivity.this, songList.get(songNum), musicSrv);
+        Intent nt = MusicHelpers.sendToDetailedSongInfo(MainActivity.this, songList.get(position), musicSrv);
         nt.setFlags(Intent.FLAG_ACTIVITY_NEW_TASK | Intent.FLAG_ACTIVITY_SINGLE_TOP);
         startActivity(nt);
     }
