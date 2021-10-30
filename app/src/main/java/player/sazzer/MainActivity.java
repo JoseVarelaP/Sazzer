@@ -3,21 +3,17 @@ package player.sazzer;
 import android.Manifest;
 import android.app.NotificationChannel;
 import android.app.NotificationManager;
-import android.app.PendingIntent;
 import android.content.ComponentName;
 import android.content.ContentResolver;
-import android.content.ContentUris;
 import android.content.Context;
 import android.content.Intent;
 import android.content.ServiceConnection;
 import android.content.pm.PackageManager;
 import android.database.Cursor;
-import android.media.MediaMetadataRetriever;
 import android.net.Uri;
 import android.os.Build;
 import android.os.Bundle;
 import android.os.IBinder;
-import android.os.Parcelable;
 import android.provider.MediaStore;
 import android.util.Log;
 import android.view.View;
@@ -27,7 +23,6 @@ import android.widget.Toast;
 import androidx.annotation.NonNull;
 import androidx.annotation.Nullable;
 import androidx.appcompat.app.AppCompatActivity;
-import android.widget.MediaController.MediaPlayerControl;
 
 import com.google.gson.Gson;
 
@@ -39,15 +34,11 @@ public class MainActivity extends AppCompatActivity {
     public static final int REQUEST_CODE_EXTERNAL_STORAGE = 1002;
 
     Intent playIntent = null;
-
     ArrayList<Song> songList;
-
     private AudioServiceBinder musicSrv;
-
     NotificationManager notificationManager;
 
     private final ServiceConnection musicConnection = new ServiceConnection() {
-
         @Override
         public void onServiceConnected(ComponentName name, IBinder service) {}
 
@@ -59,8 +50,6 @@ public class MainActivity extends AppCompatActivity {
     protected void onCreate(@Nullable Bundle savedInstanceState) {
         super.onCreate(savedInstanceState);
         setContentView(R.layout.activity_main);
-
-        //musicSrv = new AudioServiceBinder();
 
         // Hay que pedir el elemento para cargar los audios.
         // Si no, entonces tendremos un error/choque debido a la estancia de acceso ilegal de archivos.
@@ -85,8 +74,6 @@ public class MainActivity extends AppCompatActivity {
 
         ListadoMusica listMusica = new ListadoMusica(this, songList);
         songView.setAdapter(listMusica);
-
-        //musicSrv.setList(songList);
     }
 
     @Override

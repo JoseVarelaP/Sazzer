@@ -50,13 +50,7 @@ public class AudioServiceBinder extends Service implements MediaPlayer.OnPrepare
     PlayerState curPlayerState = PlayerState.PLAYER_NULL;
 
     private int songPosn = 0;
-
-    //public Context getContext() { return context; }
-    //public void setContext(Context context) { this.context = context; }
-    //public Uri getAudioFileUri() { return audioFileUri; }
-    //public void setAudioFileUri(Uri audioFileUri) { this.audioFileUri = audioFileUri; }
     public void setProgress( int ms ) { this.audioPlayer.seekTo(ms); }
-    //public MediaPlayer GetPlayer() { return audioPlayer; }
 
     public boolean isPlaying()
     {
@@ -158,12 +152,6 @@ public class AudioServiceBinder extends Service implements MediaPlayer.OnPrepare
             ret = (currAudioPosition * 100) / totalAudioDuration;
         }
         return ret;
-    }
-
-    public class MusicBinder extends Binder {
-        AudioServiceBinder getService() {
-            return AudioServiceBinder.this;
-        }
     }
 
     public void setSong(int songIndex) {

@@ -24,19 +24,6 @@ import androidx.annotation.Nullable;
 import java.sql.Date;
 import java.util.concurrent.TimeUnit;
 
-class TimeSpace {
-    long hours = 0;
-    long minute = 0;
-    long second = 0;
-
-    public TimeSpace(int seconds)
-    {
-        hours = TimeUnit.MILLISECONDS.toHours(seconds);
-        minute = TimeUnit.MILLISECONDS.toMinutes(seconds) - (TimeUnit.MILLISECONDS.toHours(seconds)* 60);
-        second = TimeUnit.MILLISECONDS.toSeconds(seconds) - (TimeUnit.MILLISECONDS.toMinutes(seconds) *60);
-    }
-}
-
 public class DetailsActivity extends Activity {
     //private Handler audioProgressUpdateHandler = null;
     MediaPlayer player;
@@ -79,9 +66,9 @@ public class DetailsActivity extends Activity {
             TimeSpace timeCur = new TimeSpace(songProgress);
             TimeSpace timeMax = new TimeSpace(songMax);
 
-            curTime.setText( String.format("%02d:%02d",timeCur.minute, timeCur.second) );
+            curTime.setText( timeCur.convertToReadableMusicTime() );
 
-            totalTime.setText( String.format("%02d:%02d",timeMax.minute, timeMax.second) );
+            totalTime.setText( timeMax.convertToReadableMusicTime() );
             sbProgress.setMax(songMax);
 
             sbProgress.setProgress( songProgress );
