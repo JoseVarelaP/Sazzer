@@ -261,7 +261,7 @@ public class AudioServiceBinder extends Service implements MediaPlayer.OnPrepare
 
                     if( Progress > -1 )
                     {
-                        setProgress( (Progress * getTotalAudioDuration()) / 100 );
+                        setProgress( Progress );
                     }
                     break;
                 }

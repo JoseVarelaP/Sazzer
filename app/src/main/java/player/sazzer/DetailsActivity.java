@@ -175,10 +175,11 @@ public class DetailsActivity extends Activity {
     protected void onStart() { super.onStart (); }
 
     class MySeekBarChangeListener implements SeekBar.OnSeekBarChangeListener {
-
+        int curVal = 0;
         @Override
         public void onProgressChanged (SeekBar seekBar, int i, boolean b) {
             if (b) {
+                curVal = i;
                 //audioServiceBinder.pauseAudio();
                 //audioServiceBinder.setProgress( i );
                 //audioServiceBinder.startAudio();
@@ -193,7 +194,7 @@ public class DetailsActivity extends Activity {
             Intent forThePlayer = new Intent();
             forThePlayer.setAction(AudioServiceBinder.mBroadcasterServiceBinder);
             forThePlayer.putExtra("AUDIO_ACTION", AudioServiceAction.AUDIO_SERVICE_ACTION_UPDATE_PROGRESS);
-            forThePlayer.putExtra("Audio.SeekProgress",seekBar.getProgress());
+            forThePlayer.putExtra("Audio.SeekProgress", curVal );
             sendBroadcast(forThePlayer);
         }
 
