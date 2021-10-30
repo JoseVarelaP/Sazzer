@@ -152,21 +152,18 @@ public class MainActivity extends AppCompatActivity {
         Log.d("MainActivity","Set Song: " + (view.getTag().toString()));
         int songNum = Integer.parseInt(view.getTag().toString());
 
-        Gson gson = new Gson();
-        String jsonMusica = gson.toJson(songList);
+        // Broadcast a music list reset to the service.
+        sendBroadcast( MusicHelpers.quickIntentFromAction(AudioServiceAction.AUDIO_SERVICE_ACTION_CLEAN_QUEUE) );
+
+        sendBroadcast( MusicHelpers.createIntentToUpdateMusicArray(songList) );
 
         Intent intent = new Intent();
         intent.setAction(AudioServiceBinder.mBroadcasterServiceBinder);
-        intent.putExtra("AUDIO_ACTION", AudioServiceAction.AUDIO_SERVICE_ACTION_UPDATE_BINDER);
-        intent.putExtra("Audio.SongArray", jsonMusica);
+        intent.putExtra("AUDIO_ACTION", AudioServiceAction.AUDIO_SERVICE_ACTION_UPDATE_SONG_ID);
+        intent.putExtra("Audio.SongID", songNum);
         sendBroadcast(intent);
 
-        intent = new Intent();
-        intent.setAction(AudioServiceBinder.mBroadcasterServiceBinder);
-        intent.putExtra("AUDIO_ACTION", AudioServiceAction.AUDIO_SERVICE_ACTION_UPDATE_BINDER);
-        intent.putExtra("Audio.SongID", songNum);
-        intent.putExtra("Audio.PlaySong", true);
-        sendBroadcast(intent);
+        sendBroadcast( MusicHelpers.quickIntentFromAction(AudioServiceAction.AUDIO_SERVICE_ACTION_PLAY_SONG) );
 
         Intent nt = MusicHelpers.sendToDetailedSongInfo(MainActivity.this, songList.get(songNum), musicSrv);
         nt.setFlags(Intent.FLAG_ACTIVITY_NEW_TASK | Intent.FLAG_ACTIVITY_SINGLE_TOP);

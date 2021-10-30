@@ -9,6 +9,10 @@ import android.media.MediaMetadataRetriever;
 import androidx.annotation.NonNull;
 import androidx.annotation.Nullable;
 
+import com.google.gson.Gson;
+
+import java.util.ArrayList;
+
 public class MusicHelpers {
     /**
      * Generate a Bitmap object that comes from the song's embedded metadata.
@@ -21,6 +25,31 @@ public class MusicHelpers {
         byte[] data = mmr.getEmbeddedPicture();
         if (data != null) return BitmapFactory.decodeByteArray(data, 0, data.length);
         return null;
+    }
+
+    public static Intent quickIntentFromAction(AudioServiceAction action)
+    {
+        Intent i = new Intent();
+        i.setAction(AudioServiceBinder.mBroadcasterServiceBinder);
+        i.putExtra("AUDIO_ACTION", action);
+        return i;
+    }
+
+    /**
+     * (Utilizes Gson to convert the array to a serialized string).
+     * @param songList New list to send to the service.
+     * @return AUDIO_SERVICE_ACTION_UPDATE_BINDER brodcast action.
+     */
+    public static Intent createIntentToUpdateMusicArray(ArrayList<Song> songList) {
+        Gson gson = new Gson();
+        String jsonMusica = gson.toJson(songList);
+
+        Intent intent = new Intent();
+        intent.setAction(AudioServiceBinder.mBroadcasterServiceBinder);
+        intent.putExtra("AUDIO_ACTION", AudioServiceAction.AUDIO_SERVICE_ACTION_UPDATE_BINDER);
+        intent.putExtra("Audio.SongArray", jsonMusica);
+
+        return intent;
     }
 
     /**

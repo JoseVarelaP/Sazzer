@@ -229,7 +229,21 @@ public class AudioServiceBinder extends Service implements MediaPlayer.OnPrepare
                             songs = (ArrayList<Song>) newsongs;
                         }
                     }
+                    break;
+                }
 
+                case AUDIO_SERVICE_ACTION_PLAY_SONG:
+                {
+                    Log.d("Broadcast","Playing new song");
+                    try {
+                        playSong();
+                    } catch (IOException e) {
+                        e.printStackTrace();
+                    }
+                }
+
+                case AUDIO_SERVICE_ACTION_UPDATE_SONG_ID:
+                {
                     if( intent.getIntExtra("Audio.SongID",-1) != -1 )
                     {
                         if( songs.size() > 0 )
@@ -238,17 +252,6 @@ public class AudioServiceBinder extends Service implements MediaPlayer.OnPrepare
                             Log.e("BroacastReciever", "The song array is empty.");
                             return;
                         }
-                    }
-
-                    if( intent.getBooleanExtra("Audio.PlaySong",false) )
-                    {
-                        Log.d("Broadcast","Playing new song");
-                        try {
-                            playSong();
-                        } catch (IOException e) {
-                            e.printStackTrace();
-                        }
-                        return;
                     }
                     break;
                 }

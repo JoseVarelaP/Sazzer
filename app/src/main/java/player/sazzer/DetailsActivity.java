@@ -120,29 +120,19 @@ public class DetailsActivity extends Activity {
         button = findViewById(R.id.TogglePlay);
         button.setColorFilter( R.color.nowPlayingbuttonColor );
         button.setOnClickListener(v -> {
-            Intent forThePlayer = new Intent();
-            forThePlayer.setAction(AudioServiceBinder.mBroadcasterServiceBinder);
-            forThePlayer.putExtra("AUDIO_ACTION", AudioServiceAction.AUDIO_SERVICE_ACTION_TOGGLE_PLAY);
-            forThePlayer.putExtra("Audio.TogglePlay",true);
-            sendBroadcast(forThePlayer);
+            sendBroadcast( MusicHelpers.quickIntentFromAction(AudioServiceAction.AUDIO_SERVICE_ACTION_TOGGLE_PLAY) );
         });
 
         prev = findViewById(R.id.PrevSong);
         prev.setColorFilter( R.color.nowPlayingbuttonColor );
         prev.setOnClickListener(v -> {
-            Intent forThePlayer = new Intent();
-            forThePlayer.setAction(AudioServiceBinder.mBroadcasterServiceBinder);
-            forThePlayer.putExtra("AUDIO_ACTION", AudioServiceAction.AUDIO_SERVICE_ACTION_PREV_SONG);
-            sendBroadcast(forThePlayer);
+            sendBroadcast( MusicHelpers.quickIntentFromAction(AudioServiceAction.AUDIO_SERVICE_ACTION_PREV_SONG) );
         });
 
         next = findViewById(R.id.NextSong);
         next.setColorFilter( R.color.nowPlayingbuttonColor );
         next.setOnClickListener(v -> {
-            Intent forThePlayer = new Intent();
-            forThePlayer.setAction(AudioServiceBinder.mBroadcasterServiceBinder);
-            forThePlayer.putExtra("AUDIO_ACTION", AudioServiceAction.AUDIO_SERVICE_ACTION_NEXT_SONG);
-            sendBroadcast(forThePlayer);
+            sendBroadcast( MusicHelpers.quickIntentFromAction(AudioServiceAction.AUDIO_SERVICE_ACTION_NEXT_SONG) );
         });
 
     }
