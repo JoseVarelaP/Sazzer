@@ -5,4 +5,5 @@
     <color name="colorAccent">#3F86D1</color>
     <color name="colorBG">#000000</color>
     <color name="colorText">#FCFCFC</color>
+    <color name="artistColor">#3700B3</color>
 </resources>

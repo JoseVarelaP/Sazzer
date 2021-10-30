@@ -11,6 +11,7 @@ import android.net.Uri;
 import android.os.Bundle;
 import android.os.Message;
 import android.os.Handler;
+import android.text.method.ScrollingMovementMethod;
 import android.util.Log;
 import android.widget.ImageButton;
 import android.widget.ImageView;
@@ -53,7 +54,7 @@ public class DetailsActivity extends Activity {
             String nArtista = intent.getStringExtra("songArtist");
             String nArt = intent.getStringExtra("songArt");
 
-            if( nCancion != null )
+            if( nCancion != null && (!Nombre.getText().equals(nCancion)) )
                 Nombre.setText( nCancion );
             if( nArtista != null )
                 Artista.setText( nArtista );
@@ -104,6 +105,9 @@ public class DetailsActivity extends Activity {
         Nombre = findViewById( R.id.songName );
         Artista = findViewById( R.id.artistName );
         albumArt = findViewById( R.id.imageCover );
+
+        Nombre.setSelected(true);
+        Artista.setSelected(true);
 
         onNewIntent(this.getIntent());
 

@@ -14,18 +14,29 @@
         android:src="@drawable/default_cover"/>
 
     <TextView
-        android:id="@+id/songName"
+        android:id="@+id/artistName"
         android:layout_weight="1"
         android:layout_width="match_parent"
+        android:textStyle="bold"
+        android:singleLine="true"
         android:textAlignment="center"
-        android:textColor="@color/colorText"
+        android:ellipsize="marquee"
+        android:marqueeRepeatLimit="marquee_forever"
+        android:scrollHorizontally="true"
+        android:textColor="@color/artistColor"
         android:layout_height="wrap_content" />
 
     <TextView
-        android:id="@+id/artistName"
-        android:layout_weight="1"
-        android:textAlignment="center"
+        android:id="@+id/songName"
         android:layout_width="match_parent"
+        android:layout_weight="0"
+        android:textStyle="bold"
+        android:textAlignment="center"
+        android:singleLine="true"
+        android:ellipsize="marquee"
+        android:marqueeRepeatLimit ="marquee_forever"
+        android:textSize="20sp"
+        android:scrollHorizontally="true"
         android:textColor="@color/colorText"
         android:layout_height="wrap_content" />
 
@@ -61,14 +72,14 @@
         android:layout_width="match_parent"
         android:layout_height="wrap_content"
         android:showDividers="middle"
-        android:layout_weight="0">
+        android:layout_weight="2">
 
         <ImageButton android:id="@+id/PrevSong"
             android:contentDescription="@string/prevSong"
             android:layout_width="wrap_content"
             android:layout_height="50dp"
             android:layout_marginEnd="20dp"
-            android:layout_marginStart="30dp"
+            android:layout_marginStart="50dp"
             android:layout_gravity="center"
             android:background="@null"
             android:src="@drawable/ic_baseline_skip_previous_24"
@@ -78,7 +89,7 @@
             android:contentDescription="@string/playSong"
             android:layout_width="wrap_content"
             android:layout_height="50dp"
-            android:layout_marginStart="35dp"
+            android:layout_marginStart="50dp"
             android:layout_gravity="center"
             android:background="@null"
             android:src="@drawable/ic_pause_white_48dp"
@@ -88,7 +99,7 @@
             android:contentDescription="@string/nextSong"
             android:layout_width="wrap_content"
             android:layout_height="50dp"
-            android:layout_marginStart="50dp"
+            android:layout_marginStart="70dp"
             android:layout_gravity="center"
             android:background="@null"
             android:src="@drawable/ic_baseline_skip_next_24"
