@@ -1,5 +1,6 @@
 package player.sazzer;
 
+import android.app.Activity;
 import android.app.Notification;
 import android.app.PendingIntent;
 import android.content.Context;
@@ -19,16 +20,13 @@ import java.io.FileNotFoundException;
 import java.io.IOException;
 import java.io.Serializable;
 
-public class NowPlayingManager implements Serializable {
+public class NowPlayingManager extends Activity implements Serializable {
     public static final String CHANNEL_ID = "CHANNEL_1";
-    //public static final String ACTION_NEXT = "NEXT";
-    //public static final String ACTION_PREV = "PREVIOUS";
-    //public static final String ACTION_PLAY = "PLAY";
 
     private Notification notification;
-    private Context parent;
-
-    private RemoteViews remoteView;
+    private final Context parent;
+    private Bitmap image;
+    private boolean songHasImage = false;
     NotificationManagerCompat NMC;
 
     public NowPlayingManager(Context context) {
@@ -39,55 +37,34 @@ public class NowPlayingManager implements Serializable {
         }
     }
 
-    public void updateSong( Song track )
+    public void updateSong( Song track, int percentage, AudioServiceBinder bind, boolean forceAlbumImageRegen )
     {
-        // TODO: Made album art compatible
-        Bitmap bitmap = null;
+        //songHasImage = MusicHelpers.getAlbumImage( track.getAlbumArt() ) != null;
 
-        bitmap = MusicHelpers.getAlbumImage( track.getAlbumArt() );
+        if( (image == null || forceAlbumImageRegen) )
+            image = MusicHelpers.getAlbumImage( track.getAlbumArt() );
 
-        /*
-        try {
-            bitmap = MediaStore.Images.Media.getBitmap(
-                    parent.getContentResolver(), track.getAlbumArt());
-            bitmap = Bitmap.createScaledBitmap(bitmap, 30, 30, true);
-            bitmap = getAlbumImage( track.getAlbumArt() );
-        } catch (FileNotFoundException exception) {
-            exception.printStackTrace();
-            bitmap = BitmapFactory.decodeResource(parent.getResources(),
-                    R.drawable.default_cover);
-        } catch (IOException e) {
-            e.printStackTrace();
-        }
-        */
-
-        //remoteView = new RemoteViews(parent.getPackageName(), R.layout.notificationview);
-
-        //setListeners(remoteView);
+        if( image == null )
+            image = BitmapFactory.decodeResource(bind.getResources(),R.drawable.default_cover);
 
         // Create an intent that will move to the detailed song info screen.
-        Intent intent = new Intent(parent, DetailsActivity.class);
-        intent.setFlags(Intent.FLAG_ACTIVITY_NEW_TASK);
-        intent.putExtra("songName", track.getTitle());
-        intent.putExtra("songArtist", track.getArtist());
-        intent.putExtra("songArt", track.getAlbumArt());
+        Intent intent = MusicHelpers.sendToDetailedSongInfo(parent, track, bind);
 
-        // If more than one contact-specific PendingIntent will be outstanding at once, and they need to have separate extras,
-        // it has to contain something to make it unique.
-        //intent.setAction("action"+System.currentTimeMillis());
-
-        Log.d("NowPlayingManager",String.format("Created a new intent with the following data: %s by %s", track.getTitle(), track.getArtist()));
-        PendingIntent showSongIntent = PendingIntent.getActivity(parent, 0, intent, PendingIntent.FLAG_UPDATE_CURRENT);
+        //Log.d("NowPlayingManager",String.format("Created a new intent with the following data: %s by %s", track.getTitle(), track.getArtist()));
+        PendingIntent showSongIntent = PendingIntent.getActivity(parent, 0, intent, PendingIntent.FLAG_IMMUTABLE | PendingIntent.FLAG_UPDATE_CURRENT);
 
         notification = new NotificationCompat.Builder(parent, CHANNEL_ID)
-                .setSmallIcon(R.drawable.ic_play_arrow_black_48dp)
+                .setSmallIcon(R.drawable.ic_play_white_48dp)
                 .setOngoing(true)
                 .setContentTitle(track.getTitle())
                 .setContentText(track.getArtist())
-                .setSubText(track.getAlbum())
-                .setLargeIcon(bitmap)
+                .setSubText(track.getAlbum() + " " + percentage)
+                .setLargeIcon(image)
                 .setOnlyAlertOnce(true)
                 .setShowWhen(false)
+                .setSilent(true)
+                .setProgress( intent.getIntExtra("TotalTime", 0) , intent.getIntExtra("Progress", 0), false )
+                .setPriority(NotificationCompat.PRIORITY_LOW)
                 .setContentIntent(showSongIntent)
                 .setAutoCancel(false)
                 .setTicker("something")
@@ -98,6 +75,6 @@ public class NowPlayingManager implements Serializable {
 
     public void cancelNotification()
     {
-        NMC.cancel(2);
+        NMC.cancel(1);
     }
 }

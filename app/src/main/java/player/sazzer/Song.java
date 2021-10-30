@@ -1,7 +1,5 @@
 package player.sazzer;
 
-import android.net.Uri;
-
 public class Song {
     private final long id;
     private final String title;

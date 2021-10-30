@@ -1,7 +1,11 @@
 package player.sazzer;
 
 import android.app.Activity;
+import android.content.BroadcastReceiver;
+import android.content.Context;
 import android.content.Intent;
+import android.content.IntentFilter;
+import android.media.Image;
 import android.media.MediaPlayer;
 import android.net.Uri;
 import android.os.Bundle;
@@ -17,13 +21,63 @@ import android.widget.ProgressBar;
 import androidx.annotation.NonNull;
 import androidx.annotation.Nullable;
 
+import java.sql.Date;
+import java.util.concurrent.TimeUnit;
+
 public class DetailsActivity extends Activity {
-    AudioServiceBinder audioServiceBinder;
-    private Handler audioProgressUpdateHandler = null;
-    private ProgressBar backgroundAudioProgress;
+    //private Handler audioProgressUpdateHandler = null;
     MediaPlayer player;
-    Thread posThread;
-    Uri mediaUri;
+    SeekBar sbProgress;
+    ImageButton button,prev,next;
+    TextView curTime,totalTime,Nombre,Artista;
+    ImageView albumArt;
+
+
+    private final BroadcastReceiver musicDataReciever = new BroadcastReceiver() {
+        @Override
+        public void onReceive(Context context, Intent intent) {
+            Bundle extras = intent.getExtras();
+
+            if( extras == null )
+                return;
+
+            if( extras.getBoolean("needsPause",false) )
+            {
+                button.setImageResource(R.drawable.ic_play_white_48dp);
+                return;
+            } else {
+                button.setImageResource(R.drawable.ic_pause_white_48dp);
+            }
+
+            String nCancion = intent.getStringExtra("songName");
+            String nArtista = intent.getStringExtra("songArtist");
+            String nArt = intent.getStringExtra("songArt");
+
+            if( nCancion != null )
+                Nombre.setText( nCancion );
+            if( nArtista != null )
+                Artista.setText( nArtista );
+            if( nArt != null )
+                albumArt.setImageBitmap( MusicHelpers.getAlbumImage(nArt) );
+
+            int songProgress = extras.getInt("Progress");
+            int songMax = extras.getInt("TotalTime");
+
+            TimeSpace timeCur = new TimeSpace(songProgress);
+            TimeSpace timeMax = new TimeSpace(songMax);
+
+            curTime.setText( timeCur.convertToReadableMusicTime() );
+
+            totalTime.setText( timeMax.convertToReadableMusicTime() );
+            sbProgress.setMax(songMax);
+
+            sbProgress.setProgress( songProgress );
+        }
+    };
+
+    private IntentFilter mIntentFilter;
+
+    public static final String mBroadcasterAudioAction = "player.sazzer.action.UPDATE_PROGRESS";
 
     @Override
     protected void onNewIntent(Intent intent) {
@@ -32,10 +86,6 @@ public class DetailsActivity extends Activity {
         String nCancion = intent.getStringExtra("songName");
         String nArtista = intent.getStringExtra("songArtist");
         String nArt = intent.getStringExtra("songArt");
-
-        TextView Nombre = findViewById( R.id.songName );
-        TextView Artista = findViewById( R.id.artistName );
-        ImageView albumArt = findViewById( R.id.imageCover );
 
         Nombre.setText( nCancion );
         Artista.setText( nArtista );
@@ -49,61 +99,43 @@ public class DetailsActivity extends Activity {
         super.onCreate(savedInstanceState);
         Log.d("onCreate", "Creating new screen");
         setContentView(R.layout.activity_details);
+        curTime = findViewById(R.id.curTime);
+        totalTime = findViewById(R.id.totalTime);
+        Nombre = findViewById( R.id.songName );
+        Artista = findViewById( R.id.artistName );
+        albumArt = findViewById( R.id.imageCover );
+
         onNewIntent(this.getIntent());
 
-        SeekBar sbProgress = findViewById(R.id.sbProgress);
+        sbProgress = findViewById(R.id.sbProgress);
         sbProgress.setOnSeekBarChangeListener(new MySeekBarChangeListener());
 
-        //audioServiceBinder = new AudioServiceBinder();
+        mIntentFilter = new IntentFilter();
+        mIntentFilter.addAction(mBroadcasterAudioAction);
 
-        //mediaUri = Uri.parse(getIntent().getStringExtra("audioURL"));
-        //String nCancion = getIntent().getStringExtra("songName");
-        //String nArtista = getIntent().getStringExtra("songArtist");
-
-        //TextView Nombre = findViewById( R.id.songName );
-        //TextView Artista = findViewById( R.id.artistName );
-
-        //audioServiceBinder.setAudioFileUri(mediaUri);
-        //createAudioProgressbarUpdater();
-
-        //backgroundAudioProgress = findViewById( R.id.backgroundaudioprogress );
-
-        //audioServiceBinder.setContext(getApplicationContext());
-        //audioServiceBinder.startAudio();
-
-        // Esto deberia quedar aqui?
-        // (Problablemente puede estar en el servicio tambien)
-        /*
-        audioServiceBinder.GetPlayer().setOnPreparedListener (mediaPlayer -> {
-            posThread = new Thread (() -> {
-                try {
-                    if( audioServiceBinder != null ) {
-                        while ( audioServiceBinder.isPlaying() ) {
-                            Thread.sleep(1000);
-                            if( audioServiceBinder != null )
-                                sbProgress.setProgress(audioServiceBinder.getCurrentAudioPosition());
-                        }
-                    }
-                } catch (InterruptedException in) { in.printStackTrace (); }
-            });
-
-            sbProgress.setMax ( audioServiceBinder.getTotalAudioDuration() );
-            posThread.start ();
-        });
-        */
-
-        //Nombre.setText( nCancion );
-        //Artista.setText( nArtista );
-
-        ImageButton button = findViewById(R.id.Accion);
+        button = findViewById(R.id.TogglePlay);
         button.setOnClickListener(v -> {
-            if (audioServiceBinder.isPlaying()) {
-                //audioServiceBinder.pauseAudio();
-                button.setImageResource(R.drawable.ic_play_arrow_black_48dp);
-            } else {
-                //audioServiceBinder.startAudio();
-                button.setImageResource(R.drawable.ic_pause_black_48dp);
-            }
+            Intent forThePlayer = new Intent();
+            forThePlayer.setAction(AudioServiceBinder.mBroadcasterServiceBinder);
+            forThePlayer.putExtra("AUDIO_ACTION", AudioServiceAction.AUDIO_SERVICE_ACTION_TOGGLE_PLAY);
+            forThePlayer.putExtra("Audio.TogglePlay",true);
+            sendBroadcast(forThePlayer);
+        });
+
+        prev = findViewById(R.id.PrevSong);
+        prev.setOnClickListener(v -> {
+            Intent forThePlayer = new Intent();
+            forThePlayer.setAction(AudioServiceBinder.mBroadcasterServiceBinder);
+            forThePlayer.putExtra("AUDIO_ACTION", AudioServiceAction.AUDIO_SERVICE_ACTION_PREV_SONG);
+            sendBroadcast(forThePlayer);
+        });
+
+        next = findViewById(R.id.NextSong);
+        next.setOnClickListener(v -> {
+            Intent forThePlayer = new Intent();
+            forThePlayer.setAction(AudioServiceBinder.mBroadcasterServiceBinder);
+            forThePlayer.putExtra("AUDIO_ACTION", AudioServiceAction.AUDIO_SERVICE_ACTION_NEXT_SONG);
+            sendBroadcast(forThePlayer);
         });
 
     }
@@ -121,16 +153,6 @@ public class DetailsActivity extends Activity {
         //outState.putString ("SONG", mediaUri != null ? mediaUri.toString (): "");
         outState.putInt ("PROGRESS", player != null ?  player.getCurrentPosition () : -1);
         outState.putBoolean ("ISPLAYING", player != null && player.isPlaying ());
-
-        /*
-        if ( audioServiceBinder.isPlaying() ) {
-            posThread.interrupt ();
-
-            // audioServiceBinder.stopAudio();
-            // audioServiceBinder.setProgress(0);
-            // audioServiceBinder.destroyAudioPlayer();
-        }
-        */
     }
 
     @Override
@@ -139,18 +161,27 @@ public class DetailsActivity extends Activity {
     @Override
     protected void onResume() {
         super.onResume ();
+        //IntentFilter intentFilter = new IntentFilter(mBroadcasterAudioAction);
+        this.registerReceiver(musicDataReciever, mIntentFilter);
+    }
+
+    @Override
+    protected void onPause() {
+        super.onPause();
+        this.unregisterReceiver(musicDataReciever);
     }
 
     @Override
     protected void onStart() { super.onStart (); }
 
     class MySeekBarChangeListener implements SeekBar.OnSeekBarChangeListener {
-
+        int curVal = 0;
         @Override
         public void onProgressChanged (SeekBar seekBar, int i, boolean b) {
             if (b) {
+                curVal = i;
                 //audioServiceBinder.pauseAudio();
-                audioServiceBinder.setProgress( i );
+                //audioServiceBinder.setProgress( i );
                 //audioServiceBinder.startAudio();
             }
         }
@@ -159,26 +190,13 @@ public class DetailsActivity extends Activity {
         public void onStartTrackingTouch (SeekBar seekBar) {}
 
         @Override
-        public void onStopTrackingTouch (SeekBar seekBar) {}
-
-    }
-
-    private void createAudioProgressbarUpdater()
-    {
-        if(audioProgressUpdateHandler==null) {
-            audioProgressUpdateHandler = new Handler() {
-                @Override
-                public void handleMessage(Message msg) {
-                    if (msg.what == audioServiceBinder.UPDATE_AUDIO_PROGRESS_BAR) {
-
-                        if( audioServiceBinder != null) {
-                            int progAct =audioServiceBinder.getAudioProgress();
-
-                            //backgroundAudioProgress.setProgress(progAct*10);
-                        }
-                    }
-                }
-            };
+        public void onStopTrackingTouch (SeekBar seekBar) {
+            Intent forThePlayer = new Intent();
+            forThePlayer.setAction(AudioServiceBinder.mBroadcasterServiceBinder);
+            forThePlayer.putExtra("AUDIO_ACTION", AudioServiceAction.AUDIO_SERVICE_ACTION_UPDATE_PROGRESS);
+            forThePlayer.putExtra("Audio.SeekProgress", curVal );
+            sendBroadcast(forThePlayer);
         }
+
     }
 }

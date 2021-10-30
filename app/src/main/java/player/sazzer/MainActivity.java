@@ -3,16 +3,14 @@ package player.sazzer;
 import android.Manifest;
 import android.app.NotificationChannel;
 import android.app.NotificationManager;
-import android.app.PendingIntent;
 import android.content.ComponentName;
 import android.content.ContentResolver;
-import android.content.ContentUris;
 import android.content.Context;
 import android.content.Intent;
 import android.content.ServiceConnection;
 import android.content.pm.PackageManager;
+import android.content.res.Configuration;
 import android.database.Cursor;
-import android.media.MediaMetadataRetriever;
 import android.net.Uri;
 import android.os.Build;
 import android.os.Bundle;
@@ -26,9 +24,9 @@ import android.widget.Toast;
 import androidx.annotation.NonNull;
 import androidx.annotation.Nullable;
 import androidx.appcompat.app.AppCompatActivity;
-import android.widget.MediaController.MediaPlayerControl;
+import androidx.appcompat.app.AppCompatDelegate;
 
-import player.sazzer.AudioServiceBinder.MusicBinder;
+import com.google.gson.Gson;
 
 import java.io.IOException;
 import java.util.ArrayList;
@@ -38,36 +36,23 @@ public class MainActivity extends AppCompatActivity {
     public static final int REQUEST_CODE_EXTERNAL_STORAGE = 1002;
 
     Intent playIntent = null;
-
     ArrayList<Song> songList;
-
     private AudioServiceBinder musicSrv;
-
     NotificationManager notificationManager;
 
     private final ServiceConnection musicConnection = new ServiceConnection() {
+        @Override
+        public void onServiceConnected(ComponentName name, IBinder service) {}
 
         @Override
-        public void onServiceConnected(ComponentName name, IBinder service) {
-            MusicBinder binder = (MusicBinder) service;
-            musicSrv = binder.getService();
-            musicSrv.setList(songList);
-            //musicBound = true;
-            Log.d("musicConnection","Service Connected");
-        }
-
-        @Override
-        public void onServiceDisconnected(ComponentName name) {
-            //musicBound = false;
-        }
+        public void onServiceDisconnected(ComponentName name) {}
     };
 
     @Override
     protected void onCreate(@Nullable Bundle savedInstanceState) {
         super.onCreate(savedInstanceState);
+        AppCompatDelegate.setDefaultNightMode(AppCompatDelegate.MODE_NIGHT_FOLLOW_SYSTEM);
         setContentView(R.layout.activity_main);
-
-        musicSrv = new AudioServiceBinder();
 
         // Hay que pedir el elemento para cargar los audios.
         // Si no, entonces tendremos un error/choque debido a la estancia de acceso ilegal de archivos.
@@ -92,16 +77,12 @@ public class MainActivity extends AppCompatActivity {
 
         ListadoMusica listMusica = new ListadoMusica(this, songList);
         songView.setAdapter(listMusica);
-
-        musicSrv.setList(songList);
     }
 
     @Override
     protected void onStart() {
         Log.d("onStart","Starting");
         super.onStart();
-        musicSrv.setContext(getApplicationContext());
-        musicSrv.initAudioPlayer();
         if (playIntent == null) {
             Log.d("onStart","Intent is null, starting service.");
             playIntent = new Intent(this, AudioServiceBinder.class);
@@ -169,8 +150,27 @@ public class MainActivity extends AppCompatActivity {
 
     public void songPicked(View view) throws IOException {
         Log.d("MainActivity","Set Song: " + (view.getTag().toString()));
-        musicSrv.setSong(Integer.parseInt(view.getTag().toString()));
-        musicSrv.playSong();
+        int songNum = Integer.parseInt(view.getTag().toString());
+
+        Gson gson = new Gson();
+        String jsonMusica = gson.toJson(songList);
+
+        Intent intent = new Intent();
+        intent.setAction(AudioServiceBinder.mBroadcasterServiceBinder);
+        intent.putExtra("AUDIO_ACTION", AudioServiceAction.AUDIO_SERVICE_ACTION_UPDATE_BINDER);
+        intent.putExtra("Audio.SongArray", jsonMusica);
+        sendBroadcast(intent);
+
+        intent = new Intent();
+        intent.setAction(AudioServiceBinder.mBroadcasterServiceBinder);
+        intent.putExtra("AUDIO_ACTION", AudioServiceAction.AUDIO_SERVICE_ACTION_UPDATE_BINDER);
+        intent.putExtra("Audio.SongID", songNum);
+        intent.putExtra("Audio.PlaySong", true);
+        sendBroadcast(intent);
+
+        Intent nt = MusicHelpers.sendToDetailedSongInfo(MainActivity.this, songList.get(songNum), musicSrv);
+        nt.setFlags(Intent.FLAG_ACTIVITY_NEW_TASK | Intent.FLAG_ACTIVITY_SINGLE_TOP);
+        startActivity(nt);
     }
 
     @Override
