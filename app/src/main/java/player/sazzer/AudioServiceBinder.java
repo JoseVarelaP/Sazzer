@@ -62,7 +62,7 @@ public class AudioServiceBinder extends Service implements MediaPlayer.OnPrepare
         if( !isPlaying() )
             return;
 
-        Log.d("runBinderUpdater","Song now is at " + getAudioProgress() + "%");
+        //Log.d("runBinderUpdater","Song now is at " + getAudioProgress() + "%");
         manager.updateSong( songs.get(songPosn), getAudioProgress(), this, false );
 
         //Intent broadcastIntent = new Intent();

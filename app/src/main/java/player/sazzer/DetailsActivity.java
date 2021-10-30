@@ -118,6 +118,7 @@ public class DetailsActivity extends Activity {
         mIntentFilter.addAction(mBroadcasterAudioAction);
 
         button = findViewById(R.id.TogglePlay);
+        button.setColorFilter( R.color.nowPlayingbuttonColor );
         button.setOnClickListener(v -> {
             Intent forThePlayer = new Intent();
             forThePlayer.setAction(AudioServiceBinder.mBroadcasterServiceBinder);
@@ -127,6 +128,7 @@ public class DetailsActivity extends Activity {
         });
 
         prev = findViewById(R.id.PrevSong);
+        prev.setColorFilter( R.color.nowPlayingbuttonColor );
         prev.setOnClickListener(v -> {
             Intent forThePlayer = new Intent();
             forThePlayer.setAction(AudioServiceBinder.mBroadcasterServiceBinder);
@@ -135,6 +137,7 @@ public class DetailsActivity extends Activity {
         });
 
         next = findViewById(R.id.NextSong);
+        next.setColorFilter( R.color.nowPlayingbuttonColor );
         next.setOnClickListener(v -> {
             Intent forThePlayer = new Intent();
             forThePlayer.setAction(AudioServiceBinder.mBroadcasterServiceBinder);
