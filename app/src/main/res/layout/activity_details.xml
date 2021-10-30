@@ -9,19 +9,22 @@
     <ImageView
         android:id="@+id/imageCover"
         android:layout_width="match_parent"
-        android:layout_height="0dp"
-        android:padding="10dp"
-        android:layout_weight="10"
+        android:layout_height="wrap_content"
+        android:layout_weight="20"
         android:src="@drawable/default_cover"/>
 
     <TextView
         android:id="@+id/songName"
+        android:layout_weight="1"
         android:layout_width="match_parent"
+        android:textAlignment="center"
         android:textColor="@color/colorText"
         android:layout_height="wrap_content" />
 
     <TextView
         android:id="@+id/artistName"
+        android:layout_weight="1"
+        android:textAlignment="center"
         android:layout_width="match_parent"
         android:textColor="@color/colorText"
         android:layout_height="wrap_content" />
@@ -46,15 +49,12 @@
             android:textColor="@color/colorText"
             android:layout_width="wrap_content"
             android:layout_height="wrap_content"/>
-
-
     </LinearLayout>
+
     <SeekBar android:id="@+id/sbProgress"
         android:layout_width="match_parent"
         android:layout_height="wrap_content"
-        android:outlineAmbientShadowColor="@color/colorText"
-        android:outlineSpotShadowColor="@color/colorText"
-        android:layout_weight="1" />
+        android:layout_weight="0" />
 
     <LinearLayout
         android:orientation="horizontal"
@@ -70,7 +70,8 @@
             android:layout_marginEnd="20dp"
             android:layout_marginStart="30dp"
             android:layout_gravity="center"
-            android:src="@drawable/ic_pause_black_48dp"
+            android:background="@null"
+            android:src="@drawable/ic_baseline_skip_previous_24"
             />
 
         <ImageButton android:id="@+id/TogglePlay"
@@ -79,7 +80,8 @@
             android:layout_height="50dp"
             android:layout_marginStart="35dp"
             android:layout_gravity="center"
-            android:src="@drawable/ic_pause_black_48dp"
+            android:background="@null"
+            android:src="@drawable/ic_pause_white_48dp"
             />
 
         <ImageButton android:id="@+id/NextSong"
@@ -88,7 +90,8 @@
             android:layout_height="50dp"
             android:layout_marginStart="50dp"
             android:layout_gravity="center"
-            android:src="@drawable/ic_pause_black_48dp"
+            android:background="@null"
+            android:src="@drawable/ic_baseline_skip_next_24"
             />
     </LinearLayout>
 

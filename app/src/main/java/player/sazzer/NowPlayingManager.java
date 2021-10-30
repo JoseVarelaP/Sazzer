@@ -54,7 +54,7 @@ public class NowPlayingManager extends Activity implements Serializable {
         PendingIntent showSongIntent = PendingIntent.getActivity(parent, 0, intent, PendingIntent.FLAG_IMMUTABLE | PendingIntent.FLAG_UPDATE_CURRENT);
 
         notification = new NotificationCompat.Builder(parent, CHANNEL_ID)
-                .setSmallIcon(R.drawable.ic_play_arrow_black_48dp)
+                .setSmallIcon(R.drawable.ic_play_white_48dp)
                 .setOngoing(true)
                 .setContentTitle(track.getTitle())
                 .setContentText(track.getArtist())

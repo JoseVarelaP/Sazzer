@@ -43,10 +43,10 @@ public class DetailsActivity extends Activity {
 
             if( extras.getBoolean("needsPause",false) )
             {
-                button.setImageResource(R.drawable.ic_play_arrow_black_48dp);
+                button.setImageResource(R.drawable.ic_play_white_48dp);
                 return;
             } else {
-                button.setImageResource(R.drawable.ic_pause_black_48dp);
+                button.setImageResource(R.drawable.ic_pause_white_48dp);
             }
 
             String nCancion = intent.getStringExtra("songName");

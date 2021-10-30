@@ -271,6 +271,13 @@ public class AudioServiceBinder extends Service implements MediaPlayer.OnPrepare
                         audioPlayer.pause();
                     else
                         audioPlayer.start();
+
+                    {
+                        Intent broadcastIntent = new Intent(); //= MusicHelpers.sendToDetailedSongInfo(getApplicationContext(), songs.get(songPosn), this);
+                        broadcastIntent.setAction(DetailsActivity.mBroadcasterAudioAction);
+                        broadcastIntent.putExtra("needsPause", !audioPlayer.isPlaying());
+                        getApplicationContext().sendBroadcast(broadcastIntent);
+                    }
                     break;
                 }
 
@@ -311,6 +318,16 @@ public class AudioServiceBinder extends Service implements MediaPlayer.OnPrepare
                     }
 
                     break;
+                }
+
+                case AUDIO_SERVICE_ACTION_CLEAN_QUEUE:
+                {
+                    // If anything is currently playing, stop.
+                    if( audioPlayer.isPlaying() ) {
+                        audioPlayer.stop();
+                        audioPlayer.reset();
+                    }
+                    songs.clear();
                 }
             }
         }
