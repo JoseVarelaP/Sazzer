@@ -22,11 +22,13 @@ public class PlaylistRecyclerViewAdapter extends RecyclerView.Adapter<PlaylistRe
     private final ArrayList<Song> mData;
     private final LayoutInflater mInflater;
     private ItemClickListener mClickListener;
+    private boolean needsInvertedColors;
 
     // data is passed into the constructor
-    public PlaylistRecyclerViewAdapter(Context context, ArrayList<Song> data) {
+    public PlaylistRecyclerViewAdapter(Context context, ArrayList<Song> data, boolean invertColor) {
         this.mInflater = LayoutInflater.from(context);
         this.mData = data;
+        this.needsInvertedColors = invertColor;
     }
 
     // inflates the row layout from xml when needed
@@ -44,7 +46,18 @@ public class PlaylistRecyclerViewAdapter extends RecyclerView.Adapter<PlaylistRe
         holder.songName.setText( track.getTitle() );
         holder.songArtist.setText( track.getArtist() );
         holder.songAlbum.setText( track.getAlbum() );
-        holder.songArt.setImageBitmap(MusicHelpers.getAlbumImage( track.getAlbumArt() ));
+        //holder.songArt.setImageBitmap(MusicHelpers.getAlbumImage( track.getAlbumArt() ));
+        new MusicHelpers.AlbumImageLoaderAsync(new MusicHelpers.AlbumImageLoaderAsync.Listener() {
+            @Override
+            public void onImageDownloaded(Bitmap bitmap) {
+                holder.songArt.setImageBitmap(bitmap);
+            }
+
+            @Override
+            public void onImageDownloadError() {
+
+            }
+        }).execute(track.getAlbumArt());
     }
 
     // total number of rows
