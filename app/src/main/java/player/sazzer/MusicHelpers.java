@@ -109,6 +109,16 @@ public class MusicHelpers {
         return intent;
     }
 
+    public static void actionServicePlaySong( Context context, int position )
+    {
+        Intent intent = new Intent();
+        intent.setAction(AudioServiceBinder.mBroadcasterServiceBinder);
+        intent.putExtra("AUDIO_ACTION", AudioServiceAction.AUDIO_SERVICE_ACTION_UPDATE_SONG_ID);
+        intent.putExtra("Audio.SongID", position);
+        context.sendBroadcast(intent);
+        context.sendBroadcast( quickIntentFromAction(AudioServiceAction.AUDIO_SERVICE_ACTION_PLAY_SONG) );
+    }
+
     public static Intent sendToPlaylist(Context context, @NonNull ArrayList<Song> tracks)
     {
         Gson gson = new Gson();

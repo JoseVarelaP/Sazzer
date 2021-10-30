@@ -162,13 +162,7 @@ public class MainActivity extends AppCompatActivity implements PlaylistRecyclerV
 
         sendBroadcast( MusicHelpers.createIntentToUpdateMusicArray(songList) );
 
-        Intent intent = new Intent();
-        intent.setAction(AudioServiceBinder.mBroadcasterServiceBinder);
-        intent.putExtra("AUDIO_ACTION", AudioServiceAction.AUDIO_SERVICE_ACTION_UPDATE_SONG_ID);
-        intent.putExtra("Audio.SongID", position);
-        sendBroadcast(intent);
-
-        sendBroadcast( MusicHelpers.quickIntentFromAction(AudioServiceAction.AUDIO_SERVICE_ACTION_PLAY_SONG) );
+        MusicHelpers.actionServicePlaySong(getApplicationContext(), position);
 
         Intent nt = MusicHelpers.sendToDetailedSongInfo(MainActivity.this, songList.get(position), musicSrv);
         nt.setFlags(Intent.FLAG_ACTIVITY_NEW_TASK | Intent.FLAG_ACTIVITY_SINGLE_TOP);

@@ -73,6 +73,6 @@ public class PlaylistView extends Activity implements PlaylistRecyclerViewAdapte
 
     @Override
     public void onItemClick(View view, int position) {
-        Toast.makeText(this, "You clicked " + songs.get(position) + " on row number " + position, Toast.LENGTH_SHORT).show();
+        MusicHelpers.actionServicePlaySong(getApplicationContext(), position);
     }
 }

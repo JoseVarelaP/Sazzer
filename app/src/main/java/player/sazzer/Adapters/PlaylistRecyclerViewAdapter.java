@@ -22,13 +22,11 @@ public class PlaylistRecyclerViewAdapter extends RecyclerView.Adapter<PlaylistRe
     private final ArrayList<Song> mData;
     private final LayoutInflater mInflater;
     private ItemClickListener mClickListener;
-    private boolean needsInvertedColors;
 
     // data is passed into the constructor
-    public PlaylistRecyclerViewAdapter(Context context, ArrayList<Song> data, boolean invertColor) {
+    public PlaylistRecyclerViewAdapter(Context context, ArrayList<Song> data) {
         this.mInflater = LayoutInflater.from(context);
         this.mData = data;
-        this.needsInvertedColors = invertColor;
     }
 
     // inflates the row layout from xml when needed
