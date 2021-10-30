@@ -25,6 +25,7 @@ import androidx.annotation.NonNull;
 import androidx.annotation.Nullable;
 import androidx.appcompat.app.AppCompatActivity;
 import androidx.appcompat.app.AppCompatDelegate;
+import androidx.core.app.ActivityCompat;
 
 import com.google.gson.Gson;
 
@@ -32,7 +33,6 @@ import java.io.IOException;
 import java.util.ArrayList;
 
 public class MainActivity extends AppCompatActivity {
-    public static final int REQUEST_CODE = 1001;
     public static final int REQUEST_CODE_EXTERNAL_STORAGE = 1002;
 
     Intent playIntent = null;
@@ -58,10 +58,9 @@ public class MainActivity extends AppCompatActivity {
         // Si no, entonces tendremos un error/choque debido a la estancia de acceso ilegal de archivos.
         int perm = getBaseContext ().checkSelfPermission (Manifest.permission.READ_EXTERNAL_STORAGE);
         if (perm != PackageManager.PERMISSION_GRANTED) {
-            requestPermissions (
-                    new String [] { Manifest.permission.READ_EXTERNAL_STORAGE },
-                    REQUEST_CODE_EXTERNAL_STORAGE
-            );
+            ActivityCompat.requestPermissions(this,
+                    new String[] { Manifest.permission.READ_EXTERNAL_STORAGE },
+                    REQUEST_CODE_EXTERNAL_STORAGE);
         } else {
             GenerateMainSongList();
         }
@@ -175,15 +174,13 @@ public class MainActivity extends AppCompatActivity {
         super.onRequestPermissionsResult (requestCode, permissions, grantResults);
 
         switch (requestCode) {
-            case REQUEST_CODE:
-                if (grantResults.length > 0 && grantResults [0] == PackageManager.PERMISSION_GRANTED) {
-                    Toast.makeText (getBaseContext(),"¡Permiso concedido!", Toast.LENGTH_LONG).show ();
-                }
-                break;
             case REQUEST_CODE_EXTERNAL_STORAGE:
                 if (grantResults.length > 0 && grantResults [0] == PackageManager.PERMISSION_GRANTED) {
                     GenerateMainSongList ();
                 }
+                break;
+            default:
+                break;
         }
     }
 
