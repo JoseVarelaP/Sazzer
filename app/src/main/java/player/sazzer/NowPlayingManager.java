@@ -7,17 +7,9 @@ import android.content.Context;
 import android.content.Intent;
 import android.graphics.Bitmap;
 import android.graphics.BitmapFactory;
-import android.media.MediaMetadataRetriever;
 import android.os.Build;
-import android.provider.MediaStore;
-import android.util.Log;
-import android.widget.RemoteViews;
-
 import androidx.core.app.NotificationCompat;
 import androidx.core.app.NotificationManagerCompat;
-
-import java.io.FileNotFoundException;
-import java.io.IOException;
 import java.io.Serializable;
 
 public class NowPlayingManager extends Activity implements Serializable {

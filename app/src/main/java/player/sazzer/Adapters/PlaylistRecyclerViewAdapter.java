@@ -45,6 +45,7 @@ public class PlaylistRecyclerViewAdapter extends RecyclerView.Adapter<PlaylistRe
         holder.songArtist.setText( track.getArtist() );
         holder.songAlbum.setText( track.getAlbum() );
         //holder.songArt.setImageBitmap(MusicHelpers.getAlbumImage( track.getAlbumArt() ));
+        holder.songArt.setImageResource(R.drawable.default_cover);
         new MusicHelpers.AlbumImageLoaderAsync(new MusicHelpers.AlbumImageLoaderAsync.Listener() {
             @Override
             public void onImageDownloaded(Bitmap bitmap) {
@@ -52,9 +53,7 @@ public class PlaylistRecyclerViewAdapter extends RecyclerView.Adapter<PlaylistRe
             }
 
             @Override
-            public void onImageDownloadError() {
-
-            }
+            public void onImageDownloadError() {}
         }).execute(track.getAlbumArt());
     }
 

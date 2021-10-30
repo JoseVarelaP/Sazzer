@@ -3,9 +3,7 @@ package player.sazzer;
 import android.app.Activity;
 import android.content.Intent;
 import android.os.Bundle;
-import android.util.Log;
 import android.view.View;
-import android.widget.Toast;
 
 import androidx.annotation.Nullable;
 import androidx.recyclerview.widget.LinearLayoutManager;
@@ -36,13 +34,9 @@ public class PlaylistView extends Activity implements PlaylistRecyclerViewAdapte
         onNewIntent(this.getIntent());
     }
 
-    public static final String mPlaylistAudioAction = "player.sazzer.action.UPDATE_PLAYLIST";
-
     @Override
     protected void onNewIntent(Intent intent) {
         super.onNewIntent(intent);
-        Log.d("PlaylistView", "onNewIntent: Starting");
-
         String newsongsStr = intent.getStringExtra("Audio.SongArray");
 
         if( newsongsStr != null && !newsongsStr.isEmpty() ) {
@@ -51,12 +45,8 @@ public class PlaylistView extends Activity implements PlaylistRecyclerViewAdapte
             Type type = new TypeToken<List<Song>>(){}.getType();
             List<Song> newsongs = gson.fromJson(newsongsStr, type);
 
-            if( newsongs.isEmpty() )
+            if( !newsongs.isEmpty() )
             {
-                Log.e("BroacastReciever", "The given array is empty.");
-                return;
-            } else {
-                Log.w("BroacastReciever", "Obtained the array.");
                 songs = (ArrayList<Song>)newsongs;
 
                 adapter = new PlaylistRecyclerViewAdapter(this, songs);
