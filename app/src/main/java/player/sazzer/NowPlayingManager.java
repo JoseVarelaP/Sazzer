@@ -45,7 +45,7 @@ public class NowPlayingManager extends Activity implements Serializable {
             image = MusicHelpers.getAlbumImage( track.getAlbumArt() );
 
         if( image == null )
-            image = BitmapFactory.decodeResource(getResources(),R.drawable.default_cover);
+            image = BitmapFactory.decodeResource(bind.getResources(),R.drawable.default_cover);
 
         // Create an intent that will move to the detailed song info screen.
         Intent intent = MusicHelpers.sendToDetailedSongInfo(parent, track, bind);
