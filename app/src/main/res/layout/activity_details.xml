@@ -26,6 +26,29 @@
         android:textColor="@color/colorText"
         android:layout_height="wrap_content" />
 
+    <LinearLayout
+        android:orientation="horizontal"
+        android:layout_width="match_parent"
+        android:layout_height="wrap_content"
+        android:showDividers="middle"
+        android:layout_weight="0">
+
+        <TextView
+            android:layout_weight="2"
+            android:id="@+id/curTime"
+            android:textColor="@color/colorText"
+            android:layout_width="wrap_content"
+            android:layout_height="wrap_content"/>
+        <TextView
+            android:id="@+id/totalTime"
+            android:layout_weight="2"
+            android:textAlignment="viewEnd"
+            android:textColor="@color/colorText"
+            android:layout_width="wrap_content"
+            android:layout_height="wrap_content"/>
+
+
+    </LinearLayout>
     <SeekBar android:id="@+id/sbProgress"
         android:layout_width="match_parent"
         android:layout_height="wrap_content"
@@ -33,12 +56,40 @@
         android:outlineSpotShadowColor="@color/colorText"
         android:layout_weight="1" />
 
-    <ImageButton android:id="@+id/Accion"
-        android:layout_width="10mm"
-        android:layout_height="2mm"
-        android:layout_weight="1"
-        android:layout_gravity="center"
-        android:src="@drawable/ic_pause_black_48dp"
-        />
+    <LinearLayout
+        android:orientation="horizontal"
+        android:layout_width="match_parent"
+        android:layout_height="wrap_content"
+        android:showDividers="middle"
+        android:layout_weight="0">
+
+        <ImageButton android:id="@+id/PrevSong"
+            android:contentDescription="@string/prevSong"
+            android:layout_width="wrap_content"
+            android:layout_height="50dp"
+            android:layout_marginEnd="20dp"
+            android:layout_marginStart="30dp"
+            android:layout_gravity="center"
+            android:src="@drawable/ic_pause_black_48dp"
+            />
+
+        <ImageButton android:id="@+id/TogglePlay"
+            android:contentDescription="@string/playSong"
+            android:layout_width="wrap_content"
+            android:layout_height="50dp"
+            android:layout_marginStart="35dp"
+            android:layout_gravity="center"
+            android:src="@drawable/ic_pause_black_48dp"
+            />
+
+        <ImageButton android:id="@+id/NextSong"
+            android:contentDescription="@string/nextSong"
+            android:layout_width="wrap_content"
+            android:layout_height="50dp"
+            android:layout_marginStart="50dp"
+            android:layout_gravity="center"
+            android:src="@drawable/ic_pause_black_48dp"
+            />
+    </LinearLayout>
 
 </LinearLayout>

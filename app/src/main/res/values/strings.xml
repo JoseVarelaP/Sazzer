@@ -3,4 +3,7 @@
     <string name="nameSong">Song</string>
     <string name="nameArtist">Artist</string>
     <string name="nameAlbum">Album</string>
+    <string name="playSong">Play</string>
+    <string name="prevSong">Previous Song</string>
+    <string name="nextSong">Next Song</string>
 </resources>

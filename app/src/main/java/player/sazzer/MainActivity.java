@@ -31,8 +31,6 @@ import android.widget.MediaController.MediaPlayerControl;
 
 import com.google.gson.Gson;
 
-import player.sazzer.AudioServiceBinder.MusicBinder;
-
 import java.io.IOException;
 import java.util.ArrayList;
 
@@ -51,12 +49,7 @@ public class MainActivity extends AppCompatActivity {
     private final ServiceConnection musicConnection = new ServiceConnection() {
 
         @Override
-        public void onServiceConnected(ComponentName name, IBinder service) {
-            MusicBinder binder = (MusicBinder) service;
-            //musicSrv = binder.getService();
-            //musicSrv.setList(songList);
-            Log.d("musicConnection","Service Connected");
-        }
+        public void onServiceConnected(ComponentName name, IBinder service) {}
 
         @Override
         public void onServiceDisconnected(ComponentName name) {}

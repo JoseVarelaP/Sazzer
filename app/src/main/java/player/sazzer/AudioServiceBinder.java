@@ -65,17 +65,14 @@ public class AudioServiceBinder extends Service implements MediaPlayer.OnPrepare
 
     void updateContent()
     {
-        if( curPlayerState == PlayerState.PLAYER_ERROR || curPlayerState == PlayerState.PLAYER_NULL )
-            return;
-
         if( !isPlaying() )
             return;
 
-        //Log.d("runBinderUpdater","Song now is at " + getAudioProgress() + "%");
-        manager.updateSong( songs.get(songPosn), getAudioProgress(), this );
+        Log.d("runBinderUpdater","Song now is at " + getAudioProgress() + "%");
+        manager.updateSong( songs.get(songPosn), getAudioProgress(), this, false );
 
         //Intent broadcastIntent = new Intent();
-        Intent broadcastIntent = MusicHelpers.sendToDetailedSongInfo(getApplicationContext(), songs.get(songPosn), this);
+        Intent broadcastIntent = new Intent(); //= MusicHelpers.sendToDetailedSongInfo(getApplicationContext(), songs.get(songPosn), this);
         broadcastIntent.setAction(DetailsActivity.mBroadcasterAudioAction);
         broadcastIntent.putExtra("Progress", getCurrentAudioPosition());
         broadcastIntent.putExtra("TotalTime", getTotalAudioDuration());
@@ -148,12 +145,7 @@ public class AudioServiceBinder extends Service implements MediaPlayer.OnPrepare
     // Duracion completa de la canción.
     public int getTotalAudioDuration()
     {
-        int ret = 0;
-        if(audioPlayer != null)
-        {
-            ret = audioPlayer.getDuration();
-        }
-        return ret;
+        return audioPlayer.getDuration();
     }
 
     // Progreso actual de la canción.
@@ -205,7 +197,7 @@ public class AudioServiceBinder extends Service implements MediaPlayer.OnPrepare
             curPlayerState = PlayerState.PLAYER_LOADING;
 
             // Create the manager to send the notification.
-            manager.updateSong( songs.get(songPosn), 0, this );
+            manager.updateSong( songs.get(songPosn), 0, this, true );
             refresh(900);
         } catch (Exception e) {
             curPlayerState = PlayerState.PLAYER_ERROR;
@@ -292,6 +284,45 @@ public class AudioServiceBinder extends Service implements MediaPlayer.OnPrepare
                         audioPlayer.pause();
                     else
                         audioPlayer.start();
+                    break;
+                }
+
+                case AUDIO_SERVICE_ACTION_NEXT_SONG:
+                case AUDIO_SERVICE_ACTION_PREV_SONG:
+                {
+                    int offset = Action == AudioServiceAction.AUDIO_SERVICE_ACTION_NEXT_SONG ? 1 : -1;
+                    // Is there a song available to play next?
+                    int oldsum = songPosn;
+                    int newsum = (songPosn += offset);
+                    if( newsum < 0 || newsum > songs.size() )
+                        break;
+
+                    songPosn = newsum;
+                    setSong(songPosn);
+
+                    if( Action == AudioServiceAction.AUDIO_SERVICE_ACTION_NEXT_SONG )
+                    {
+                        try {
+                            playSong();
+                        } catch (IOException e) {
+                            e.printStackTrace();
+                        }
+                    } else {
+                        // When pressing the previous song button, usually it goes back to the start
+                        // of the song, before actually going to the previous song.
+                        if( getAudioProgress() > 4 )
+                        {
+                            setProgress(0);
+                            songPosn = oldsum;
+                        } else {
+                            try {
+                                playSong();
+                            } catch (IOException e) {
+                                e.printStackTrace();
+                            }
+                        }
+                    }
+
                     break;
                 }
             }

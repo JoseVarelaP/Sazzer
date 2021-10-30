@@ -24,6 +24,8 @@ public class NowPlayingManager implements Serializable {
 
     private Notification notification;
     private final Context parent;
+    private Bitmap image;
+    private boolean songHasImage = false;
     NotificationManagerCompat NMC;
 
     public NowPlayingManager(Context context) {
@@ -34,9 +36,12 @@ public class NowPlayingManager implements Serializable {
         }
     }
 
-    public void updateSong( Song track, int percentage, AudioServiceBinder bind )
+    public void updateSong( Song track, int percentage, AudioServiceBinder bind, boolean forceAlbumImageRegen )
     {
-        Bitmap bitmap = MusicHelpers.getAlbumImage( track.getAlbumArt() );
+        songHasImage = MusicHelpers.getAlbumImage( track.getAlbumArt() ) != null;
+
+        if( (image == null || forceAlbumImageRegen) && songHasImage )
+            image = MusicHelpers.getAlbumImage( track.getAlbumArt() );
 
         // Create an intent that will move to the detailed song info screen.
         Intent intent = MusicHelpers.sendToDetailedSongInfo(parent, track, bind);
@@ -50,7 +55,7 @@ public class NowPlayingManager implements Serializable {
                 .setContentTitle(track.getTitle())
                 .setContentText(track.getArtist())
                 .setSubText(track.getAlbum() + " " + percentage)
-                .setLargeIcon(bitmap)
+                .setLargeIcon(image)
                 .setOnlyAlertOnce(true)
                 .setShowWhen(false)
                 .setSilent(true)

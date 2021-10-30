@@ -5,6 +5,7 @@ import android.content.BroadcastReceiver;
 import android.content.Context;
 import android.content.Intent;
 import android.content.IntentFilter;
+import android.media.Image;
 import android.media.MediaPlayer;
 import android.net.Uri;
 import android.os.Bundle;
@@ -20,11 +21,30 @@ import android.widget.ProgressBar;
 import androidx.annotation.NonNull;
 import androidx.annotation.Nullable;
 
+import java.sql.Date;
+import java.util.concurrent.TimeUnit;
+
+class TimeSpace {
+    long hours = 0;
+    long minute = 0;
+    long second = 0;
+
+    public TimeSpace(int seconds)
+    {
+        hours = TimeUnit.MILLISECONDS.toHours(seconds);
+        minute = TimeUnit.MILLISECONDS.toMinutes(seconds) - (TimeUnit.MILLISECONDS.toHours(seconds)* 60);
+        second = TimeUnit.MILLISECONDS.toSeconds(seconds) - (TimeUnit.MILLISECONDS.toMinutes(seconds) *60);
+    }
+}
+
 public class DetailsActivity extends Activity {
     //private Handler audioProgressUpdateHandler = null;
     MediaPlayer player;
     SeekBar sbProgress;
-    ImageButton button;
+    ImageButton button,prev,next;
+    TextView curTime,totalTime,Nombre,Artista;
+    ImageView albumArt;
+
 
     private final BroadcastReceiver musicDataReciever = new BroadcastReceiver() {
         @Override
@@ -42,13 +62,27 @@ public class DetailsActivity extends Activity {
                 button.setImageResource(R.drawable.ic_pause_black_48dp);
             }
 
+            String nCancion = intent.getStringExtra("songName");
+            String nArtista = intent.getStringExtra("songArtist");
+            String nArt = intent.getStringExtra("songArt");
+
+            if( nCancion != null )
+                Nombre.setText( nCancion );
+            if( nArtista != null )
+                Artista.setText( nArtista );
+            if( nArt != null )
+                albumArt.setImageBitmap( MusicHelpers.getAlbumImage(nArt) );
+
             int songProgress = extras.getInt("Progress");
             int songMax = extras.getInt("TotalTime");
 
-            if( sbProgress.getMax() != songMax )
-            {
-                sbProgress.setMax(songMax);
-            }
+            TimeSpace timeCur = new TimeSpace(songProgress);
+            TimeSpace timeMax = new TimeSpace(songMax);
+
+            curTime.setText( String.format("%02d:%02d",timeCur.minute, timeCur.second) );
+
+            totalTime.setText( String.format("%02d:%02d",timeMax.minute, timeMax.second) );
+            sbProgress.setMax(songMax);
 
             sbProgress.setProgress( songProgress );
         }
@@ -66,10 +100,6 @@ public class DetailsActivity extends Activity {
         String nArtista = intent.getStringExtra("songArtist");
         String nArt = intent.getStringExtra("songArt");
 
-        TextView Nombre = findViewById( R.id.songName );
-        TextView Artista = findViewById( R.id.artistName );
-        ImageView albumArt = findViewById( R.id.imageCover );
-
         Nombre.setText( nCancion );
         Artista.setText( nArtista );
         albumArt.setImageBitmap( MusicHelpers.getAlbumImage(nArt) );
@@ -82,6 +112,12 @@ public class DetailsActivity extends Activity {
         super.onCreate(savedInstanceState);
         Log.d("onCreate", "Creating new screen");
         setContentView(R.layout.activity_details);
+        curTime = findViewById(R.id.curTime);
+        totalTime = findViewById(R.id.totalTime);
+        Nombre = findViewById( R.id.songName );
+        Artista = findViewById( R.id.artistName );
+        albumArt = findViewById( R.id.imageCover );
+
         onNewIntent(this.getIntent());
 
         sbProgress = findViewById(R.id.sbProgress);
@@ -90,12 +126,28 @@ public class DetailsActivity extends Activity {
         mIntentFilter = new IntentFilter();
         mIntentFilter.addAction(mBroadcasterAudioAction);
 
-        button = findViewById(R.id.Accion);
+        button = findViewById(R.id.TogglePlay);
         button.setOnClickListener(v -> {
             Intent forThePlayer = new Intent();
             forThePlayer.setAction(AudioServiceBinder.mBroadcasterServiceBinder);
             forThePlayer.putExtra("AUDIO_ACTION", AudioServiceAction.AUDIO_SERVICE_ACTION_TOGGLE_PLAY);
             forThePlayer.putExtra("Audio.TogglePlay",true);
+            sendBroadcast(forThePlayer);
+        });
+
+        prev = findViewById(R.id.PrevSong);
+        prev.setOnClickListener(v -> {
+            Intent forThePlayer = new Intent();
+            forThePlayer.setAction(AudioServiceBinder.mBroadcasterServiceBinder);
+            forThePlayer.putExtra("AUDIO_ACTION", AudioServiceAction.AUDIO_SERVICE_ACTION_PREV_SONG);
+            sendBroadcast(forThePlayer);
+        });
+
+        next = findViewById(R.id.NextSong);
+        next.setOnClickListener(v -> {
+            Intent forThePlayer = new Intent();
+            forThePlayer.setAction(AudioServiceBinder.mBroadcasterServiceBinder);
+            forThePlayer.putExtra("AUDIO_ACTION", AudioServiceAction.AUDIO_SERVICE_ACTION_NEXT_SONG);
             sendBroadcast(forThePlayer);
         });
 

@@ -4,4 +4,7 @@
     <string name="nameSong">Canción</string>
     <string name="nameArtist">Artista</string>
     <string name="nameAlbum">Album</string>
+    <string name="playSong">Reproducir</string>
+    <string name="prevSong">Canción Anterior</string>
+    <string name="nextSong">Canción Siguiente</string>
 </resources>
