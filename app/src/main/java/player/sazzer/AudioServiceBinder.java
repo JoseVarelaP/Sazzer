@@ -156,17 +156,10 @@ public class AudioServiceBinder extends Service implements MediaPlayer.OnPrepare
         songPosn = songIndex;
     }
 
-    public void setList( ArrayList<Song> canciones )
-    {
-        this.songs = canciones;
-    }
-
     public void playSong() throws IOException {
         audioPlayer.reset();
         Log.d("AudioPlayerCheck",String.format("%s",audioPlayer));
         Song playSong = songs.get(songPosn);
-        //songTitle = playSong.getTitle();
-        //long currSong = playSong.getId();
         Uri trackUri = Uri.fromFile( new File(playSong.getAlbumArt()) );
 
         if( TextUtils.isEmpty(trackUri.toString()) )

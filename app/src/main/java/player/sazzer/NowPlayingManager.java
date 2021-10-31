@@ -8,7 +8,6 @@ import android.content.Intent;
 import android.graphics.Bitmap;
 import android.graphics.BitmapFactory;
 import android.os.Build;
-import android.os.Handler;
 import android.support.v4.media.session.MediaSessionCompat;
 import android.support.v4.media.session.PlaybackStateCompat;
 
@@ -22,11 +21,9 @@ public class NowPlayingManager extends Activity implements Serializable {
     private Notification notification;
     private final Context parent;
     private Bitmap image;
-    private boolean songHasImage = false;
     MediaSessionCompat mediaSessionCompat;
     NotificationManagerCompat NMC;
 
-    private Handler handler;
     private PlaybackStateCompat.Builder mStateBuilder;
 
     public NowPlayingManager(Context context) {
@@ -39,7 +36,6 @@ public class NowPlayingManager extends Activity implements Serializable {
 
     public void updateSong( Song track, int percentage, AudioServiceBinder bind, boolean forceAlbumImageRegen )
     {
-        //songHasImage = MusicHelpers.getAlbumImage( track.getAlbumArt() ) != null;
 
         if( parent == null )
             return;
@@ -65,20 +61,20 @@ public class NowPlayingManager extends Activity implements Serializable {
                     );
             mediaSessionCompat.setPlaybackState(mStateBuilder.build());
         }
-        //mediaSessionCompat.setCallback();
         mediaSessionCompat.setActive(true);
 
         draw_prev = R.drawable.ic_baseline_skip_previous_24;
         Intent intentPrevious = MusicHelpers.quickIntentFromAction(AudioServiceAction.AUDIO_SERVICE_ACTION_PREV_SONG);
-        PendingIntent PIPrevious = PendingIntent.getBroadcast(parent, 0, intentPrevious, PendingIntent.FLAG_UPDATE_CURRENT);
+        int flags = PendingIntent.FLAG_UPDATE_CURRENT |PendingIntent.FLAG_IMMUTABLE;
+        PendingIntent PIPrevious = PendingIntent.getBroadcast(parent, 0, intentPrevious, flags);
 
         draw_play = R.drawable.ic_play_white_48dp;
         Intent intentPlay = MusicHelpers.quickIntentFromAction(AudioServiceAction.AUDIO_SERVICE_ACTION_TOGGLE_PLAY);
-        PendingIntent PIPlay = PendingIntent.getBroadcast(parent, 0, intentPlay, PendingIntent.FLAG_UPDATE_CURRENT);
+        PendingIntent PIPlay = PendingIntent.getBroadcast(parent, 0, intentPlay, flags);
 
         draw_next = R.drawable.ic_baseline_skip_next_24;
         Intent intentNext = MusicHelpers.quickIntentFromAction(AudioServiceAction.AUDIO_SERVICE_ACTION_NEXT_SONG);
-        PendingIntent PINext = PendingIntent.getBroadcast(parent, 0, intentNext, PendingIntent.FLAG_UPDATE_CURRENT);
+        PendingIntent PINext = PendingIntent.getBroadcast(parent, 0, intentNext, flags);
 
         // Create an intent that will move to the detailed song info screen.
         Intent intent = MusicHelpers.sendToDetailedSongInfo(parent, track, bind);
@@ -88,18 +84,15 @@ public class NowPlayingManager extends Activity implements Serializable {
 
         notification = new NotificationCompat.Builder(parent, CHANNEL_ID)
                 .setSmallIcon(R.drawable.ic_play_white_48dp)
-                //.setOngoing(true)
                 .setContentTitle(track.getTitle())
                 .setContentText(track.getArtist())
-                //.setSubText(track.getAlbum() + " " + percentage)
                 .setLargeIcon(image)
                 .setOnlyAlertOnce(true)
                 .setShowWhen(false)
-                //.setSilent(true)
                 .setProgress( intent.getIntExtra("TotalTime", 0) , intent.getIntExtra("Progress", 0), false )
                 .setPriority(NotificationCompat.PRIORITY_LOW)
-                //.setContentIntent(showSongIntent)
                 .setAutoCancel(false)
+                .setContentIntent(showSongIntent)
                 .addAction(draw_prev, "Previous", PIPrevious)
                 .addAction(draw_play, "Play", PIPlay)
                 .addAction(draw_next, "Next", PINext)

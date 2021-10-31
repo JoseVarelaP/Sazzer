@@ -18,7 +18,7 @@ public class MusicHelpers {
 
     static public class AlbumImageLoaderAsync extends AsyncTask<String, Void, Bitmap> {
 
-        public static interface Listener {
+        public interface Listener {
             void onImageDownloaded(final Bitmap bitmap);
             void onImageDownloadError();
         }
