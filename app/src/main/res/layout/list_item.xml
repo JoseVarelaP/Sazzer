@@ -5,7 +5,7 @@
     android:layout_width="match_parent"
     android:layout_height="wrap_content"
     android:id="@+id/songContainer"
-    android:padding="10dp">
+    android:padding="6dp">
 
     <RelativeLayout
         android:layout_width="50dp"
@@ -35,6 +35,10 @@
             android:layout_width="match_parent"
             android:layout_height="wrap_content"
             android:textColor="@color/colorText"
+            android:singleLine="true"
+            android:ellipsize="marquee"
+            android:marqueeRepeatLimit ="marquee_forever"
+            android:scrollHorizontally="true"
             android:textSize="6pt" />
 
         <TextView

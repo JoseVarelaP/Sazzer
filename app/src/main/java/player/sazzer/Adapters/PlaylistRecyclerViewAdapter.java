@@ -10,6 +10,7 @@ import android.widget.LinearLayout;
 import android.widget.TextView;
 
 import androidx.annotation.NonNull;
+import androidx.core.content.ContextCompat;
 import androidx.recyclerview.widget.RecyclerView;
 
 import java.util.ArrayList;
@@ -24,12 +25,14 @@ public class PlaylistRecyclerViewAdapter extends RecyclerView.Adapter<PlaylistRe
     private final LayoutInflater mInflater;
     private ItemClickListener mClickListener;
     private final Song current;
+    private Context context = null;
 
     // data is passed into the constructor
     public PlaylistRecyclerViewAdapter(Context context, ArrayList<Song> data, Song current) {
         this.mInflater = LayoutInflater.from(context);
         this.mData = data;
         this.current = current;
+        this.context = context;
     }
 
     // inflates the row layout from xml when needed
@@ -46,10 +49,10 @@ public class PlaylistRecyclerViewAdapter extends RecyclerView.Adapter<PlaylistRe
         Song track = mData.get(position);
 
         holder.playIcon.setVisibility(View.GONE);
+        holder.container.setBackgroundColor( ContextCompat.getColor(context,R.color.colorBG)  );
         if( track != null && track == current )
         {
-            // TODO: How to transfer it over to getColor()?
-            holder.container.setBackgroundColor( R.color.colorPrimary );
+            holder.container.setBackgroundColor( ContextCompat.getColor(context,R.color.colorPrimary)  );
             holder.playIcon.setVisibility(View.VISIBLE);
         }
 
