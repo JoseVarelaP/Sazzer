@@ -73,6 +73,7 @@ public class SongFinder extends AppCompatActivity {
             int albumColumn = musicCursor.getColumnIndex(MediaStore.Audio.Media.ALBUM);
             //int albumId = musicCursor.getColumnIndex(MediaStore.Audio.Media.ALBUM_ID);
             int column_index = musicCursor.getColumnIndexOrThrow(MediaStore.Audio.Media.DATA);
+            int durationColumn = musicCursor.getColumnIndexOrThrow(MediaStore.Audio.Media.DURATION);
 
             do {
                 long thisId = musicCursor.getLong(idColumn);
@@ -84,7 +85,8 @@ public class SongFinder extends AppCompatActivity {
                 String thisTitle = musicCursor.getString(titleColumn);
                 String thisArtist = musicCursor.getString(artistColumn);
                 String thisAlbum = musicCursor.getString(albumColumn);
-                masterSongList.add(new Song(thisId, thisTitle, thisArtist, thisAlbum, pathId));
+                long thisDuration = musicCursor.getLong(durationColumn);
+                masterSongList.add(new Song(thisId, thisTitle, thisArtist, thisAlbum, pathId, thisDuration));
             }
             while (musicCursor.moveToNext());
         }

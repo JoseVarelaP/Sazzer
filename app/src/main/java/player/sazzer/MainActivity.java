@@ -1,7 +1,6 @@
 package player.sazzer;
 
 import android.Manifest;
-import android.app.NotificationManager;
 import android.content.BroadcastReceiver;
 import android.content.ComponentName;
 import android.content.Context;
@@ -9,7 +8,6 @@ import android.content.Intent;
 import android.content.IntentFilter;
 import android.content.ServiceConnection;
 import android.content.pm.PackageManager;
-import android.os.Build;
 import android.os.Bundle;
 import android.os.IBinder;
 import android.util.Log;
@@ -34,7 +32,6 @@ public class MainActivity extends AppCompatActivity implements PlaylistRecyclerV
     Intent playIntent = null;
     ArrayList<Song> songList;
     private AudioServiceBinder musicSrv;
-    NotificationManager notificationManager;
 
     private IntentFilter mIntentFilter;
 
@@ -43,6 +40,9 @@ public class MainActivity extends AppCompatActivity implements PlaylistRecyclerV
     private final ServiceConnection musicConnection = new ServiceConnection() {
         @Override
         public void onServiceConnected(ComponentName name, IBinder service) {
+            AudioServiceBinder.LocalBinder binder = (AudioServiceBinder.LocalBinder) service;
+            musicSrv = binder.getService();
+            //musicSrv.setCallback(MainActivity.this);
             Log.d("musicConnection","Service has started");
             sendBroadcast( MusicHelpers.quickIntentFromAction(AudioServiceAction.AUDIO_SERVICE_ACTION_FETCH_SONGS) );
             sendBroadcast( MusicHelpers.quickIntentFromAction(AudioServiceAction.AUDIO_SERVICE_ACTION_OBTAIN_SONGS_TO_DISPLAY) );
@@ -106,10 +106,6 @@ public class MainActivity extends AppCompatActivity implements PlaylistRecyclerV
     protected void onDestroy() {
         stopService(playIntent);
         musicSrv = null;
-        if (Build.VERSION.SDK_INT >= Build.VERSION_CODES.O){
-            notificationManager.cancelAll();
-        }
-        //this.unregisterReceiver(musicDataReciever);
         super.onDestroy();
     }
 

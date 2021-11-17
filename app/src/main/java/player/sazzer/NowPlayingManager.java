@@ -1,21 +1,17 @@
 package player.sazzer;
 
-import android.app.Activity;
-import android.app.Notification;
 import android.app.NotificationChannel;
 import android.app.NotificationManager;
 import android.app.PendingIntent;
 import android.app.Service;
-import android.content.BroadcastReceiver;
-import android.content.Context;
 import android.content.Intent;
-import android.content.IntentFilter;
 import android.graphics.Bitmap;
 import android.graphics.BitmapFactory;
 import android.os.Binder;
 import android.os.Build;
-import android.os.Bundle;
 import android.os.IBinder;
+import android.os.SystemClock;
+import android.support.v4.media.MediaMetadataCompat;
 import android.support.v4.media.session.MediaSessionCompat;
 import android.support.v4.media.session.PlaybackStateCompat;
 import android.util.Log;
@@ -29,13 +25,15 @@ import player.sazzer.DataTypes.Song;
 public class NowPlayingManager extends Service {
     public static final String CHANNEL_ID = "CHANNEL_1";
     public static final String mBroadcasterNotificationAction = "player.sazzer.action.UPDATE_NOTIFICATION";
+    public static final String ACTION_PLAY = "PLAY";
+    public static final String ACTION_PREV = "PREV";
+    public static final String ACTION_NEXT = "NEXT";
 
-    private Notification notification;
-    //private final Context parent;
     private Bitmap image;
     MediaSessionCompat mediaSessionCompat;
     NotificationManagerCompat NMC;
-    private IntentFilter mIntentFilter;
+    Song track;
+    int draw_prev,draw_play,draw_next;
 
     private PlaybackStateCompat.Builder mStateBuilder;
 
@@ -45,7 +43,7 @@ public class NowPlayingManager extends Service {
         if( Build.VERSION.SDK_INT >= Build.VERSION_CODES.O)
         {
             NotificationChannel nCH1 = new NotificationChannel(CHANNEL_ID,
-                    "Music Playback", NotificationManager.IMPORTANCE_HIGH);
+                    "Music Playback", NotificationManager.IMPORTANCE_LOW);
             nCH1.setDescription("Manager for music playback");
             // Register the notification to the application so the system can acknowledge it.
             NotificationManager NManager = getSystemService(NotificationManager.class);
@@ -54,29 +52,6 @@ public class NowPlayingManager extends Service {
             Log.d("createNotificationChannel", "Done.");
         }
     }
-
-    // Receieve broadcasts from other classes.
-    private final BroadcastReceiver notificationReciever = new BroadcastReceiver() {
-        @Override
-        public void onReceive(Context context, Intent intent) {
-            Bundle extras = intent.getExtras();
-            Log.d("notificationReciever","Recieved a braodcast");
-
-            if( extras == null )
-                return;
-
-            if( intent.getAction().equals(mBroadcasterNotificationAction) )
-            {
-                Log.d(mBroadcasterNotificationAction, "Creating list");
-                String songStr = intent.getStringExtra("currentSong");
-                if( songStr != null && !songStr.isEmpty() ) {
-                    Log.d(mBroadcasterNotificationAction, "Found Song Entry.");
-                    Song track = MusicHelpers.ConvertJSONToSong(songStr);
-                    updateSong( track, true );
-                }
-            }
-        }
-    };
 
     public void onCreate() {
         super.onCreate();
@@ -87,27 +62,39 @@ public class NowPlayingManager extends Service {
         }
         createNotificationChannel();
 
-        mIntentFilter = new IntentFilter();
-        mIntentFilter.addAction(mBroadcasterNotificationAction);
-
-        this.registerReceiver(notificationReciever,mIntentFilter);
+        draw_prev = R.drawable.ic_baseline_skip_previous_24;
+        draw_play = R.drawable.ic_play_white_48dp;
+        draw_next = R.drawable.ic_baseline_skip_next_24;
     }
 
     @Override
     public void onDestroy() {
         super.onDestroy();
-        unregisterReceiver(notificationReciever);
+    }
+
+    public void updateMediaSessionPosition(long pos)
+    {
+        mStateBuilder = new PlaybackStateCompat.Builder()
+                .setActions(
+                        PlaybackStateCompat.ACTION_PLAY |
+                                PlaybackStateCompat.ACTION_PAUSE |
+                                PlaybackStateCompat.ACTION_SKIP_TO_PREVIOUS |
+                                PlaybackStateCompat.ACTION_PLAY_PAUSE |
+                                PlaybackStateCompat.ACTION_SEEK_TO
+                )
+                .setState(PlaybackStateCompat.STATE_PLAYING,pos,1, SystemClock.elapsedRealtime());
+        mediaSessionCompat.setPlaybackState(mStateBuilder.build());
     }
 
     public void updateSong(Song track, boolean forceAlbumImageRegen )
     {
+        this.track = track;
+
         if( (image == null || forceAlbumImageRegen) )
-            image = MusicHelpers.getAlbumImage( track.getAlbumArt() );
+            image = MusicHelpers.getAlbumImage( this.track.getAlbumArt() );
 
         if( image == null )
             image = BitmapFactory.decodeResource(getResources(),R.drawable.default_cover);
-
-        int draw_prev,draw_play,draw_next;
 
         if( mediaSessionCompat == null)
             mediaSessionCompat = new MediaSessionCompat(this, "PlayerAudio");
@@ -118,23 +105,63 @@ public class NowPlayingManager extends Service {
                             PlaybackStateCompat.ACTION_PLAY |
                                     PlaybackStateCompat.ACTION_PAUSE |
                                     PlaybackStateCompat.ACTION_SKIP_TO_PREVIOUS |
-                                    PlaybackStateCompat.ACTION_PLAY_PAUSE
+                                    PlaybackStateCompat.ACTION_PLAY_PAUSE |
+                                    PlaybackStateCompat.ACTION_SEEK_TO
                     );
             mediaSessionCompat.setPlaybackState(mStateBuilder.build());
         }
+
+        mediaSessionCompat.setMetadata(new MediaMetadataCompat.Builder()
+                .putBitmap(MediaMetadataCompat.METADATA_KEY_ALBUM_ART, image)
+                .putString(
+                        MediaMetadataCompat.METADATA_KEY_ARTIST,
+                        this.track.getArtist()
+                )
+                .putString(
+                        MediaMetadataCompat.METADATA_KEY_ALBUM,
+                        this.track.getAlbum()
+                )
+                .putString(
+                        MediaMetadataCompat.METADATA_KEY_TITLE,
+                        this.track.getTitle()
+                )
+                .putLong(
+                        MediaMetadataCompat.METADATA_KEY_DURATION,
+                        this.track.getDuration()
+                )
+                .build()
+        );
+
+        mediaSessionCompat.setCallback(new MediaSessionCompat.Callback() {
+                @Override
+                public void onSeekTo(long pos) {
+                    super.onSeekTo(pos);
+
+                    Intent forThePlayer = new Intent();
+                    forThePlayer.setAction(AudioServiceBinder.mBroadcasterServiceBinder);
+                    forThePlayer.putExtra("AUDIO_ACTION", AudioServiceAction.AUDIO_SERVICE_ACTION_UPDATE_PROGRESS);
+                    forThePlayer.putExtra("Audio.SeekProgress", (int)pos );
+                    sendBroadcast(forThePlayer);
+                }
+            }
+        );
         mediaSessionCompat.setActive(true);
 
-        draw_prev = R.drawable.ic_baseline_skip_previous_24;
-        Intent intentPrevious = MusicHelpers.quickIntentFromAction(AudioServiceAction.AUDIO_SERVICE_ACTION_PREV_SONG);
-        int flags = PendingIntent.FLAG_UPDATE_CURRENT | PendingIntent.FLAG_IMMUTABLE;
+        showNotification();
+    }
+
+    public void showNotification()
+    {
+        // Common flag for all intents.
+        int flags = PendingIntent.FLAG_UPDATE_CURRENT;
+
+        Intent intentPrevious = new Intent(this, NotificationReceiver.class).setAction(ACTION_PREV);
         PendingIntent PIPrevious = PendingIntent.getBroadcast(this, 0, intentPrevious, flags);
 
-        draw_play = R.drawable.ic_play_white_48dp;
-        Intent intentPlay = MusicHelpers.quickIntentFromAction(AudioServiceAction.AUDIO_SERVICE_ACTION_TOGGLE_PLAY);
+        Intent intentPlay = new Intent(this, NotificationReceiver.class).setAction(ACTION_PLAY);
         PendingIntent PIPlay = PendingIntent.getBroadcast(this, 0, intentPlay, flags);
 
-        draw_next = R.drawable.ic_baseline_skip_next_24;
-        Intent intentNext = MusicHelpers.quickIntentFromAction(AudioServiceAction.AUDIO_SERVICE_ACTION_NEXT_SONG);
+        Intent intentNext = new Intent(this, NotificationReceiver.class).setAction(ACTION_NEXT);
         PendingIntent PINext = PendingIntent.getBroadcast(this, 0, intentNext, flags);
 
         // Create an intent that will move to the detailed song info screen.
@@ -143,35 +170,38 @@ public class NowPlayingManager extends Service {
         //Log.d("NowPlayingManager",String.format("Created a new intent with the following data: %s by %s", track.getTitle(), track.getArtist()));
         PendingIntent showSongIntent = PendingIntent.getActivity(this, 0, intent, 0);
 
-        notification = new NotificationCompat.Builder(this, CHANNEL_ID)
-                .setSmallIcon(R.drawable.ic_play_white_48dp)
-                .setContentTitle(track.getTitle())
-                .setContentText(track.getArtist())
-                .setLargeIcon(image)
-                .setOnlyAlertOnce(true)
-                .setShowWhen(false)
-                .setProgress( intent.getIntExtra("TotalTime", 0) , intent.getIntExtra("Progress", 0), false )
+        NotificationCompat.Builder builder = new NotificationCompat.Builder(this, CHANNEL_ID);
+        builder
                 .setPriority(NotificationCompat.PRIORITY_LOW)
-                .setAutoCancel(false)
                 .setContentIntent(showSongIntent)
+                .setVisibility(NotificationCompat.VISIBILITY_PUBLIC)
                 .addAction(draw_prev, "Previous", PIPrevious)
                 .addAction(draw_play, "Play", PIPlay)
                 .addAction(draw_next, "Next", PINext)
                 .setStyle( new androidx.media.app.NotificationCompat.MediaStyle()
-                        .setShowActionsInCompactView(0,1,2)
-                        .setMediaSession(mediaSessionCompat.getSessionToken())
+                    .setShowActionsInCompactView(0,1,2)
+                    .setMediaSession(mediaSessionCompat.getSessionToken()
+                    )
                 )
-                .build();
+                .setSmallIcon(R.mipmap.ic_launcher);
 
-        //NMC.notify(1, notification);
-
-        NotificationManager nManager = (NotificationManager) getApplicationContext().getSystemService(NOTIFICATION_SERVICE);
-        nManager.notify(0, notification);
+        NotificationManagerCompat.from(this).notify(0, builder.build());
     }
 
-    public void cancelNotification()
+    public void setPauseIcon(boolean isPlaying, long curTime)
     {
-        NMC.cancel(1);
+        int state = isPlaying ? PlaybackStateCompat.STATE_PLAYING : PlaybackStateCompat.STATE_PAUSED;
+        if(isPlaying)
+        {
+            draw_play = R.drawable.ic_pause_white_48dp;
+        } else {
+            draw_play = R.drawable.ic_play_white_48dp;
+        }
+
+        if( mStateBuilder != null )
+            mStateBuilder.setState( state, curTime, 1, SystemClock.elapsedRealtime() );
+
+        showNotification();
     }
 
     private final IBinder mBinder = new NowPlayingManager.LocalBinder();

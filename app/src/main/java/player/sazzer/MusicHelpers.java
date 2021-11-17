@@ -152,6 +152,31 @@ public class MusicHelpers {
         return gson.toJson(tracks);
     }
 
+    public static String ConvertSongsToJSONTable(@NonNull Song tracks)
+    {
+        Gson gson = new Gson();
+        return gson.toJson(tracks);
+    }
+
+    /**
+     * @param JSONData Stringyfied version of the Song.
+     * @return a {@link Song} object.
+     *
+     * @see #ConvertSongsToJSONTable(ArrayList)
+     * @see #ConvertJSONToTracks(String)
+     * @see Gson
+     */
+    public static Song ConvertJSONToSong(@NonNull String JSONData)
+    {
+        if( JSONData.isEmpty() )
+            return null;
+
+        Gson gson = new Gson();
+        Type type = new TypeToken<Song>(){}.getType();
+
+        return gson.fromJson(JSONData, type);
+    }
+
     /**
      *
      * @param JSONData Stringyfied version of the Array.
@@ -166,7 +191,6 @@ public class MusicHelpers {
             return null;
 
         Gson gson = new Gson();
-
         Type type = new TypeToken<List<Song>>(){}.getType();
 
         return gson.fromJson(JSONData, type);

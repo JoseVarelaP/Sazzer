@@ -58,6 +58,15 @@
                 <action android:name="player.sazzer.action.UPDATE_NOTIFICATION"/>
             </intent-filter>
         </service>
+        <receiver android:name=".NotificationReceiver"
+            android:exported="true"
+            android:enabled="true">
+            <intent-filter>
+                <action android:name="PLAY"/>
+                <action android:name="PREV"/>
+                <action android:name="NEXT"/>
+            </intent-filter>
+        </receiver>
     </application>
 
 </manifest>
