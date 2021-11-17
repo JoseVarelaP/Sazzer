@@ -142,15 +142,14 @@ public class MusicHelpers {
 
     public static List<Song> ConvertJSONToTracks(@NonNull String JSONData)
     {
-        if( JSONData == null || JSONData.isEmpty() )
+        if( JSONData.isEmpty() )
             return null;
 
         Gson gson = new Gson();
 
         Type type = new TypeToken<List<Song>>(){}.getType();
-        List<Song> newsongs = gson.fromJson(JSONData, type);
 
-        return newsongs;
+        return gson.fromJson(JSONData, type);
     }
 
     public static Intent sendToPlaylist(Context context, @NonNull ArrayList<Song> tracks)

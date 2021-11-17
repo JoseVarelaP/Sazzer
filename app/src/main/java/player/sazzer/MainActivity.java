@@ -189,7 +189,7 @@ public class MainActivity extends AppCompatActivity implements PlaylistRecyclerV
             if( extras == null )
                 return;
 
-            if( intent.getAction() == mBroadcasterMainActivity )
+            if( intent.getAction().equals(mBroadcasterMainActivity) )
             {
                 Log.d(mBroadcasterMainActivity, "Creating list");
                 String newsongsStr = intent.getStringExtra("Audio.SongArray");
