@@ -29,7 +29,6 @@ import java.util.List;
 public class AudioServiceBinder extends Service implements MediaPlayer.OnPreparedListener,MediaPlayer.OnErrorListener,MediaPlayer.OnCompletionListener {
 
     // Guarda la ubicacion del archivo
-    // private Uri audioFileUri = null;
     public static String mBroadcasterServiceBinder = "player.sazzer.action.UPDATE_AUDIOBINDER";
 
     // El reproductor mismo para reproducir contenido.
@@ -40,15 +39,6 @@ public class AudioServiceBinder extends Service implements MediaPlayer.OnPrepare
 
     private NowPlayingManager manager;
     private SongFinder songFinder;
-
-    enum PlayerState {
-        PLAYER_READY,
-        PLAYER_LOADING,
-        PLAYER_ERROR,
-        PLAYER_NULL
-    }
-
-    PlayerState curPlayerState = PlayerState.PLAYER_NULL;
 
     private int songPosn = 0;
     public void setProgress( int ms ) { this.audioPlayer.seekTo(ms); }
@@ -63,7 +53,6 @@ public class AudioServiceBinder extends Service implements MediaPlayer.OnPrepare
         if( !isPlaying() )
             return;
 
-        //Log.d("runBinderUpdater","Song now is at " + getAudioProgress() + "%");
         manager.updateSong( songs.get(songPosn), getAudioProgress(), this, false );
 
         Intent broadcastIntent = new Intent();
@@ -126,7 +115,6 @@ public class AudioServiceBinder extends Service implements MediaPlayer.OnPrepare
 
     public void initAudioPlayer()
     {
-        //audioPlayer.setWakeMode(getContext(), PowerManager.PARTIAL_WAKE_LOCK);
         audioPlayer.setAudioAttributes(new AudioAttributes.Builder().setContentType(AudioAttributes.CONTENT_TYPE_MUSIC).build());
         audioPlayer.setOnPreparedListener(this);
         audioPlayer.setOnCompletionListener(this);
@@ -182,14 +170,10 @@ public class AudioServiceBinder extends Service implements MediaPlayer.OnPrepare
         try {
             audioPlayer.setDataSource(getApplicationContext(), trackUri);
             audioPlayer.prepareAsync();
-
-            curPlayerState = PlayerState.PLAYER_LOADING;
-
             // Create the manager to send the notification.
             manager.updateSong( songs.get(songPosn), 0, this, true );
             refresh(900);
         } catch (Exception e) {
-            curPlayerState = PlayerState.PLAYER_ERROR;
             Log.e("MUSIC SERVICE", "Error setting data source", e);
         }
     }
@@ -277,7 +261,7 @@ public class AudioServiceBinder extends Service implements MediaPlayer.OnPrepare
                         audioPlayer.start();
 
                     {
-                        Intent broadcastIntent = new Intent(); //= MusicHelpers.sendToDetailedSongInfo(getApplicationContext(), songs.get(songPosn), this);
+                        Intent broadcastIntent = new Intent();
                         broadcastIntent.setAction(DetailsActivity.mBroadcasterAudioAction);
                         broadcastIntent.putExtra("needsPause", !audioPlayer.isPlaying());
                         getApplicationContext().sendBroadcast(broadcastIntent);
@@ -356,7 +340,7 @@ public class AudioServiceBinder extends Service implements MediaPlayer.OnPrepare
                 }
                 case AUDIO_SERVICE_ACTION_OBTAIN_SONGS_TO_DISPLAY:
                 {
-                    Intent broadcastIntent = new Intent(); //= MusicHelpers.sendToDetailedSongInfo(getApplicationContext(), songs.get(songPosn), this);
+                    Intent broadcastIntent = new Intent();
                     broadcastIntent.setAction(MainActivity.mBroadcasterMainActivity);
                     broadcastIntent.putExtra("Audio.SongArray", MusicHelpers.ConvertSongsToJSONTable(songs) );
                     getApplicationContext().sendBroadcast(broadcastIntent);
@@ -383,8 +367,6 @@ public class AudioServiceBinder extends Service implements MediaPlayer.OnPrepare
         Log.d("MediaPlayer","Playing a track");
         Log.d("MediaPlayer","Song seems to be " + audioPlayer.getDuration());
 
-        curPlayerState = PlayerState.PLAYER_READY;
-
         Intent broadcastIntent = new Intent();
         broadcastIntent.setAction(DetailsActivity.mBroadcasterAudioAction);
         Song track = songs.get(songPosn);
@@ -394,7 +376,7 @@ public class AudioServiceBinder extends Service implements MediaPlayer.OnPrepare
         getApplicationContext().sendBroadcast(broadcastIntent);
 
         // Update the playlist if it happens to be available and shown on the screen.
-        broadcastIntent = new Intent(); //= MusicHelpers.sendToDetailedSongInfo(getApplicationContext(), songs.get(songPosn), this);
+        broadcastIntent = new Intent();
         broadcastIntent.setAction(PlaylistView.mBroadcasterPlayListView);
         broadcastIntent.putExtra("position", songPosn );
         getApplicationContext().sendBroadcast(broadcastIntent);
