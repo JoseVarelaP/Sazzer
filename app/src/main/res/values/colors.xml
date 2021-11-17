@@ -5,4 +5,8 @@
     <color name="colorAccent">#3F86D1</color>
     <color name="colorBG">#FCFCFC</color>
     <color name="colorText">#000000</color>
+    <color name="songNameColor">#000000</color>
+    <color name="nowPlayingbuttonColor">#000000</color>
+    <color name="nowPlayingBackgroundColor">#FCFCFC</color>
+    <color name="recordButtonColor">#AEAE00</color>
 </resources>

@@ -6,4 +6,6 @@
     <string name="playSong">Play</string>
     <string name="prevSong">Previous Song</string>
     <string name="nextSong">Next Song</string>
+    <string name="playListAction">Open Playlist</string>
+    <string name="recordVoice">Record Voice</string>
 </resources>

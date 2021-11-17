@@ -8,12 +8,10 @@ import android.content.IntentFilter;
 import android.media.AudioAttributes;
 import android.media.MediaPlayer;
 import android.net.Uri;
-import android.os.Binder;
 import android.os.Handler;
 import android.os.IBinder;
 import android.text.TextUtils;
 import android.util.Log;
-import android.widget.Toast;
 
 import androidx.annotation.Nullable;
 
@@ -62,7 +60,7 @@ public class AudioServiceBinder extends Service implements MediaPlayer.OnPrepare
         if( !isPlaying() )
             return;
 
-        Log.d("runBinderUpdater","Song now is at " + getAudioProgress() + "%");
+        //Log.d("runBinderUpdater","Song now is at " + getAudioProgress() + "%");
         manager.updateSong( songs.get(songPosn), getAudioProgress(), this, false );
 
         //Intent broadcastIntent = new Intent();
@@ -158,17 +156,10 @@ public class AudioServiceBinder extends Service implements MediaPlayer.OnPrepare
         songPosn = songIndex;
     }
 
-    public void setList( ArrayList<Song> canciones )
-    {
-        this.songs = canciones;
-    }
-
     public void playSong() throws IOException {
         audioPlayer.reset();
         Log.d("AudioPlayerCheck",String.format("%s",audioPlayer));
         Song playSong = songs.get(songPosn);
-        //songTitle = playSong.getTitle();
-        //long currSong = playSong.getId();
         Uri trackUri = Uri.fromFile( new File(playSong.getAlbumArt()) );
 
         if( TextUtils.isEmpty(trackUri.toString()) )
@@ -229,7 +220,21 @@ public class AudioServiceBinder extends Service implements MediaPlayer.OnPrepare
                             songs = (ArrayList<Song>) newsongs;
                         }
                     }
+                    break;
+                }
 
+                case AUDIO_SERVICE_ACTION_PLAY_SONG:
+                {
+                    Log.d("Broadcast","Playing new song");
+                    try {
+                        playSong();
+                    } catch (IOException e) {
+                        e.printStackTrace();
+                    }
+                }
+
+                case AUDIO_SERVICE_ACTION_UPDATE_SONG_ID:
+                {
                     if( intent.getIntExtra("Audio.SongID",-1) != -1 )
                     {
                         if( songs.size() > 0 )
@@ -238,17 +243,6 @@ public class AudioServiceBinder extends Service implements MediaPlayer.OnPrepare
                             Log.e("BroacastReciever", "The song array is empty.");
                             return;
                         }
-                    }
-
-                    if( intent.getBooleanExtra("Audio.PlaySong",false) )
-                    {
-                        Log.d("Broadcast","Playing new song");
-                        try {
-                            playSong();
-                        } catch (IOException e) {
-                            e.printStackTrace();
-                        }
-                        return;
                     }
                     break;
                 }
@@ -328,6 +322,17 @@ public class AudioServiceBinder extends Service implements MediaPlayer.OnPrepare
                         audioPlayer.reset();
                     }
                     songs.clear();
+                    break;
+                }
+
+                case AUDIO_SERVICE_ACTION_EXPORT_QUEUE_TO_PLAYLIST:
+                {
+                    Log.d("AUDIO_SERVICE_ACTION_EXPORT_QUEUE_TO_PLAYLIST","Export to Playlist");
+                    Intent set = MusicHelpers.sendToPlaylist(getApplicationContext(), songs);
+                    set.putExtra("position", songPosn);
+                    startActivity(set);
+                    //getApplicationContext().sendBroadcast(set);
+                    break;
                 }
             }
         }

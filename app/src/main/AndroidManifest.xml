@@ -33,6 +33,17 @@
             </intent-filter>
         </activity>
 
+        <activity
+            android:exported="true"
+            android:theme="@style/Theme.Transparent"
+            android:name=".PlaylistView"
+            android:launchMode="singleTop"
+            android:screenOrientation="sensor">
+            <intent-filter>
+                <action android:name="player.sazzer.action.UPDATE_PLAYLIST"/>
+            </intent-filter>
+        </activity>
+
         <service
             android:exported="false"
             android:name=".AudioServiceBinder">

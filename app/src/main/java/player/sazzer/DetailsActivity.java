@@ -5,28 +5,18 @@ import android.content.BroadcastReceiver;
 import android.content.Context;
 import android.content.Intent;
 import android.content.IntentFilter;
-import android.media.Image;
-import android.media.MediaPlayer;
-import android.net.Uri;
+
 import android.os.Bundle;
-import android.os.Message;
-import android.os.Handler;
 import android.util.Log;
 import android.widget.ImageButton;
 import android.widget.ImageView;
 import android.widget.SeekBar;
 import android.widget.TextView;
-import android.widget.ProgressBar;
 
 import androidx.annotation.NonNull;
 import androidx.annotation.Nullable;
 
-import java.sql.Date;
-import java.util.concurrent.TimeUnit;
-
 public class DetailsActivity extends Activity {
-    //private Handler audioProgressUpdateHandler = null;
-    MediaPlayer player;
     SeekBar sbProgress;
     ImageButton button,prev,next;
     TextView curTime,totalTime,Nombre,Artista;
@@ -53,7 +43,7 @@ public class DetailsActivity extends Activity {
             String nArtista = intent.getStringExtra("songArtist");
             String nArt = intent.getStringExtra("songArt");
 
-            if( nCancion != null )
+            if( nCancion != null && (!Nombre.getText().equals(nCancion)) )
                 Nombre.setText( nCancion );
             if( nArtista != null )
                 Artista.setText( nArtista );
@@ -105,6 +95,9 @@ public class DetailsActivity extends Activity {
         Artista = findViewById( R.id.artistName );
         albumArt = findViewById( R.id.imageCover );
 
+        Nombre.setSelected(true);
+        Artista.setSelected(true);
+
         onNewIntent(this.getIntent());
 
         sbProgress = findViewById(R.id.sbProgress);
@@ -114,30 +107,30 @@ public class DetailsActivity extends Activity {
         mIntentFilter.addAction(mBroadcasterAudioAction);
 
         button = findViewById(R.id.TogglePlay);
-        button.setOnClickListener(v -> {
-            Intent forThePlayer = new Intent();
-            forThePlayer.setAction(AudioServiceBinder.mBroadcasterServiceBinder);
-            forThePlayer.putExtra("AUDIO_ACTION", AudioServiceAction.AUDIO_SERVICE_ACTION_TOGGLE_PLAY);
-            forThePlayer.putExtra("Audio.TogglePlay",true);
-            sendBroadcast(forThePlayer);
-        });
+        button.setColorFilter( R.color.nowPlayingbuttonColor );
+        button.setOnClickListener(v -> sendBroadcast( MusicHelpers.quickIntentFromAction(AudioServiceAction.AUDIO_SERVICE_ACTION_TOGGLE_PLAY) ));
 
         prev = findViewById(R.id.PrevSong);
-        prev.setOnClickListener(v -> {
-            Intent forThePlayer = new Intent();
-            forThePlayer.setAction(AudioServiceBinder.mBroadcasterServiceBinder);
-            forThePlayer.putExtra("AUDIO_ACTION", AudioServiceAction.AUDIO_SERVICE_ACTION_PREV_SONG);
-            sendBroadcast(forThePlayer);
-        });
+        prev.setColorFilter( R.color.nowPlayingbuttonColor );
+        prev.setOnClickListener(v -> sendBroadcast( MusicHelpers.quickIntentFromAction(AudioServiceAction.AUDIO_SERVICE_ACTION_PREV_SONG) ));
 
         next = findViewById(R.id.NextSong);
-        next.setOnClickListener(v -> {
-            Intent forThePlayer = new Intent();
-            forThePlayer.setAction(AudioServiceBinder.mBroadcasterServiceBinder);
-            forThePlayer.putExtra("AUDIO_ACTION", AudioServiceAction.AUDIO_SERVICE_ACTION_NEXT_SONG);
-            sendBroadcast(forThePlayer);
+        next.setColorFilter( R.color.nowPlayingbuttonColor );
+        next.setOnClickListener(v -> sendBroadcast( MusicHelpers.quickIntentFromAction(AudioServiceAction.AUDIO_SERVICE_ACTION_NEXT_SONG) ));
+
+        ImageView playList = findViewById(R.id.playListButton);
+        playList.setColorFilter( R.color.nowPlayingbuttonColor );
+        playList.setOnClickListener(v -> {
+            Log.d("PlayList", "Starting playlist area");
+            sendBroadcast( MusicHelpers.quickIntentFromAction(AudioServiceAction.AUDIO_SERVICE_ACTION_EXPORT_QUEUE_TO_PLAYLIST) );
         });
 
+        ImageView record = findViewById(R.id.recordSongButton);
+        record.setColorFilter( R.color.recordButtonColor );
+        record.setOnClickListener(v -> {
+            Log.d("Record", "Starting record area");
+            finish();
+        });
     }
 
     @Override
@@ -147,12 +140,18 @@ public class DetailsActivity extends Activity {
     }
 
     @Override
+    protected void onRestoreInstanceState(@NonNull Bundle savedInstanceState) {
+        super.onRestoreInstanceState(savedInstanceState);
+
+        Nombre.setText( savedInstanceState.getString("SongName") );
+        Artista.setText( savedInstanceState.getString("SongArtist") );
+    }
+
+    @Override
     protected void onSaveInstanceState (@NonNull Bundle outState) {
         super.onSaveInstanceState (outState);
-
-        //outState.putString ("SONG", mediaUri != null ? mediaUri.toString (): "");
-        outState.putInt ("PROGRESS", player != null ?  player.getCurrentPosition () : -1);
-        outState.putBoolean ("ISPLAYING", player != null && player.isPlaying ());
+        outState.putString("SongName", Nombre.getText().toString() );
+        outState.putString("SongArtist", Artista.getText().toString() );
     }
 
     @Override
@@ -161,7 +160,6 @@ public class DetailsActivity extends Activity {
     @Override
     protected void onResume() {
         super.onResume ();
-        //IntentFilter intentFilter = new IntentFilter(mBroadcasterAudioAction);
         this.registerReceiver(musicDataReciever, mIntentFilter);
     }
 
@@ -180,9 +178,6 @@ public class DetailsActivity extends Activity {
         public void onProgressChanged (SeekBar seekBar, int i, boolean b) {
             if (b) {
                 curVal = i;
-                //audioServiceBinder.pauseAudio();
-                //audioServiceBinder.setProgress( i );
-                //audioServiceBinder.startAudio();
             }
         }
 
