@@ -26,6 +26,8 @@ import java.lang.reflect.Type;
 import java.util.ArrayList;
 import java.util.List;
 
+import player.sazzer.DataTypes.Song;
+
 public class AudioServiceBinder extends Service implements MediaPlayer.OnPreparedListener,MediaPlayer.OnErrorListener,MediaPlayer.OnCompletionListener {
 
     // Guarda la ubicacion del archivo

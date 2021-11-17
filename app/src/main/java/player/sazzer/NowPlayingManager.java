@@ -14,6 +14,8 @@ import android.support.v4.media.session.PlaybackStateCompat;
 import androidx.core.app.NotificationCompat;
 import androidx.core.app.NotificationManagerCompat;
 
+import player.sazzer.DataTypes.Song;
+
 public class NowPlayingManager extends Activity {
     public static final String CHANNEL_ID = "CHANNEL_1";
 
@@ -33,7 +35,7 @@ public class NowPlayingManager extends Activity {
         }
     }
 
-    public void updateSong( Song track, int percentage, AudioServiceBinder bind, boolean forceAlbumImageRegen )
+    public void updateSong(Song track, int percentage, AudioServiceBinder bind, boolean forceAlbumImageRegen )
     {
 
         if( parent == null )

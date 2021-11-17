@@ -11,6 +11,8 @@ import androidx.appcompat.app.AppCompatActivity;
 
 import java.util.ArrayList;
 
+import player.sazzer.DataTypes.Song;
+
 public class SongFinder extends AppCompatActivity {
 
     private ArrayList<Song> masterSongList;

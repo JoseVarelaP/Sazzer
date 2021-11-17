@@ -17,7 +17,7 @@ import java.util.ArrayList;
 
 import player.sazzer.MusicHelpers;
 import player.sazzer.R;
-import player.sazzer.Song;
+import player.sazzer.DataTypes.Song;
 
 public class PlaylistRecyclerViewAdapter extends RecyclerView.Adapter<PlaylistRecyclerViewAdapter.ViewHolder> {
 

@@ -16,6 +16,8 @@ import android.widget.TextView;
 import androidx.annotation.NonNull;
 import androidx.annotation.Nullable;
 
+import player.sazzer.DataTypes.TimeSpace;
+
 public class DetailsActivity extends Activity {
     SeekBar sbProgress;
     ImageButton button,prev,next;

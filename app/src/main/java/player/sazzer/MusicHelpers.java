@@ -18,6 +18,8 @@ import java.util.ArrayList;
 import java.util.Arrays;
 import java.util.List;
 
+import player.sazzer.DataTypes.Song;
+
 public class MusicHelpers {
 
     static public class AlbumImageLoaderAsync extends AsyncTask<String, Void, Bitmap> {

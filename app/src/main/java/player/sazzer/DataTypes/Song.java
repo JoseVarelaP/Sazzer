@@ -1,4 +1,4 @@
-package player.sazzer;
+package player.sazzer.DataTypes;
 
 public class Song {
     private final long id;
@@ -7,7 +7,7 @@ public class Song {
     private final String album;
     private final String albumArt;
 
-    Song(long songID, String songTitle, String songArtist, String songAlbum, String albumArt)
+    public Song(long songID, String songTitle, String songArtist, String songAlbum, String albumArt)
     {
         this.id = songID;
         this.title = songTitle;

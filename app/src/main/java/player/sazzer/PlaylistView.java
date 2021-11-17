@@ -21,6 +21,7 @@ import java.util.ArrayList;
 import java.util.List;
 
 import player.sazzer.Adapters.PlaylistRecyclerViewAdapter;
+import player.sazzer.DataTypes.Song;
 
 public class PlaylistView extends Activity implements PlaylistRecyclerViewAdapter.ItemClickListener {
     private PlaylistRecyclerViewAdapter adapter;

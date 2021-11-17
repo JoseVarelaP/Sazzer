@@ -26,6 +26,7 @@ import androidx.recyclerview.widget.RecyclerView;
 import java.util.ArrayList;
 
 import player.sazzer.Adapters.PlaylistRecyclerViewAdapter;
+import player.sazzer.DataTypes.Song;
 
 public class MainActivity extends AppCompatActivity implements PlaylistRecyclerViewAdapter.ItemClickListener {
     public static final int REQUEST_CODE_EXTERNAL_STORAGE = 1002;
