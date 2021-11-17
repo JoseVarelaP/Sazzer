@@ -362,6 +362,18 @@ public class AudioServiceBinder extends Service implements MediaPlayer.OnPrepare
                     getApplicationContext().sendBroadcast(broadcastIntent);
                     break;
                 }
+
+                case AUDIO_SERVICE_ACTION_UPDATE_DETAILED_INFO:
+                {
+                    Log.d("AudioServioce","Sending back info");
+                    Intent broadcastIntent = new Intent();
+                    broadcastIntent.setAction(DetailsActivity.mBroadcasterAudioAction);
+                    Song track = songs.get(songPosn);
+                    broadcastIntent.putExtra("songName", track.getTitle());
+                    broadcastIntent.putExtra("songArtist", track.getArtist());
+                    broadcastIntent.putExtra("songArt", track.getAlbumArt());
+                    getApplicationContext().sendBroadcast(broadcastIntent);
+                }
             }
         }
     };

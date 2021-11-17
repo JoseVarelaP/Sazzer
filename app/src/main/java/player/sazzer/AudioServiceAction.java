@@ -13,4 +13,5 @@ public enum AudioServiceAction {
     // Actions to obtain from the AudioQueue class
     AUDIO_SERVICE_ACTION_FETCH_SONGS,
     AUDIO_SERVICE_ACTION_OBTAIN_SONGS_TO_DISPLAY,
+    AUDIO_SERVICE_ACTION_UPDATE_DETAILED_INFO
 }

@@ -160,6 +160,7 @@ public class DetailsActivity extends Activity {
     @Override
     protected void onResume() {
         super.onResume ();
+        sendBroadcast(MusicHelpers.quickIntentFromAction(AudioServiceAction.AUDIO_SERVICE_ACTION_UPDATE_DETAILED_INFO));
         this.registerReceiver(musicDataReciever, mIntentFilter);
     }
 
