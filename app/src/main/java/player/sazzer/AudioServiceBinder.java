@@ -8,9 +8,11 @@ import android.content.Intent;
 import android.content.IntentFilter;
 import android.content.ServiceConnection;
 import android.media.AudioAttributes;
+import android.media.AudioManager;
 import android.media.MediaPlayer;
 import android.net.Uri;
 import android.os.Binder;
+import android.os.Build;
 import android.os.Handler;
 import android.os.IBinder;
 import android.provider.MediaStore;
@@ -30,7 +32,7 @@ import java.util.List;
 
 import player.sazzer.DataTypes.Song;
 
-public class AudioServiceBinder extends Service implements MediaPlayer.OnPreparedListener,MediaPlayer.OnErrorListener,MediaPlayer.OnCompletionListener {
+public class AudioServiceBinder extends Service implements MediaPlayer.OnPreparedListener,MediaPlayer.OnErrorListener,MediaPlayer.OnCompletionListener, AudioManager.OnAudioFocusChangeListener {
     // Guarda la ubicacion del archivo
     public static String mBroadcasterServiceBinder = "player.sazzer.action.UPDATE_AUDIOBINDER";
 
@@ -42,6 +44,8 @@ public class AudioServiceBinder extends Service implements MediaPlayer.OnPrepare
 
     private NowPlayingManager manager;
     private SongFinder songFinder;
+
+    private AudioManager am = null;
 
     private int songPosn = 0;
     public void setProgress( int ms ) { this.audioPlayer.seekTo(ms); }
@@ -100,6 +104,7 @@ public class AudioServiceBinder extends Service implements MediaPlayer.OnPrepare
         audioPlayer = new MediaPlayer();
         songFinder = new SongFinder( getApplicationContext() , MediaStore.Audio.Media.EXTERNAL_CONTENT_URI );
 
+        am = (AudioManager) getApplicationContext().getSystemService(Context.AUDIO_SERVICE);
         initAudioPlayer();
 
         if( playIntent == null ) {
@@ -123,6 +128,27 @@ public class AudioServiceBinder extends Service implements MediaPlayer.OnPrepare
     }
 
     private final IBinder mBinder = new LocalBinder();
+
+    @Override
+    public void onAudioFocusChange(int focusChange) {
+        if(focusChange == AudioManager.AUDIOFOCUS_LOSS_TRANSIENT)
+        {
+            audioPlayer.stop();
+            manager.setPauseIcon( false, getCurrentAudioPosition() );
+        }
+        else if(focusChange == AudioManager.AUDIOFOCUS_GAIN)
+        {
+            audioPlayer.start();
+            manager.setPauseIcon( true, getCurrentAudioPosition() );
+        }
+        else if(focusChange == AudioManager.AUDIOFOCUS_LOSS)
+        {
+            audioPlayer.stop();
+            manager.setPauseIcon( false, getCurrentAudioPosition() );
+            // Stop or pause depending on your need
+        }
+    }
+
     public class LocalBinder extends Binder {
         public AudioServiceBinder getService() {
             return AudioServiceBinder.this;
@@ -447,6 +473,8 @@ public class AudioServiceBinder extends Service implements MediaPlayer.OnPrepare
         broadcastIntent.setAction(PlaylistView.mBroadcasterPlayListView);
         broadcastIntent.putExtra("position", songPosn );
         getApplicationContext().sendBroadcast(broadcastIntent);
+
+        am.requestAudioFocus(this, AudioManager.STREAM_MUSIC, AudioManager.AUDIOFOCUS_GAIN);
 
         mp.start();
         manager.setPauseIcon( audioPlayer.isPlaying(), 0 );
