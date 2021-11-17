@@ -6,6 +6,7 @@ import android.graphics.Bitmap;
 import android.graphics.BitmapFactory;
 import android.media.MediaMetadataRetriever;
 import android.os.AsyncTask;
+import android.util.Log;
 
 import androidx.annotation.NonNull;
 import androidx.annotation.Nullable;
@@ -32,10 +33,15 @@ public class MusicHelpers {
         private final Listener listener;
 
         @Override protected Bitmap doInBackground(String... path) {
+
             android.media.MediaMetadataRetriever mmr = new MediaMetadataRetriever();
-            mmr.setDataSource(path[0]);
-            byte[] data = mmr.getEmbeddedPicture();
-            if (data != null) return BitmapFactory.decodeByteArray(data, 0, data.length);
+            try{
+                mmr.setDataSource(path[0]);
+                byte[] data = mmr.getEmbeddedPicture();
+                if (data != null) return BitmapFactory.decodeByteArray(data, 0, data.length);
+            } catch ( IllegalArgumentException e ) {
+                Log.e("doInBackground", e.toString());
+            }
             return null;
         }
         @Override protected void onPostExecute(Bitmap result) {
@@ -76,9 +82,13 @@ public class MusicHelpers {
      */
     public static Bitmap getAlbumImage(String path) {
         android.media.MediaMetadataRetriever mmr = new MediaMetadataRetriever();
-        mmr.setDataSource(path);
-        byte[] data = mmr.getEmbeddedPicture();
-        if (data != null) return BitmapFactory.decodeByteArray(data, 0, data.length);
+        try{
+            mmr.setDataSource(path);
+            byte[] data = mmr.getEmbeddedPicture();
+            if (data != null) return BitmapFactory.decodeByteArray(data, 0, data.length);
+        } catch ( IllegalArgumentException e ) {
+            Log.e("getAlbumImage", e.toString());
+        }
         return null;
     }
 

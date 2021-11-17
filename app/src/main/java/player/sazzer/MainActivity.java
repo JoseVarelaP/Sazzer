@@ -8,6 +8,7 @@ import android.content.Intent;
 import android.content.IntentFilter;
 import android.content.ServiceConnection;
 import android.content.pm.PackageManager;
+import android.os.Build;
 import android.os.Bundle;
 import android.os.IBinder;
 import android.util.Log;
@@ -27,7 +28,7 @@ import player.sazzer.Adapters.PlaylistRecyclerViewAdapter;
 import player.sazzer.DataTypes.Song;
 
 public class MainActivity extends AppCompatActivity implements PlaylistRecyclerViewAdapter.ItemClickListener {
-    public static final int REQUEST_CODE_EXTERNAL_STORAGE = 1002;
+    public static final int REQUEST_CODE_EXTERNAL_STORAGE = 1;
 
     Intent playIntent = null;
     ArrayList<Song> songList;
@@ -52,6 +53,15 @@ public class MainActivity extends AppCompatActivity implements PlaylistRecyclerV
         public void onServiceDisconnected(ComponentName name) {}
     };
 
+    private void grantPermission(String permission, int requestCode) {
+        long checkPermission = getBaseContext().checkSelfPermission(permission);
+
+        if( checkPermission != PackageManager.PERMISSION_GRANTED ) {
+            //requestPermissions(new String[]{permission},requestCode);
+            ActivityCompat.requestPermissions(MainActivity.this, new String[]{Manifest.permission.READ_EXTERNAL_STORAGE}, REQUEST_CODE_EXTERNAL_STORAGE);
+        }
+    }
+
     @Override
     protected void onCreate(@Nullable Bundle savedInstanceState) {
         super.onCreate(savedInstanceState);
@@ -60,12 +70,8 @@ public class MainActivity extends AppCompatActivity implements PlaylistRecyclerV
 
         // Hay que pedir el elemento para cargar los audios.
         // Si no, entonces tendremos un error/choque debido a la estancia de acceso ilegal de archivos.
-        int perm = getBaseContext ().checkSelfPermission (Manifest.permission.READ_EXTERNAL_STORAGE);
-        if (perm != PackageManager.PERMISSION_GRANTED) {
-            ActivityCompat.requestPermissions(this,
-                    new String[] { Manifest.permission.READ_EXTERNAL_STORAGE },
-                    REQUEST_CODE_EXTERNAL_STORAGE);
-        }
+        grantPermission(Manifest.permission.READ_EXTERNAL_STORAGE, REQUEST_CODE_EXTERNAL_STORAGE);
+        //grantPermission(Manifest.permission.WRITE_EXTERNAL_STORAGE, REQUEST_CODE_EXTERNAL_STORAGE);
 
         songList = new ArrayList<>();
         mIntentFilter = new IntentFilter();

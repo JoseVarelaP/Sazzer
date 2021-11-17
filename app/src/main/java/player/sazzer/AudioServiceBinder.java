@@ -110,7 +110,11 @@ public class AudioServiceBinder extends Service implements MediaPlayer.OnPrepare
         if( playIntent == null ) {
             playIntent = new Intent(this, NowPlayingManager.class);
             bindService(playIntent, notificationConnection, Context.BIND_AUTO_CREATE);
-            startService(playIntent);
+            if (Build.VERSION.SDK_INT >= Build.VERSION_CODES.O) {
+                startForegroundService(playIntent);
+            } else {
+                startService(playIntent);
+            }
         }
 
         Log.d("AudioServiceBinder","onCreate: Done");

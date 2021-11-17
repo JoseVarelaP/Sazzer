@@ -153,7 +153,7 @@ public class NowPlayingManager extends Service {
     public void showNotification()
     {
         // Common flag for all intents.
-        int flags = PendingIntent.FLAG_UPDATE_CURRENT;
+        int flags = PendingIntent.FLAG_UPDATE_CURRENT | PendingIntent.FLAG_IMMUTABLE;
 
         Intent intentPrevious = new Intent(this, NotificationReceiver.class).setAction(ACTION_PREV);
         PendingIntent PIPrevious = PendingIntent.getBroadcast(this, 0, intentPrevious, flags);
@@ -168,7 +168,7 @@ public class NowPlayingManager extends Service {
         Intent intent = MusicHelpers.sendToDetailedSongInfo(this, track, null);
 
         //Log.d("NowPlayingManager",String.format("Created a new intent with the following data: %s by %s", track.getTitle(), track.getArtist()));
-        PendingIntent showSongIntent = PendingIntent.getActivity(this, 0, intent, 0);
+        PendingIntent showSongIntent = PendingIntent.getActivity(this, 0, intent, PendingIntent.FLAG_IMMUTABLE);
 
         NotificationCompat.Builder builder = new NotificationCompat.Builder(this, CHANNEL_ID);
         builder
