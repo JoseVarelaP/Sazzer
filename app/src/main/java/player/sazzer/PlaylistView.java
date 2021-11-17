@@ -70,6 +70,14 @@ public class PlaylistView extends Activity implements PlaylistRecyclerViewAdapte
 
     @Override
     public void onItemClick(View view, int position) {
+        Intent broadcastIntent = new Intent();
+        broadcastIntent.setAction(DetailsActivity.mBroadcasterAudioAction);
+        Song track = songs.get(position);
+        broadcastIntent.putExtra("songName", track.getTitle());
+        broadcastIntent.putExtra("songArtist", track.getArtist());
+        broadcastIntent.putExtra("songArt", track.getAlbumArt());
+        getApplicationContext().sendBroadcast(broadcastIntent);
+
         MusicHelpers.actionServicePlaySong(getApplicationContext(), position);
     }
 }

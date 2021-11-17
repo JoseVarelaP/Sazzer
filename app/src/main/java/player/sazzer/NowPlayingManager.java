@@ -13,9 +13,8 @@ import android.support.v4.media.session.PlaybackStateCompat;
 
 import androidx.core.app.NotificationCompat;
 import androidx.core.app.NotificationManagerCompat;
-import java.io.Serializable;
 
-public class NowPlayingManager extends Activity implements Serializable {
+public class NowPlayingManager extends Activity {
     public static final String CHANNEL_ID = "CHANNEL_1";
 
     private Notification notification;
@@ -65,7 +64,7 @@ public class NowPlayingManager extends Activity implements Serializable {
 
         draw_prev = R.drawable.ic_baseline_skip_previous_24;
         Intent intentPrevious = MusicHelpers.quickIntentFromAction(AudioServiceAction.AUDIO_SERVICE_ACTION_PREV_SONG);
-        int flags = PendingIntent.FLAG_UPDATE_CURRENT |PendingIntent.FLAG_IMMUTABLE;
+        int flags = PendingIntent.FLAG_UPDATE_CURRENT | PendingIntent.FLAG_IMMUTABLE;
         PendingIntent PIPrevious = PendingIntent.getBroadcast(parent, 0, intentPrevious, flags);
 
         draw_play = R.drawable.ic_play_white_48dp;

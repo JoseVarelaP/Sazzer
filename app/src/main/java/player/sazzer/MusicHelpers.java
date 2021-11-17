@@ -11,8 +11,12 @@ import androidx.annotation.NonNull;
 import androidx.annotation.Nullable;
 
 import com.google.gson.Gson;
+import com.google.gson.reflect.TypeToken;
 
+import java.lang.reflect.Array;
+import java.lang.reflect.Type;
 import java.util.ArrayList;
+import java.util.List;
 
 public class MusicHelpers {
 
@@ -119,14 +123,30 @@ public class MusicHelpers {
         context.sendBroadcast( quickIntentFromAction(AudioServiceAction.AUDIO_SERVICE_ACTION_PLAY_SONG) );
     }
 
-    public static Intent sendToPlaylist(Context context, @NonNull ArrayList<Song> tracks)
+    public static String ConvertSongsToJSONTable(@NonNull ArrayList<Song> tracks)
     {
         Gson gson = new Gson();
-        String jsonMusica = gson.toJson(tracks);
+        return gson.toJson(tracks);
+    }
 
+    public static List<Song> ConvertJSONToTracks(@NonNull String JSONData)
+    {
+        if( JSONData == null || JSONData.isEmpty() )
+            return null;
+
+        Gson gson = new Gson();
+
+        Type type = new TypeToken<List<Song>>(){}.getType();
+        List<Song> newsongs = gson.fromJson(JSONData, type);
+
+        return newsongs;
+    }
+
+    public static Intent sendToPlaylist(Context context, @NonNull ArrayList<Song> tracks)
+    {
         Intent intent = new Intent(context, PlaylistView.class);
         intent.setFlags(Intent.FLAG_ACTIVITY_NEW_TASK | Intent.FLAG_ACTIVITY_SINGLE_TOP);
-        intent.putExtra("Audio.SongArray", jsonMusica);
+        intent.putExtra("Audio.SongArray", ConvertSongsToJSONTable(tracks) );
         return intent;
     }
 }

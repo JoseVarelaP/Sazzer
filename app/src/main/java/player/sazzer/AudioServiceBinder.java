@@ -8,8 +8,10 @@ import android.content.IntentFilter;
 import android.media.AudioAttributes;
 import android.media.MediaPlayer;
 import android.net.Uri;
+import android.os.Binder;
 import android.os.Handler;
 import android.os.IBinder;
+import android.provider.MediaStore;
 import android.text.TextUtils;
 import android.util.Log;
 
@@ -37,6 +39,7 @@ public class AudioServiceBinder extends Service implements MediaPlayer.OnPrepare
     private ArrayList<Song> songs = new ArrayList<>();
 
     private NowPlayingManager manager;
+    private SongFinder songFinder;
 
     enum PlayerState {
         PLAYER_READY,
@@ -91,6 +94,7 @@ public class AudioServiceBinder extends Service implements MediaPlayer.OnPrepare
         this.registerReceiver(mReceiver,filter);
 
         audioPlayer = new MediaPlayer();
+        songFinder = new SongFinder( getApplicationContext() , MediaStore.Audio.Media.EXTERNAL_CONTENT_URI );
 
         Log.d("AudioPlayerCheck",String.format("%s",audioPlayer));
         initAudioPlayer();
@@ -108,10 +112,17 @@ public class AudioServiceBinder extends Service implements MediaPlayer.OnPrepare
         unregisterReceiver(mReceiver);
     }
 
+    private final IBinder mBinder = new LocalBinder();
+    public class LocalBinder extends Binder {
+        public AudioServiceBinder getService() {
+            return AudioServiceBinder.this;
+        }
+    }
+
     @Nullable
     @Override
     public IBinder onBind(Intent intent) {
-        return null;
+        return mBinder;
     }
 
     public void initAudioPlayer()
@@ -332,6 +343,23 @@ public class AudioServiceBinder extends Service implements MediaPlayer.OnPrepare
                     set.putExtra("position", songPosn);
                     startActivity(set);
                     //getApplicationContext().sendBroadcast(set);
+                    break;
+                }
+
+                case AUDIO_SERVICE_ACTION_FETCH_SONGS:
+                {
+                    Log.d("AUDIO_SERVICE_ACTION_FETCH_SONGS","Fetching songs");
+                    songFinder.GenerateSongList();
+                    songs = songFinder.getList();
+                    break;
+                }
+
+                case AUDIO_SERVICE_ACTION_OBTAIN_SONGS_TO_DISPLAY:
+                {
+                    Intent broadcastIntent = new Intent(); //= MusicHelpers.sendToDetailedSongInfo(getApplicationContext(), songs.get(songPosn), this);
+                    broadcastIntent.setAction(MainActivity.mBroadcasterMainActivity);
+                    broadcastIntent.putExtra("Audio.SongArray", MusicHelpers.ConvertSongsToJSONTable(songs) );
+                    getApplicationContext().sendBroadcast(broadcastIntent);
                     break;
                 }
             }
