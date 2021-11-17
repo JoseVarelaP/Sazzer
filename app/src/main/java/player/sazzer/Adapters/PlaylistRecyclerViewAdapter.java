@@ -25,7 +25,7 @@ public class PlaylistRecyclerViewAdapter extends RecyclerView.Adapter<PlaylistRe
     private final LayoutInflater mInflater;
     private ItemClickListener mClickListener;
     private Song current;
-    private Context context = null;
+    private Context context;
 
     // data is passed into the constructor
     public PlaylistRecyclerViewAdapter(Context context, ArrayList<Song> data, Song current) {
@@ -102,12 +102,7 @@ public class PlaylistRecyclerViewAdapter extends RecyclerView.Adapter<PlaylistRe
             if (mClickListener != null) mClickListener.onItemClick(view, getAdapterPosition());
         }
     }
-
-    // convenience method for getting data at click position
-    Song getItem(int id) {
-        return mData.get(id);
-    }
-
+    
     // allows clicks events to be caught
     public void setClickListener(ItemClickListener itemClickListener) {
         this.mClickListener = itemClickListener;

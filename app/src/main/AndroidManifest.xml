@@ -51,6 +51,13 @@
                 <action android:name="player.sazzer.action.UPDATE_AUDIOBINDER"/>
             </intent-filter>
         </service>
+        <service
+            android:exported="false"
+            android:name=".NowPlayingManager">
+            <intent-filter>
+                <action android:name="player.sazzer.action.UPDATE_NOTIFICATION"/>
+            </intent-filter>
+        </service>
     </application>
 
 </manifest>
