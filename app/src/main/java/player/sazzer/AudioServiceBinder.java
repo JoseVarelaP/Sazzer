@@ -345,16 +345,6 @@ public class AudioServiceBinder extends Service implements MediaPlayer.OnPrepare
                     //getApplicationContext().sendBroadcast(set);
                     break;
                 }
-
-                case AUDIO_SERVICE_ACTION_UPDATE_PLAYLIST_QUEUE:
-                {
-                    Intent broadcastIntent = new Intent(); //= MusicHelpers.sendToDetailedSongInfo(getApplicationContext(), songs.get(songPosn), this);
-                    broadcastIntent.setAction(PlaylistView.mBroadcasterPlayListView);
-                    broadcastIntent.putExtra("position", songPosn);
-                    getApplicationContext().sendBroadcast(broadcastIntent);
-                    break;
-                }
-
                 case AUDIO_SERVICE_ACTION_FETCH_SONGS:
                 {
                     Log.d("AUDIO_SERVICE_ACTION_FETCH_SONGS","Fetching songs");
@@ -365,7 +355,6 @@ public class AudioServiceBinder extends Service implements MediaPlayer.OnPrepare
                     //songs = songFinder.FindMusicByArtist("whyetc");
                     break;
                 }
-
                 case AUDIO_SERVICE_ACTION_OBTAIN_SONGS_TO_DISPLAY:
                 {
                     Intent broadcastIntent = new Intent(); //= MusicHelpers.sendToDetailedSongInfo(getApplicationContext(), songs.get(songPosn), this);
@@ -391,6 +380,12 @@ public class AudioServiceBinder extends Service implements MediaPlayer.OnPrepare
         broadcastIntent.putExtra("songName", track.getTitle());
         broadcastIntent.putExtra("songArtist", track.getArtist());
         broadcastIntent.putExtra("songArt", track.getAlbumArt());
+        getApplicationContext().sendBroadcast(broadcastIntent);
+
+        // Update the playlist if it happens to be available and shown on the screen.
+        broadcastIntent = new Intent(); //= MusicHelpers.sendToDetailedSongInfo(getApplicationContext(), songs.get(songPosn), this);
+        broadcastIntent.setAction(PlaylistView.mBroadcasterPlayListView);
+        broadcastIntent.putExtra("position", songPosn );
         getApplicationContext().sendBroadcast(broadcastIntent);
 
         mp.start();

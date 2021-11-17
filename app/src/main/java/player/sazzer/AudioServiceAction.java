@@ -13,6 +13,4 @@ public enum AudioServiceAction {
     // Actions to obtain from the AudioQueue class
     AUDIO_SERVICE_ACTION_FETCH_SONGS,
     AUDIO_SERVICE_ACTION_OBTAIN_SONGS_TO_DISPLAY,
-    // Update the playlist object
-    AUDIO_SERVICE_ACTION_UPDATE_PLAYLIST_QUEUE
 }
