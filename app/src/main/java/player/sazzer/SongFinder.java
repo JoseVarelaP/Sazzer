@@ -76,6 +76,9 @@ public class SongFinder extends AppCompatActivity {
                 long thisId = musicCursor.getLong(idColumn);
                 String pathId = musicCursor.getString(column_index);
 
+                if( !MusicHelpers.isSongValidAudio(pathId) )
+                    continue;
+
                 String thisTitle = musicCursor.getString(titleColumn);
                 String thisArtist = musicCursor.getString(artistColumn);
                 String thisAlbum = musicCursor.getString(albumColumn);

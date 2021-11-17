@@ -13,9 +13,9 @@ import androidx.annotation.Nullable;
 import com.google.gson.Gson;
 import com.google.gson.reflect.TypeToken;
 
-import java.lang.reflect.Array;
 import java.lang.reflect.Type;
 import java.util.ArrayList;
+import java.util.Arrays;
 import java.util.List;
 
 public class MusicHelpers {
@@ -49,6 +49,17 @@ public class MusicHelpers {
         {
             this.listener = listener;
         }
+    }
+
+    public static boolean isSongValidAudio(String path) {
+        List<String> availableFormats = Arrays.asList("mp3","ogg","flac","wav","ogv");
+        String lowerPath = path.toLowerCase();
+        for( String s : availableFormats ) {
+            if (lowerPath.endsWith(s))
+                return true;
+        }
+
+        return false;
     }
 
     /**
