@@ -51,6 +51,11 @@ public class MusicHelpers {
         }
     }
 
+    /**
+     * Verify if the current audio file has a valid audio format supported by the device.
+     * @param path Full song path to the audio file.
+     * @return {@link Boolean} representing the result.
+     */
     public static boolean isSongValidAudio(String path) {
         List<String> availableFormats = Arrays.asList("mp3","ogg","flac","wav","ogv");
         String lowerPath = path.toLowerCase();
@@ -63,9 +68,9 @@ public class MusicHelpers {
     }
 
     /**
-     * Generate a Bitmap object that comes from the song's embedded metadata.
+     * Generate a {@link Bitmap} object that comes from the song's embedded metadata.
      * @param path Path to the song, which contains embedded information
-     * @return A generated Bitmap. However, keep in mind that this can be null.
+     * @return A generated {@link Bitmap}. However, keep in mind that this can be null.
      */
     public static Bitmap getAlbumImage(String path) {
         android.media.MediaMetadataRetriever mmr = new MediaMetadataRetriever();
@@ -84,18 +89,18 @@ public class MusicHelpers {
     }
 
     /**
-     * (Utilizes Gson to convert the array to a serialized string).
+     * Notifies the {@link AudioServiceBinder} service to update the contents of its song list
+     * with a new set.
      * @param songList New list to send to the service.
-     * @return AUDIO_SERVICE_ACTION_UPDATE_BINDER brodcast action.
+     * @return {@link AudioServiceAction#AUDIO_SERVICE_ACTION_UPDATE_BINDER} broadcast action.
+     *
+     * @see #ConvertSongsToJSONTable(ArrayList)
      */
     public static Intent createIntentToUpdateMusicArray(ArrayList<Song> songList) {
-        Gson gson = new Gson();
-        String jsonMusica = gson.toJson(songList);
-
         Intent intent = new Intent();
         intent.setAction(AudioServiceBinder.mBroadcasterServiceBinder);
         intent.putExtra("AUDIO_ACTION", AudioServiceAction.AUDIO_SERVICE_ACTION_UPDATE_BINDER);
-        intent.putExtra("Audio.SongArray", jsonMusica);
+        intent.putExtra("Audio.SongArray", ConvertSongsToJSONTable(songList));
 
         return intent;
     }
@@ -105,7 +110,7 @@ public class MusicHelpers {
      * for showing more in-depth song information.
      * @param context The current context that will be stacked to the chain.
      * @param track Current song that will be used to fill information
-     * @return The intent to be used on a related PendingIntent.
+     * @return The {@link android.content.Intent} to be used on a related {@link android.app.PendingIntent}.
      */
     public static Intent sendToDetailedSongInfo(Context context, @NonNull Song track, @Nullable AudioServiceBinder binder)
     {
@@ -134,12 +139,25 @@ public class MusicHelpers {
         context.sendBroadcast( quickIntentFromAction(AudioServiceAction.AUDIO_SERVICE_ACTION_PLAY_SONG) );
     }
 
+    /**
+     * As a shortcut, we can just use {@link Gson} to convert the ArrayList to a JSON.
+     * @param tracks {@link ArrayList} of songs to convert.
+     * @return {@link String}
+     */
     public static String ConvertSongsToJSONTable(@NonNull ArrayList<Song> tracks)
     {
         Gson gson = new Gson();
         return gson.toJson(tracks);
     }
 
+    /**
+     *
+     * @param JSONData Stringyfied version of the Array.
+     * @return a {@link List} containing the songs. Can be casted directly into a {@link ArrayList}.
+     * 
+     * @see #ConvertSongsToJSONTable(ArrayList)
+     * @see Gson
+     */
     public static List<Song> ConvertJSONToTracks(@NonNull String JSONData)
     {
         if( JSONData.isEmpty() )
