@@ -1,8 +1,11 @@
 package player.sazzer;
 
 import android.app.Activity;
+import android.content.BroadcastReceiver;
+import android.content.Context;
 import android.content.Intent;
 import android.os.Bundle;
+import android.util.Log;
 import android.view.View;
 
 import androidx.annotation.Nullable;
@@ -23,6 +26,7 @@ public class PlaylistView extends Activity implements PlaylistRecyclerViewAdapte
     LinearLayoutManager LLM;
     ArrayList<Song> songs;
     RecyclerView recyclerView;
+    int oldpos = 0;
     @Override
     protected void onCreate(@Nullable Bundle savedInstanceState) {
         super.onCreate(savedInstanceState);
@@ -35,6 +39,26 @@ public class PlaylistView extends Activity implements PlaylistRecyclerViewAdapte
 
         onNewIntent(this.getIntent());
     }
+
+    public static final String mBroadcasterPlayListView = "player.sazzer.action.PLAYLIST_VIEW";
+
+    // Receieve broadcasts from other classes.
+    private final BroadcastReceiver playlistDataReciever = new BroadcastReceiver() {
+        @Override
+        public void onReceive(Context context, Intent intent) {
+            Bundle extras = intent.getExtras();
+            Log.d("MainActivity","Recieved a braodcast");
+
+            if( extras == null )
+                return;
+
+            if( intent.getAction() == mBroadcasterPlayListView )
+            {
+                Log.d(mBroadcasterPlayListView, "Creating list");
+                String newsongsStr = intent.getStringExtra("songIndex");
+            }
+        }
+    };
 
     @Override
     protected void onNewIntent(Intent intent) {
@@ -54,6 +78,7 @@ public class PlaylistView extends Activity implements PlaylistRecyclerViewAdapte
                 int position = intent.getIntExtra("position",-1);
                 if( position != -1 )
                 {
+                    oldpos = position;
                     adapter = new PlaylistRecyclerViewAdapter(this, songs, songs.get(position));
                     adapter.setClickListener(this);
                     recyclerView.setAdapter(adapter);
@@ -79,7 +104,10 @@ public class PlaylistView extends Activity implements PlaylistRecyclerViewAdapte
         getApplicationContext().sendBroadcast(broadcastIntent);
 
         adapter.updateCurrentSong( track );
-        adapter.notifyDataSetChanged();
+        adapter.notifyItemChanged(oldpos);
+        adapter.notifyItemChanged(position);
+
+        oldpos = position;
 
         MusicHelpers.actionServicePlaySong(getApplicationContext(), position);
     }
