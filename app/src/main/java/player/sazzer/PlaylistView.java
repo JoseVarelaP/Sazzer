@@ -78,6 +78,9 @@ public class PlaylistView extends Activity implements PlaylistRecyclerViewAdapte
         broadcastIntent.putExtra("songArt", track.getAlbumArt());
         getApplicationContext().sendBroadcast(broadcastIntent);
 
+        adapter.updateCurrentSong( track );
+        adapter.notifyDataSetChanged();
+
         MusicHelpers.actionServicePlaySong(getApplicationContext(), position);
     }
 }

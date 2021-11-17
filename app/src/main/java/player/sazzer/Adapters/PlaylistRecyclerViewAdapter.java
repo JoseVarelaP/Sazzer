@@ -24,7 +24,7 @@ public class PlaylistRecyclerViewAdapter extends RecyclerView.Adapter<PlaylistRe
     private final ArrayList<Song> mData;
     private final LayoutInflater mInflater;
     private ItemClickListener mClickListener;
-    private final Song current;
+    private Song current;
     private Context context = null;
 
     // data is passed into the constructor
@@ -76,6 +76,8 @@ public class PlaylistRecyclerViewAdapter extends RecyclerView.Adapter<PlaylistRe
     public int getItemCount() {
         return mData.size();
     }
+
+    public void updateCurrentSong(Song newSong) { current = newSong; }
 
 
     // stores and recycles views as they are scrolled off screen

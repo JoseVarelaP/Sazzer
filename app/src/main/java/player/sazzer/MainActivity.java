@@ -124,14 +124,19 @@ public class MainActivity extends AppCompatActivity implements PlaylistRecyclerV
         if (Build.VERSION.SDK_INT >= Build.VERSION_CODES.O){
             notificationManager.cancelAll();
         }
-        this.unregisterReceiver(musicDataReciever);
+        //this.unregisterReceiver(musicDataReciever);
         super.onDestroy();
     }
 
     @Override
     protected void onPause() {
         super.onPause();
-        this.unregisterReceiver(musicDataReciever);
+        try {
+            this.unregisterReceiver(musicDataReciever);
+        } catch (IllegalArgumentException e)
+        {
+            // Don't do anything.
+        }
     }
 
     @Override
@@ -202,30 +207,10 @@ public class MainActivity extends AppCompatActivity implements PlaylistRecyclerV
                     Log.d(mBroadcasterMainActivity, "List contains data! " + newsongsStr);
                     songList = (ArrayList<Song>) MusicHelpers.ConvertJSONToTracks( newsongsStr );
 
+                    // With song infomation created, we can now generate the song list safely.
                     GenerateMainSongList();
-
-                    /*
-                    if( !songList.isEmpty() )
-                    {
-
-                    }
-
-                     */
                 }
             }
-            /*
-            if( extras.getBoolean("needsPause",false) )
-            {
-                button.setImageResource(R.drawable.ic_play_white_48dp);
-                return;
-            } else {
-                button.setImageResource(R.drawable.ic_pause_white_48dp);
-            }
-
-            String nCancion = intent.getStringExtra("songName");
-            String nArtista = intent.getStringExtra("songArtist");
-            String nArt = intent.getStringExtra("songArt");
-            */
         }
     };
 }

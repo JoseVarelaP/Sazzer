@@ -346,11 +346,23 @@ public class AudioServiceBinder extends Service implements MediaPlayer.OnPrepare
                     break;
                 }
 
+                case AUDIO_SERVICE_ACTION_UPDATE_PLAYLIST_QUEUE:
+                {
+                    Intent broadcastIntent = new Intent(); //= MusicHelpers.sendToDetailedSongInfo(getApplicationContext(), songs.get(songPosn), this);
+                    broadcastIntent.setAction(PlaylistView.mBroadcasterPlayListView);
+                    broadcastIntent.putExtra("position", songPosn);
+                    getApplicationContext().sendBroadcast(broadcastIntent);
+                    break;
+                }
+
                 case AUDIO_SERVICE_ACTION_FETCH_SONGS:
                 {
                     Log.d("AUDIO_SERVICE_ACTION_FETCH_SONGS","Fetching songs");
                     songFinder.GenerateSongList();
                     songs = songFinder.getList();
+
+                    //songs = songFinder.FindMusicByAlbumName("Canarias Virtua A");
+                    //songs = songFinder.FindMusicByArtist("whyetc");
                     break;
                 }
 

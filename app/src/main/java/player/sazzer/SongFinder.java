@@ -42,7 +42,7 @@ public class SongFinder extends AppCompatActivity {
         ArrayList<Song> result = new ArrayList<>();
         for( Song s : masterSongList )
         {
-            if( s.getArtist().contains(albumName) )
+            if( s.getAlbum().contains(albumName) )
                 result.add(s);
         }
 
