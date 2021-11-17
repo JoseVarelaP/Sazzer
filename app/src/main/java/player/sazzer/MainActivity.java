@@ -9,7 +9,6 @@ import android.content.Intent;
 import android.content.IntentFilter;
 import android.content.ServiceConnection;
 import android.content.pm.PackageManager;
-import android.net.Uri;
 import android.os.Build;
 import android.os.Bundle;
 import android.os.IBinder;
@@ -90,12 +89,6 @@ public class MainActivity extends AppCompatActivity implements PlaylistRecyclerV
 
         Log.d("GenerateMainSongList", "The array contains " + songList.size() + " songs");
 
-        //songList = new ArrayList<>();
-
-        //getSongList(MediaStore.Audio.Media.INTERNAL_CONTENT_URI);
-        //getSongList(MediaStore.Audio.Media.EXTERNAL_CONTENT_URI);
-        //getSongList(MediaStore.Audio.Media.EXTERNAL_CONTENT_URI);
-
         PlaylistRecyclerViewAdapter listMusica = new PlaylistRecyclerViewAdapter(this, songList, null);
         listMusica.setClickListener(this);
         songView.setAdapter(listMusica);
@@ -135,11 +128,6 @@ public class MainActivity extends AppCompatActivity implements PlaylistRecyclerV
         super.onResume();
     }
 
-    public void getSongList(Uri musicUri) {
-        sendBroadcast( MusicHelpers.quickIntentFromAction(AudioServiceAction.AUDIO_SERVICE_ACTION_FETCH_SONGS) );
-        sendBroadcast( MusicHelpers.quickIntentFromAction(AudioServiceAction.AUDIO_SERVICE_ACTION_OBTAIN_SONGS_TO_DISPLAY) );
-    }
-
     @Override
     public void onItemClick(View view, int position) {
         Log.d("MainActivity","Set Song: " + position );
@@ -162,7 +150,8 @@ public class MainActivity extends AppCompatActivity implements PlaylistRecyclerV
 
         if (requestCode == REQUEST_CODE_EXTERNAL_STORAGE) {
             if (grantResults.length > 0 && grantResults[0] == PackageManager.PERMISSION_GRANTED) {
-                GenerateMainSongList();
+                sendBroadcast( MusicHelpers.quickIntentFromAction(AudioServiceAction.AUDIO_SERVICE_ACTION_FETCH_SONGS) );
+                sendBroadcast( MusicHelpers.quickIntentFromAction(AudioServiceAction.AUDIO_SERVICE_ACTION_OBTAIN_SONGS_TO_DISPLAY) );
             }
         }
     }
@@ -184,7 +173,7 @@ public class MainActivity extends AppCompatActivity implements PlaylistRecyclerV
         @Override
         public void onReceive(Context context, Intent intent) {
             Bundle extras = intent.getExtras();
-            Log.d("MainActivity","Recieved a braodcast");
+            Log.d("MainActivity","Recieved a broadcast");
 
             if( extras == null )
                 return;
