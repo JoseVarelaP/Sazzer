@@ -2,25 +2,42 @@
 <LinearLayout xmlns:android="http://schemas.android.com/apk/res/android"
     xmlns:tools="http://schemas.android.com/tools"
     android:orientation="vertical"
+    android:weightSum="4"
     android:layout_width="match_parent"
     android:layout_height="match_parent">
 
-    <ImageView
-        android:contentDescription="@string/nameArtist"
-        android:id="@+id/imageCover"
-        android:background="#000000"
-        android:minHeight="390dp"
-        android:maxHeight="390dp"
+    <RelativeLayout
         android:layout_width="match_parent"
-        android:layout_height="wrap_content"
-        android:src="@drawable/default_cover"/>
+        android:layout_weight="0"
+        android:background="@drawable/bg_gradient"
+        android:layout_height="wrap_content">
+
+        <ImageView
+            android:contentDescription="@string/nameArtist"
+            android:id="@+id/imageCover"
+            android:background="#000000"
+            android:minHeight="390dp"
+            android:maxHeight="390dp"
+            android:layout_weight="0"
+            android:layout_width="match_parent"
+            android:layout_height="wrap_content"
+            android:src="@drawable/default_cover"/>
+
+        <RelativeLayout
+            android:layout_width="match_parent"
+            android:layout_height="190dp"
+            android:layout_below="@id/imageCover"
+            android:layout_marginTop="-190dp"
+            android:background="@drawable/bg_gradient" />
+
+    </RelativeLayout>
 
     <LinearLayout
         android:orientation="vertical"
         android:layout_width="match_parent"
         android:padding="10dp"
-        android:weightSum="5"
-        android:layout_weight="1"
+        android:weightSum="6"
+        android:layout_weight="4"
         android:background="@color/nowPlayingBackgroundColor"
         android:layout_height="0dp">
 
