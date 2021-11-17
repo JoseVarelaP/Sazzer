@@ -66,8 +66,7 @@ public class AudioServiceBinder extends Service implements MediaPlayer.OnPrepare
         //Log.d("runBinderUpdater","Song now is at " + getAudioProgress() + "%");
         manager.updateSong( songs.get(songPosn), getAudioProgress(), this, false );
 
-        //Intent broadcastIntent = new Intent();
-        Intent broadcastIntent = new Intent(); //= MusicHelpers.sendToDetailedSongInfo(getApplicationContext(), songs.get(songPosn), this);
+        Intent broadcastIntent = new Intent();
         broadcastIntent.setAction(DetailsActivity.mBroadcasterAudioAction);
         broadcastIntent.putExtra("Progress", getCurrentAudioPosition());
         broadcastIntent.putExtra("TotalTime", getTotalAudioDuration());
@@ -396,9 +395,12 @@ public class AudioServiceBinder extends Service implements MediaPlayer.OnPrepare
         mp.reset();
         Log.d("MediaPlayer","Completed track");
         // Is there a song available to play next?
-        if( (songPosn+1) > songs.size() )
-            if( manager != null )
+        if( (songPosn+1) > songs.size()-1 ) {
+            // No, we're done, stop everything.
+            if (manager != null)
                 manager.cancelNotification();
+            return;
+        }
 
         songPosn++;
         setSong(songPosn);

@@ -59,7 +59,7 @@ public class PlaylistView extends Activity implements PlaylistRecyclerViewAdapte
             if( extras == null )
                 return;
 
-            if( intent.getAction() == mBroadcasterPlayListView )
+            if( intent.getAction().equals(mBroadcasterPlayListView) )
             {
                 Log.d(mBroadcasterPlayListView, "Creating list");
                 int position = intent.getIntExtra("position",-1);
