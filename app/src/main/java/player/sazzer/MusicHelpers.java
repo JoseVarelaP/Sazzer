@@ -92,6 +92,12 @@ public class MusicHelpers {
         return null;
     }
 
+	public static Bitmap ResizeBitmap(Bitmap image) {
+        if (image.getWidth() > 600 && image.getHeight() > 600)
+            return Bitmap.createScaledBitmap(image, 600, 600, false);
+        return image;
+    }
+
     public static Intent quickIntentFromAction(AudioServiceAction action)
     {
         Intent i = new Intent();
