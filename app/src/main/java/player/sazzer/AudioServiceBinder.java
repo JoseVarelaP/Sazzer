@@ -239,8 +239,19 @@ public class AudioServiceBinder extends Service implements MediaPlayer.OnPrepare
         // Is there a song available to play next?
         int oldsum = songPosn;
         int newsum = (songPosn += offset);
-        if( newsum < 0 || newsum > songs.size() )
+        Log.d("dsdfa", String.format("%d - %d", newsum, songs.size()-1));
+        if( newsum < 0 )
+        {
+            songPosn = 0;
+            if( getAudioProgress() > 1 ) {
+                setProgress(0);
+            }
             return;
+        }
+        if( newsum > (songs.size()-1) ) {
+            songPosn = songs.size()-1;
+            return;
+        }
 
         songPosn = newsum;
         setSong(songPosn);
