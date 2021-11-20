@@ -85,7 +85,7 @@ public class MusicHelpers {
         try{
             mmr.setDataSource(path);
             byte[] data = mmr.getEmbeddedPicture();
-            if (data != null) return BitmapFactory.decodeByteArray(data, 0, data.length);
+            if (data != null) return ResizeBitmap(BitmapFactory.decodeByteArray(data, 0, data.length));
         } catch ( IllegalArgumentException e ) {
             Log.e("getAlbumImage", e.toString());
         }
@@ -197,7 +197,7 @@ public class MusicHelpers {
      *
      * @param JSONData Stringyfied version of the Array.
      * @return a {@link List} containing the songs. Can be casted directly into a {@link ArrayList}.
-     * 
+     *
      * @see #ConvertSongsToJSONTable(ArrayList)
      * @see Gson
      */
