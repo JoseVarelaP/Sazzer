@@ -14,14 +14,38 @@ import androidx.annotation.Nullable;
 import com.google.gson.Gson;
 import com.google.gson.reflect.TypeToken;
 
+import java.io.File;
 import java.lang.reflect.Type;
 import java.util.ArrayList;
 import java.util.Arrays;
 import java.util.List;
+import java.util.Locale;
 
 import player.sazzer.DataTypes.Song;
 
 public class MusicHelpers {
+
+    public static Bitmap findAlbumArtCoverFile( String path )
+    {
+        int instancesfordot = path.lastIndexOf('.');
+        if( instancesfordot > 0 ) {
+            // Check if an image is available on the directory for the song.
+            int lastslash = path.lastIndexOf('/');
+            if( lastslash > 0 )
+            {
+                String newstr = path.substring(0,lastslash);
+                Log.d("directory", newstr);
+
+                File cont = new File( newstr + "/cover.jpg" );
+                Log.d("Folder for " + newstr,  cont.exists() ? "Exists!" : "Failed..");
+
+                if( cont.exists() )
+                    return BitmapFactory.decodeFile( cont.getPath() );
+            }
+        }
+
+        return null;
+    }
 
     static public class AlbumImageLoaderAsync extends AsyncTask<String, Void, Bitmap> {
 
@@ -33,14 +57,23 @@ public class MusicHelpers {
         private final Listener listener;
 
         @Override protected Bitmap doInBackground(String... path) {
-
             android.media.MediaMetadataRetriever mmr = new MediaMetadataRetriever();
+
+            Bitmap coverIMG = findAlbumArtCoverFile(path[0]);
+            if( coverIMG != null ) {
+                return ResizeBitmap(coverIMG);
+            }
+            //if( path[0].toLowerCase().endsWith(".flac") )
+                //return null;
+            //Log.d("Song: ", path[0]);
+
             try{
                 mmr.setDataSource(path[0]);
                 byte[] data = mmr.getEmbeddedPicture();
                 if (data != null) return BitmapFactory.decodeByteArray(data, 0, data.length);
             } catch ( IllegalArgumentException e ) {
                 Log.e("doInBackground", e.toString());
+                return null;
             }
             return null;
         }
@@ -81,6 +114,11 @@ public class MusicHelpers {
      * @return A generated {@link Bitmap}. However, keep in mind that this can be null.
      */
     public static Bitmap getAlbumImage(String path) {
+        Bitmap coverIMG = findAlbumArtCoverFile(path);
+        if( coverIMG != null ) {
+            return ResizeBitmap(coverIMG);
+        }
+
         android.media.MediaMetadataRetriever mmr = new MediaMetadataRetriever();
         try{
             mmr.setDataSource(path);
