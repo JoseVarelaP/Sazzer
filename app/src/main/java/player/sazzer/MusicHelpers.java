@@ -37,10 +37,14 @@ public class MusicHelpers {
                 Log.d("directory", newstr);
 
                 File cont = new File( newstr + "/cover.jpg" );
-                Log.d("Folder for " + newstr,  cont.exists() ? "Exists!" : "Failed..");
-
-                if( cont.exists() )
-                    return BitmapFactory.decodeFile( cont.getPath() );
+                List<String> availableFormats = Arrays.asList("png","jpg","gif","bmp");
+                for( String s : availableFormats )
+                {
+                    cont = new File( newstr + "/cover."+s );
+                    Log.d("Folder for " + newstr,  cont.exists() ? "Exists!" : "Failed..");
+                    if( cont.exists() )
+                        return BitmapFactory.decodeFile( cont.getPath() );
+                }
             }
         }
 
