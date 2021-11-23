@@ -30,7 +30,7 @@
         <ScrollView
             android:id="@+id/lyricContainer"
             android:layout_width="match_parent"
-            android:background="@color/colorBG"
+            android:background="@color/lyricsBG"
             android:visibility="invisible"
             android:layout_height="390dp">
             <TextView
