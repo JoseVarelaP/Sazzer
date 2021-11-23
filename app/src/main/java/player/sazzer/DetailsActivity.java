@@ -140,21 +140,26 @@ public class DetailsActivity extends Activity {
             sendBroadcast( MusicHelpers.quickIntentFromAction(AudioServiceAction.AUDIO_SERVICE_ACTION_EXPORT_QUEUE_TO_PLAYLIST) );
         });
 
-        ImageView record = findViewById(R.id.recordSongButton);
-        record.setColorFilter( R.color.recordButtonColor );
-        record.setOnClickListener(v -> {
+        ImageView lyrics = findViewById(R.id.lyricsButton);
+        lyrics.setColorFilter( R.color.nowPlayingbuttonColor );
+        lyrics.setOnClickListener(v -> {
             Log.d("Record", "Starting record area");
             if (lyricContainer.getVisibility() == View.INVISIBLE)
             {
                 lyricContainer.setVisibility(View.VISIBLE);
                 if (!lyric.getText().toString().equals(""))
-                        return;
+                    return;
                 lyric.setText(getString(R.string.downloadingLyrics));
                 LyricSong lyricSong = new LyricSong(Nombre.getText().toString(), Artista.getText().toString());
                 new DownloadLyrics(this, lyricSong).start();
             }
             else lyricContainer.setVisibility(View.INVISIBLE);
-            //finish();
+        });
+
+        ImageView record = findViewById(R.id.recordSongButton);
+        record.setColorFilter( R.color.recordButtonColor );
+        record.setOnClickListener(v -> {
+            finish();
         });
     }
 

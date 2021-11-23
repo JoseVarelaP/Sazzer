@@ -12,4 +12,5 @@
     <string name="successfulDownload">Lyrics downloaded successfully</string>
     <string name="lyricsNotAvailable">Lyrics not available, try with another song</string>
     <string name="forbiddenLyrics">Forbidden lyrics, try with another song</string>
+    <string name="showLyrics">Show Lyrics</string>
 </resources>

@@ -57,7 +57,8 @@
             android:layout_width="match_parent"
             android:layout_height="0dp"
             android:layout_weight="0.5"
-            android:weightSum="10"
+            android:layout_marginBottom="20dp"
+            android:weightSum="25"
             >
 
             <ImageView
@@ -66,12 +67,25 @@
                 android:layout_width="0dp"
                 android:layout_height="match_parent"
                 android:src="@drawable/ic_baseline_format_list_bulleted_24"
-                android:layout_weight="1" />
+                android:layout_weight="5" />
 
             <View
                 android:layout_width="0dp"
                 android:layout_height="match_parent"
-                android:layout_weight="8"/>
+                android:layout_weight="5"/>
+
+            <ImageView
+                android:contentDescription="@string/showLyrics"
+                android:id="@+id/lyricsButton"
+                android:src="@drawable/ic_baseline_queue_music_24"
+                android:layout_width="0dp"
+                android:layout_height="match_parent"
+                android:layout_weight="5"/>
+
+            <View
+                android:layout_width="0dp"
+                android:layout_height="match_parent"
+                android:layout_weight="5"/>
 
             <ImageView
                 android:contentDescription="@string/recordVoice"
@@ -79,7 +93,7 @@
                 android:src="@drawable/ic_baseline_mic_24"
                 android:layout_width="0dp"
                 android:layout_height="match_parent"
-                android:layout_weight="1"/>
+                android:layout_weight="5"/>
         </LinearLayout>
 
         <TextView

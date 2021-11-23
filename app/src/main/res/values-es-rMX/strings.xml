@@ -13,4 +13,5 @@
     <string name="successfulDownload">Letra descargada correctamente</string>
     <string name="lyricsNotAvailable">Letra no disponible, intente con otra canción</string>
     <string name="forbiddenLyrics">Letra restringida, intente con otra canción</string>
+    <string name="showLyrics">Mostrar Letras</string>
 </resources>
