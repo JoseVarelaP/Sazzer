@@ -15,6 +15,7 @@ import android.os.Binder;
 import android.os.Build;
 import android.os.Handler;
 import android.os.IBinder;
+import android.os.PowerManager;
 import android.provider.MediaStore;
 import android.text.TextUtils;
 import android.util.Log;
@@ -74,9 +75,8 @@ public class AudioServiceBinder extends Service implements MediaPlayer.OnPrepare
     void refresh(int mil)
     {
         final Handler handler = new Handler();
-        final Runnable runnable = this::updateContent;
 
-        handler.postDelayed(runnable,mil);
+        handler.postDelayed(this::updateContent,mil);
     }
 
     private Intent playIntent;
@@ -102,6 +102,7 @@ public class AudioServiceBinder extends Service implements MediaPlayer.OnPrepare
         this.registerReceiver(mReceiver,filter);
 
         audioPlayer = new MediaPlayer();
+        audioPlayer.setWakeMode(getApplicationContext(), PowerManager.PARTIAL_WAKE_LOCK);
         songFinder = new SongFinder( getApplicationContext() , MediaStore.Audio.Media.EXTERNAL_CONTENT_URI );
 
         am = (AudioManager) getApplicationContext().getSystemService(Context.AUDIO_SERVICE);
