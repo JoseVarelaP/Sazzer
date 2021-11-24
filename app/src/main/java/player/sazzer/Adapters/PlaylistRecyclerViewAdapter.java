@@ -58,6 +58,12 @@ public class PlaylistRecyclerViewAdapter extends RecyclerView.Adapter<PlaylistRe
             holder.playIcon.setVisibility(View.VISIBLE);
         }
 
+        if( holder.albumLoaderThread != null )
+            if( holder.albumLoaderThread.getStatus() == AsyncTask.Status.RUNNING ) {
+                //Log.d("albumLoaderThread","Still Running!");
+                holder.albumLoaderThread.cancel(true);
+            }
+
         // Reset thread for a new action.
         holder.albumLoaderThread = new AlbumImageLoaderAsync( holder.albumListener );
         holder.albumLoaderThread.execute(track.getAlbumArt());
