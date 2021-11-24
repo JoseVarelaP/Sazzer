@@ -206,14 +206,14 @@ public class AudioServiceBinder extends Service implements MediaPlayer.OnPrepare
 
     public void playSong() throws IOException {
         audioPlayer.reset();
-        Log.d("AudioPlayerCheck",String.format("%s",audioPlayer));
+        //Log.d("AudioPlayerCheck",String.format("%s",audioPlayer));
         Song playSong = songs.get(songPosn);
         Uri trackUri = Uri.fromFile( new File(playSong.getAlbumArt()) );
 
         if( TextUtils.isEmpty(trackUri.toString()) )
             return;
 
-        Log.d("AudioServiceBinder:playSong()","Looking for song in " + trackUri.toString());
+        //Log.d("AudioServiceBinder:playSong()","Looking for song in " + trackUri.toString());
         try {
             audioPlayer.setDataSource(getApplicationContext(), trackUri);
             audioPlayer.prepareAsync();
@@ -327,9 +327,9 @@ public class AudioServiceBinder extends Service implements MediaPlayer.OnPrepare
     private final BroadcastReceiver mReceiver = new BroadcastReceiver() {
         @Override
         public void onReceive(Context context, Intent intent) {
-            Log.d("AudioPlayerCheck",String.format("%s",audioPlayer));
+            //Log.d("AudioPlayerCheck",String.format("%s",audioPlayer));
             //String action = intent.getAction();
-            Log.d("AudioServiceBinder","reciever's onReceive was called.");
+            //Log.d("AudioServiceBinder","reciever's onReceive was called.");
 
             AudioServiceAction Action = (AudioServiceAction) intent.getSerializableExtra("AUDIO_ACTION");
 

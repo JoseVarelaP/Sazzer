@@ -34,16 +34,17 @@ public class MusicHelpers {
             if( lastslash > 0 )
             {
                 String newstr = path.substring(0,lastslash);
-                Log.d("directory", newstr);
+                //Log.d("directory", newstr);
 
                 File cont = new File( newstr + "/cover.jpg" );
                 List<String> availableFormats = Arrays.asList("png","jpg","gif","bmp");
                 for( String s : availableFormats )
                 {
                     cont = new File( newstr + "/cover."+s );
-                    Log.d("Folder for " + newstr,  cont.exists() ? "Exists!" : "Failed..");
+                    //Log.d("Folder for " + newstr,  cont.exists() ? "Exists!" : "Failed..");
                     if( cont.exists() )
                         return BitmapFactory.decodeFile( cont.getPath() );
+                    Log.d("Folder for " + newstr,"Failed to find..");
                 }
             }
         }
@@ -67,9 +68,6 @@ public class MusicHelpers {
             if( coverIMG != null ) {
                 return ResizeBitmap(coverIMG);
             }
-            //if( path[0].toLowerCase().endsWith(".flac") )
-                //return null;
-            //Log.d("Song: ", path[0]);
 
             try{
                 mmr.setDataSource(path[0]);
