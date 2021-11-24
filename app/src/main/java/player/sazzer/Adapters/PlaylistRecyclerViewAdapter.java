@@ -3,7 +3,6 @@ package player.sazzer.Adapters;
 import android.content.Context;
 import android.graphics.Bitmap;
 import android.os.AsyncTask;
-import android.util.Log;
 import android.view.LayoutInflater;
 import android.view.View;
 import android.view.ViewGroup;
@@ -17,7 +16,6 @@ import androidx.recyclerview.widget.RecyclerView;
 
 import java.util.ArrayList;
 
-import player.sazzer.MusicHelpers;
 import player.sazzer.R;
 import player.sazzer.DataTypes.Song;
 
@@ -66,7 +64,7 @@ public class PlaylistRecyclerViewAdapter extends RecyclerView.Adapter<PlaylistRe
 
         // Reset thread for a new action.
         holder.albumLoaderThread = new AlbumImageLoaderAsync( holder.albumListener );
-        holder.albumLoaderThread.execute(track.getAlbum().getAlbumArt());
+        holder.albumLoaderThread.execute(track.getAlbum());
 
         holder.songName.setText( track.getTitle() );
         holder.songArtist.setText( track.getArtist() );
