@@ -9,13 +9,18 @@ import android.util.Log;
 
 import androidx.appcompat.app.AppCompatActivity;
 
+import java.lang.reflect.Array;
 import java.util.ArrayList;
+import java.util.HashMap;
+import java.util.Map;
 
+import player.sazzer.DataTypes.Album;
 import player.sazzer.DataTypes.Song;
 
 public class SongFinder extends AppCompatActivity {
 
     private ArrayList<Song> masterSongList;
+    private HashMap<String, Album> masterAlbumList;
     private Context mContext;
     Uri musicUri;
 
@@ -23,6 +28,7 @@ public class SongFinder extends AppCompatActivity {
     {
         Log.d("SongFinder", "Creating..");
         masterSongList = new ArrayList<>();
+        masterAlbumList = new HashMap<>();
         this.musicUri = man;
         this.mContext = ctx;
     }
@@ -39,6 +45,22 @@ public class SongFinder extends AppCompatActivity {
         return result;
     }
 
+    public Album GetAlbumFromName(String albumName )
+    {
+        return masterAlbumList.get(albumName);
+    }
+
+    public ArrayList<Album> getAlbumsFromArtist(String artistName )
+    {
+        ArrayList<Album> albums = new ArrayList<>();
+        for(Map.Entry<String, Album> alb : masterAlbumList.entrySet() )
+        {
+            if( alb.getValue().getArtist().equals(artistName) )
+                albums.add(alb.getValue());
+        }
+        return albums;
+    }
+
     public ArrayList<Song> FindMusicByAlbumName( String albumName )
     {
         ArrayList<Song> result = new ArrayList<>();
@@ -52,7 +74,6 @@ public class SongFinder extends AppCompatActivity {
     }
 
     // TODO: Make these functions:
-    // GetAlbumsFromArtist()
     // LookupSongsFromDirectoryArray()
 
     public void GenerateSongList()
@@ -85,6 +106,14 @@ public class SongFinder extends AppCompatActivity {
                 String thisTitle = musicCursor.getString(titleColumn);
                 String thisArtist = musicCursor.getString(artistColumn);
                 String thisAlbum = musicCursor.getString(albumColumn);
+
+                if( !masterAlbumList.containsKey(thisAlbum) )
+                {
+                    Log.d("masterAlbumList", String.format("Adding %s to HasMap.", thisAlbum));
+                    Album temp = new Album(thisId, thisAlbum, thisArtist, pathId);
+                    masterAlbumList.put(thisAlbum, temp);
+                }
+
                 long thisDuration = musicCursor.getLong(durationColumn);
                 masterSongList.add(new Song(thisId, thisTitle, thisArtist, thisAlbum, pathId, thisDuration));
             }
@@ -96,6 +125,8 @@ public class SongFinder extends AppCompatActivity {
             musicCursor.close();
         Log.d("GenerateSongList", "Done. Found " + masterSongList.size() + "songs.");
     }
+
+
 
     public void clearQueue() { masterSongList.clear(); }
     public ArrayList<Song> getList() { return masterSongList; }
