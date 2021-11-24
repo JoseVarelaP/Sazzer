@@ -52,48 +52,6 @@ public class MusicHelpers {
         return null;
     }
 
-    static public class AlbumImageLoaderAsync extends AsyncTask<String, Void, Bitmap> {
-
-        public interface Listener {
-            void onImageDownloaded(final Bitmap bitmap);
-            void onImageDownloadError();
-        }
-
-        private final Listener listener;
-
-        @Override protected Bitmap doInBackground(String... path) {
-            android.media.MediaMetadataRetriever mmr = new MediaMetadataRetriever();
-
-            Bitmap coverIMG = findAlbumArtCoverFile(path[0]);
-            if( coverIMG != null ) {
-                return ResizeBitmap(coverIMG);
-            }
-
-            try{
-                mmr.setDataSource(path[0]);
-                byte[] data = mmr.getEmbeddedPicture();
-                if (data != null) return BitmapFactory.decodeByteArray(data, 0, data.length);
-            } catch ( IllegalArgumentException e ) {
-                Log.e("doInBackground", e.toString());
-                return null;
-            }
-            return null;
-        }
-        @Override protected void onPostExecute(Bitmap result) {
-            if( null != result )
-            {
-                listener.onImageDownloaded(result);
-            } else {
-                listener.onImageDownloadError();
-            }
-        }
-
-        public AlbumImageLoaderAsync(final Listener listener)
-        {
-            this.listener = listener;
-        }
-    }
-
     /**
      * Verify if the current audio file has a valid audio format supported by the device.
      * @param path Full song path to the audio file.
