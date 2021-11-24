@@ -91,7 +91,7 @@ public class NowPlayingManager extends Service {
         this.track = track;
 
         if( (image == null || forceAlbumImageRegen) )
-            image = MusicHelpers.getAlbumImage( this.track.getAlbumArt() );
+            image = MusicHelpers.getAlbumImage( this.track.getAlbum().getAlbumArt() );
 
         if( image == null )
             image = BitmapFactory.decodeResource(getResources(),R.drawable.default_cover);
@@ -119,7 +119,7 @@ public class NowPlayingManager extends Service {
                 )
                 .putString(
                         MediaMetadataCompat.METADATA_KEY_ALBUM,
-                        this.track.getAlbum()
+                        this.track.getAlbum().getTitle()
                 )
                 .putString(
                         MediaMetadataCompat.METADATA_KEY_TITLE,

@@ -121,7 +121,7 @@ public class PlaylistView extends Activity implements PlaylistRecyclerViewAdapte
         Song track = songs.get(position);
         broadcastIntent.putExtra("songName", track.getTitle());
         broadcastIntent.putExtra("songArtist", track.getArtist());
-        broadcastIntent.putExtra("songArt", track.getAlbumArt());
+        broadcastIntent.putExtra("songArt", track.getAlbum().getAlbumArt());
         getApplicationContext().sendBroadcast(broadcastIntent);
 
         adapter.updateCurrentSong( track );

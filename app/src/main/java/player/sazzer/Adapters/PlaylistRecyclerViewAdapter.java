@@ -66,11 +66,11 @@ public class PlaylistRecyclerViewAdapter extends RecyclerView.Adapter<PlaylistRe
 
         // Reset thread for a new action.
         holder.albumLoaderThread = new AlbumImageLoaderAsync( holder.albumListener );
-        holder.albumLoaderThread.execute(track.getAlbumArt());
+        holder.albumLoaderThread.execute(track.getAlbum().getAlbumArt());
 
         holder.songName.setText( track.getTitle() );
         holder.songArtist.setText( track.getArtist() );
-        holder.songAlbum.setText( track.getAlbum() );
+        holder.songAlbum.setText( track.getAlbum().getTitle() );
         holder.songArt.setImageResource(R.drawable.default_cover);
     }
 
