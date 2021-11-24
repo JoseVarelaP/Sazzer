@@ -83,7 +83,11 @@ public class MainActivity extends AppCompatActivity implements PlaylistRecyclerV
             Log.d("onCreate","Intent is null, starting service.");
             playIntent = new Intent(this, AudioServiceBinder.class);
             bindService(playIntent, musicConnection, Context.BIND_AUTO_CREATE);
-            startService(playIntent);
+            if (Build.VERSION.SDK_INT >= Build.VERSION_CODES.O) {
+                startForegroundService(playIntent);
+            } else {
+                startService(playIntent);
+            }
             Log.d("onCreate","Done with setup of services.");
         }
     }
