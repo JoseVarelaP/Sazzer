@@ -1,10 +1,10 @@
-package player.sazzer;
+package player.sazzer.DataTypes;
 
 import android.annotation.SuppressLint;
 
 import java.util.concurrent.TimeUnit;
 
-class TimeSpace {
+public class TimeSpace {
     long hours;
     long minute;
     long second;

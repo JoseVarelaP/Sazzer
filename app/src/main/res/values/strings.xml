@@ -8,4 +8,9 @@
     <string name="nextSong">Next Song</string>
     <string name="playListAction">Open Playlist</string>
     <string name="recordVoice">Record Voice</string>
+    <string name="downloadingLyrics">Downloading lyrics…</string>
+    <string name="successfulDownload">Lyrics downloaded successfully</string>
+    <string name="lyricsNotAvailable">Lyrics not available, try with another song</string>
+    <string name="forbiddenLyrics">Forbidden lyrics, try with another song</string>
+    <string name="showLyrics">Show Lyrics</string>
 </resources>

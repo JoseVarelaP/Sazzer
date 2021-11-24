@@ -17,15 +17,15 @@ import java.util.ArrayList;
 
 import player.sazzer.MusicHelpers;
 import player.sazzer.R;
-import player.sazzer.Song;
+import player.sazzer.DataTypes.Song;
 
 public class PlaylistRecyclerViewAdapter extends RecyclerView.Adapter<PlaylistRecyclerViewAdapter.ViewHolder> {
 
     private final ArrayList<Song> mData;
     private final LayoutInflater mInflater;
     private ItemClickListener mClickListener;
-    private final Song current;
-    private Context context = null;
+    private Song current;
+    private Context context;
 
     // data is passed into the constructor
     public PlaylistRecyclerViewAdapter(Context context, ArrayList<Song> data, Song current) {
@@ -77,6 +77,8 @@ public class PlaylistRecyclerViewAdapter extends RecyclerView.Adapter<PlaylistRe
         return mData.size();
     }
 
+    public void updateCurrentSong(Song newSong) { current = newSong; }
+
 
     // stores and recycles views as they are scrolled off screen
     public class ViewHolder extends RecyclerView.ViewHolder implements View.OnClickListener {
@@ -100,12 +102,7 @@ public class PlaylistRecyclerViewAdapter extends RecyclerView.Adapter<PlaylistRe
             if (mClickListener != null) mClickListener.onItemClick(view, getAdapterPosition());
         }
     }
-
-    // convenience method for getting data at click position
-    Song getItem(int id) {
-        return mData.get(id);
-    }
-
+    
     // allows clicks events to be caught
     public void setClickListener(ItemClickListener itemClickListener) {
         this.mClickListener = itemClickListener;

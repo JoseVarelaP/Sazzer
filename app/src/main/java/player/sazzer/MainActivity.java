@@ -1,20 +1,16 @@
 package player.sazzer;
 
 import android.Manifest;
-import android.app.NotificationChannel;
-import android.app.NotificationManager;
+import android.content.BroadcastReceiver;
 import android.content.ComponentName;
-import android.content.ContentResolver;
 import android.content.Context;
 import android.content.Intent;
+import android.content.IntentFilter;
 import android.content.ServiceConnection;
 import android.content.pm.PackageManager;
-import android.database.Cursor;
-import android.net.Uri;
 import android.os.Build;
 import android.os.Bundle;
 import android.os.IBinder;
-import android.provider.MediaStore;
 import android.util.Log;
 import android.view.View;
 
@@ -25,25 +21,46 @@ import androidx.appcompat.app.AppCompatDelegate;
 import androidx.core.app.ActivityCompat;
 import androidx.recyclerview.widget.LinearLayoutManager;
 import androidx.recyclerview.widget.RecyclerView;
+
 import java.util.ArrayList;
 
 import player.sazzer.Adapters.PlaylistRecyclerViewAdapter;
+import player.sazzer.DataTypes.Song;
 
 public class MainActivity extends AppCompatActivity implements PlaylistRecyclerViewAdapter.ItemClickListener {
-    public static final int REQUEST_CODE_EXTERNAL_STORAGE = 1002;
+    public static final int REQUEST_CODE_EXTERNAL_STORAGE = 1;
 
     Intent playIntent = null;
     ArrayList<Song> songList;
     private AudioServiceBinder musicSrv;
-    NotificationManager notificationManager;
+
+    private IntentFilter mIntentFilter;
+
+    public static final String mBroadcasterMainActivity = "player.sazzer.action.UPDATE_SONG_VIEW";
 
     private final ServiceConnection musicConnection = new ServiceConnection() {
         @Override
-        public void onServiceConnected(ComponentName name, IBinder service) {}
+        public void onServiceConnected(ComponentName name, IBinder service) {
+            AudioServiceBinder.LocalBinder binder = (AudioServiceBinder.LocalBinder) service;
+            musicSrv = binder.getService();
+            //musicSrv.setCallback(MainActivity.this);
+            Log.d("musicConnection","Service has started");
+            sendBroadcast( MusicHelpers.quickIntentFromAction(AudioServiceAction.AUDIO_SERVICE_ACTION_FETCH_SONGS) );
+            sendBroadcast( MusicHelpers.quickIntentFromAction(AudioServiceAction.AUDIO_SERVICE_ACTION_OBTAIN_SONGS_TO_DISPLAY) );
+        }
 
         @Override
         public void onServiceDisconnected(ComponentName name) {}
     };
+
+    private void grantPermission(String permission, int requestCode) {
+        long checkPermission = getBaseContext().checkSelfPermission(permission);
+
+        if( checkPermission != PackageManager.PERMISSION_GRANTED ) {
+            //requestPermissions(new String[]{permission},requestCode);
+            ActivityCompat.requestPermissions(MainActivity.this, new String[]{Manifest.permission.READ_EXTERNAL_STORAGE}, REQUEST_CODE_EXTERNAL_STORAGE);
+        }
+    }
 
     @Override
     protected void onCreate(@Nullable Bundle savedInstanceState) {
@@ -53,41 +70,42 @@ public class MainActivity extends AppCompatActivity implements PlaylistRecyclerV
 
         // Hay que pedir el elemento para cargar los audios.
         // Si no, entonces tendremos un error/choque debido a la estancia de acceso ilegal de archivos.
-        int perm = getBaseContext ().checkSelfPermission (Manifest.permission.READ_EXTERNAL_STORAGE);
-        if (perm != PackageManager.PERMISSION_GRANTED) {
-            ActivityCompat.requestPermissions(this,
-                    new String[] { Manifest.permission.READ_EXTERNAL_STORAGE },
-                    REQUEST_CODE_EXTERNAL_STORAGE);
-        } else {
-            GenerateMainSongList();
+        grantPermission(Manifest.permission.READ_EXTERNAL_STORAGE, REQUEST_CODE_EXTERNAL_STORAGE);
+        //grantPermission(Manifest.permission.WRITE_EXTERNAL_STORAGE, REQUEST_CODE_EXTERNAL_STORAGE);
+
+        songList = new ArrayList<>();
+        mIntentFilter = new IntentFilter();
+        mIntentFilter.addAction(mBroadcasterMainActivity);
+
+        this.registerReceiver(musicDataReciever, mIntentFilter);
+
+        if (playIntent == null) {
+            Log.d("onCreate","Intent is null, starting service.");
+            playIntent = new Intent(this, AudioServiceBinder.class);
+            bindService(playIntent, musicConnection, Context.BIND_AUTO_CREATE);
+            startService(playIntent);
+            Log.d("onCreate","Done with setup of services.");
         }
     }
 
     protected void GenerateMainSongList()
     {
+        Log.d("GenerateMainSongList", "Creating view for song items...");
         RecyclerView songView = findViewById(R.id.songList);
         songView.setLayoutManager(new LinearLayoutManager(this));
-        songList = new ArrayList<>();
 
-        //getSongList(MediaStore.Audio.Media.INTERNAL_CONTENT_URI);
-        getSongList(MediaStore.Audio.Media.EXTERNAL_CONTENT_URI);
+        Log.d("GenerateMainSongList", "The array contains " + songList.size() + " songs");
 
         PlaylistRecyclerViewAdapter listMusica = new PlaylistRecyclerViewAdapter(this, songList, null);
         listMusica.setClickListener(this);
         songView.setAdapter(listMusica);
+        Log.d("GenerateMainSongList", "Done.");
     }
 
     @Override
     protected void onStart() {
         Log.d("onStart","Starting");
         super.onStart();
-        if (playIntent == null) {
-            Log.d("onStart","Intent is null, starting service.");
-            playIntent = new Intent(this, AudioServiceBinder.class);
-            bindService(playIntent, musicConnection, Context.BIND_AUTO_CREATE);
-            startService(playIntent);
-            Log.d("onStart","Done with setup of services.");
-        }
     }
 
     @Override
@@ -97,53 +115,20 @@ public class MainActivity extends AppCompatActivity implements PlaylistRecyclerV
         super.onDestroy();
     }
 
-    public void getSongList(Uri musicUri) {
-        ContentResolver musicResolver = getContentResolver();
-        // Vamos a buscar música que está en la memoria externa.
-        // TODO (probablemente: Preguntar luego por ubicaciones especiales, para que la gente pueda
-        // colocar su propia música.
-
-        String selection = MediaStore.Audio.Media.IS_MUSIC + "!= 0";
-        String sortOrder = MediaStore.Audio.Media.ALBUM + " ASC, " + MediaStore.Audio.Media.TRACK + " ASC";
-
-        // Check if we can create the notification channel to show it.
-        if(Build.VERSION.SDK_INT >= Build.VERSION_CODES.O )
+    @Override
+    protected void onPause() {
+        super.onPause();
+        try {
+            this.unregisterReceiver(musicDataReciever);
+        } catch (IllegalArgumentException e)
         {
-            NotificationChannel channel = new NotificationChannel(NowPlayingManager.CHANNEL_ID,
-                    "Now Playing", NotificationManager.IMPORTANCE_LOW);
-
-            notificationManager = getSystemService(NotificationManager.class);
-            if( notificationManager != null ) {
-                notificationManager.createNotificationChannel(channel);
-            }
+            // Don't do anything.
         }
+    }
 
-        Cursor musicCursor = musicResolver.query(musicUri, null, selection, null, sortOrder);
-
-        // Hora de buscar
-        if (musicCursor != null && musicCursor.moveToFirst()) {
-            int titleColumn = musicCursor.getColumnIndex(MediaStore.Audio.Media.TITLE);
-            int idColumn = musicCursor.getColumnIndex(MediaStore.Audio.Media._ID);
-            int artistColumn = musicCursor.getColumnIndex(MediaStore.Audio.Media.ARTIST);
-            int albumColumn = musicCursor.getColumnIndex(MediaStore.Audio.Media.ALBUM);
-            //int albumId = musicCursor.getColumnIndex(MediaStore.Audio.Media.ALBUM_ID);
-            int column_index = musicCursor.getColumnIndexOrThrow(MediaStore.Audio.Media.DATA);
-
-            do {
-                long thisId = musicCursor.getLong(idColumn);
-                String pathId = musicCursor.getString(column_index);
-
-                String thisTitle = musicCursor.getString(titleColumn);
-                String thisArtist = musicCursor.getString(artistColumn);
-                String thisAlbum = musicCursor.getString(albumColumn);
-                songList.add(new Song(thisId, thisTitle, thisArtist, thisAlbum, pathId));
-            }
-            while (musicCursor.moveToNext());
-        }
-
-        // Needs to be closed to avoid memory leak.
-        if(musicCursor != null)
-            musicCursor.close();
+    @Override
+    protected void onResume() {
+        super.onResume();
     }
 
     @Override
@@ -168,7 +153,8 @@ public class MainActivity extends AppCompatActivity implements PlaylistRecyclerV
 
         if (requestCode == REQUEST_CODE_EXTERNAL_STORAGE) {
             if (grantResults.length > 0 && grantResults[0] == PackageManager.PERMISSION_GRANTED) {
-                GenerateMainSongList();
+                sendBroadcast( MusicHelpers.quickIntentFromAction(AudioServiceAction.AUDIO_SERVICE_ACTION_FETCH_SONGS) );
+                sendBroadcast( MusicHelpers.quickIntentFromAction(AudioServiceAction.AUDIO_SERVICE_ACTION_OBTAIN_SONGS_TO_DISPLAY) );
             }
         }
     }
@@ -184,4 +170,30 @@ public class MainActivity extends AppCompatActivity implements PlaylistRecyclerV
     protected void onActivityResult(int requestCode, int resultCode, Intent data) {
         super.onActivityResult(requestCode, resultCode, data);
     }
+
+    // Receieve broadcasts from other classes.
+    private final BroadcastReceiver musicDataReciever = new BroadcastReceiver() {
+        @Override
+        public void onReceive(Context context, Intent intent) {
+            Bundle extras = intent.getExtras();
+            Log.d("MainActivity","Recieved a broadcast");
+
+            if( extras == null )
+                return;
+
+            if( intent.getAction().equals(mBroadcasterMainActivity) )
+            {
+                Log.d(mBroadcasterMainActivity, "Creating list");
+                String newsongsStr = intent.getStringExtra("Audio.SongArray");
+
+                if( newsongsStr != null && !newsongsStr.isEmpty() ) {
+                    Log.d(mBroadcasterMainActivity, "List contains data! " + newsongsStr);
+                    songList = (ArrayList<Song>) MusicHelpers.ConvertJSONToTracks( newsongsStr );
+
+                    // With song infomation created, we can now generate the song list safely.
+                    GenerateMainSongList();
+                }
+            }
+        }
+    };
 }

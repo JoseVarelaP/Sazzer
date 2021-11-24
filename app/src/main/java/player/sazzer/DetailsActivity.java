@@ -8,18 +8,23 @@ import android.content.IntentFilter;
 
 import android.os.Bundle;
 import android.util.Log;
+import android.view.View;
 import android.widget.ImageButton;
 import android.widget.ImageView;
+import android.widget.ScrollView;
 import android.widget.SeekBar;
 import android.widget.TextView;
 
 import androidx.annotation.NonNull;
 import androidx.annotation.Nullable;
 
+import player.sazzer.DataTypes.TimeSpace;
+
 public class DetailsActivity extends Activity {
     SeekBar sbProgress;
     ImageButton button,prev,next;
-    TextView curTime,totalTime,Nombre,Artista;
+    TextView curTime,totalTime,Nombre,Artista, lyric;
+    ScrollView lyricContainer;
     ImageView albumArt;
 
 
@@ -94,6 +99,8 @@ public class DetailsActivity extends Activity {
         Nombre = findViewById( R.id.songName );
         Artista = findViewById( R.id.artistName );
         albumArt = findViewById( R.id.imageCover );
+        lyric = findViewById(R.id.lyricText);
+        lyricContainer = findViewById(R.id.lyricContainer);
 
         Nombre.setSelected(true);
         Artista.setSelected(true);
@@ -112,11 +119,19 @@ public class DetailsActivity extends Activity {
 
         prev = findViewById(R.id.PrevSong);
         prev.setColorFilter( R.color.nowPlayingbuttonColor );
-        prev.setOnClickListener(v -> sendBroadcast( MusicHelpers.quickIntentFromAction(AudioServiceAction.AUDIO_SERVICE_ACTION_PREV_SONG) ));
+        prev.setOnClickListener(v -> {
+            lyric.setText("");
+            lyricContainer.setVisibility(View.INVISIBLE);
+            sendBroadcast( MusicHelpers.quickIntentFromAction(AudioServiceAction.AUDIO_SERVICE_ACTION_PREV_SONG) );
+        });
 
         next = findViewById(R.id.NextSong);
         next.setColorFilter( R.color.nowPlayingbuttonColor );
-        next.setOnClickListener(v -> sendBroadcast( MusicHelpers.quickIntentFromAction(AudioServiceAction.AUDIO_SERVICE_ACTION_NEXT_SONG) ));
+        next.setOnClickListener(v -> {
+            lyric.setText("");
+            lyricContainer.setVisibility(View.INVISIBLE);
+            sendBroadcast( MusicHelpers.quickIntentFromAction(AudioServiceAction.AUDIO_SERVICE_ACTION_NEXT_SONG) );
+        });
 
         ImageView playList = findViewById(R.id.playListButton);
         playList.setColorFilter( R.color.nowPlayingbuttonColor );
@@ -125,10 +140,25 @@ public class DetailsActivity extends Activity {
             sendBroadcast( MusicHelpers.quickIntentFromAction(AudioServiceAction.AUDIO_SERVICE_ACTION_EXPORT_QUEUE_TO_PLAYLIST) );
         });
 
+        ImageView lyrics = findViewById(R.id.lyricsButton);
+        lyrics.setColorFilter( R.color.nowPlayingbuttonColor );
+        lyrics.setOnClickListener(v -> {
+            Log.d("Record", "Starting record area");
+            if (lyricContainer.getVisibility() == View.INVISIBLE)
+            {
+                lyricContainer.setVisibility(View.VISIBLE);
+                if (!lyric.getText().toString().equals(""))
+                    return;
+                lyric.setText(getString(R.string.downloadingLyrics));
+                LyricSong lyricSong = new LyricSong(Nombre.getText().toString(), Artista.getText().toString());
+                new DownloadLyrics(this, lyricSong).start();
+            }
+            else lyricContainer.setVisibility(View.INVISIBLE);
+        });
+
         ImageView record = findViewById(R.id.recordSongButton);
         record.setColorFilter( R.color.recordButtonColor );
         record.setOnClickListener(v -> {
-            Log.d("Record", "Starting record area");
             finish();
         });
     }
@@ -160,6 +190,7 @@ public class DetailsActivity extends Activity {
     @Override
     protected void onResume() {
         super.onResume ();
+        sendBroadcast(MusicHelpers.quickIntentFromAction(AudioServiceAction.AUDIO_SERVICE_ACTION_UPDATE_DETAILED_INFO));
         this.registerReceiver(musicDataReciever, mIntentFilter);
     }
 

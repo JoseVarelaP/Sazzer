@@ -9,4 +9,9 @@
     <string name="nextSong">Canción Siguiente</string>
     <string name="playListAction">Abrir Cola</string>
     <string name="recordVoice">Grabar Voz</string>
+    <string name="downloadingLyrics">Descargando letra…</string>
+    <string name="successfulDownload">Letra descargada correctamente</string>
+    <string name="lyricsNotAvailable">Letra no disponible, intente con otra canción</string>
+    <string name="forbiddenLyrics">Letra restringida, intente con otra canción</string>
+    <string name="showLyrics">Mostrar Letras</string>
 </resources>
