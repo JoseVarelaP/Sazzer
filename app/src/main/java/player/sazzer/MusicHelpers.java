@@ -15,6 +15,7 @@ import com.google.gson.Gson;
 import com.google.gson.reflect.TypeToken;
 
 import java.io.File;
+import java.io.FilenameFilter;
 import java.lang.reflect.Type;
 import java.util.ArrayList;
 import java.util.Arrays;
@@ -36,16 +37,17 @@ public class MusicHelpers {
                 String newstr = path.substring(0,lastslash);
                 //Log.d("directory", newstr);
 
-                File cont = new File( newstr + "/cover.jpg" );
-                List<String> availableFormats = Arrays.asList("png","jpg","gif","bmp");
-                for( String s : availableFormats )
-                {
-                    cont = new File( newstr + "/cover."+s );
-                    //Log.d("Folder for " + newstr,  cont.exists() ? "Exists!" : "Failed..");
-                    if( cont.exists() )
-                        return BitmapFactory.decodeFile( cont.getPath() );
-                    Log.d("Folder for " + newstr,"Failed to find..");
-                }
+                File folder = new File( newstr );
+                File[] allFiles = folder.listFiles((dir, name) -> (
+                        name.endsWith(".png") ||
+                                name.endsWith(".jpg") ||
+                                name.endsWith(".jpeg") ||
+                                name.endsWith(".gif")
+                        )
+                );
+
+                if( allFiles.length > 0 )
+                    return BitmapFactory.decodeFile( allFiles[0].getPath() );
             }
         }
 
