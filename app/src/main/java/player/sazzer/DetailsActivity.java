@@ -6,6 +6,10 @@ import android.content.Context;
 import android.content.Intent;
 import android.content.IntentFilter;
 
+import android.hardware.Sensor;
+import android.hardware.SensorEvent;
+import android.hardware.SensorEventListener;
+import android.hardware.SensorManager;
 import android.os.Bundle;
 import android.util.Log;
 import android.view.View;
@@ -20,12 +24,19 @@ import androidx.annotation.Nullable;
 
 import player.sazzer.DataTypes.TimeSpace;
 
-public class DetailsActivity extends Activity {
+public class DetailsActivity extends Activity implements SensorEventListener {
     SeekBar sbProgress;
     ImageButton button,prev,next;
     TextView curTime,totalTime,Nombre,Artista, lyric;
     ScrollView lyricContainer;
     ImageView albumArt;
+
+    SensorManager sensorManager;
+    Sensor accelerometer;
+    private long mShakeTime = 0;
+
+    private static final float SHAKE_THRESHOLD = 1.1f;
+    private static final int SHAKE_WAIT_TIME_MS = 250;
 
 
     private final BroadcastReceiver musicDataReciever = new BroadcastReceiver() {
@@ -161,6 +172,10 @@ public class DetailsActivity extends Activity {
         record.setOnClickListener(v -> {
             finish();
         });
+
+
+        sensorManager = (SensorManager) getSystemService(Context.SENSOR_SERVICE);
+        accelerometer = sensorManager.getDefaultSensor(Sensor.TYPE_ACCELEROMETER);
     }
 
     @Override
@@ -185,7 +200,10 @@ public class DetailsActivity extends Activity {
     }
 
     @Override
-    protected void onDestroy () { super.onDestroy(); }
+    protected void onDestroy () {
+        super.onDestroy();
+        sensorManager.unregisterListener((SensorEventListener) this);
+    }
 
     @Override
     protected void onResume() {
@@ -201,7 +219,39 @@ public class DetailsActivity extends Activity {
     }
 
     @Override
-    protected void onStart() { super.onStart (); }
+    protected void onStart() {
+        super.onStart ();
+        sensorManager.registerListener((SensorEventListener) this, accelerometer, SensorManager.SENSOR_DELAY_NORMAL);
+    }
+
+    @Override
+    public void onSensorChanged(SensorEvent sensorEvent) {
+        if (sensorEvent.accuracy != SensorManager.SENSOR_STATUS_UNRELIABLE) {
+            if (sensorEvent.sensor.getType() == Sensor.TYPE_ACCELEROMETER) {
+                Log.i("HERE","MOVE");
+                detectShake(sensorEvent);
+            }
+        }
+    }
+
+    @Override
+    public void onAccuracyChanged(Sensor sensor, int i) { }
+
+    private void detectShake(SensorEvent event) {
+        long now = System.currentTimeMillis();
+
+        if ((now - mShakeTime) > SHAKE_WAIT_TIME_MS) {
+            mShakeTime = now;
+
+            float gX = event.values[0] / SensorManager.GRAVITY_EARTH;
+            //float gY = event.values[1] / SensorManager.GRAVITY_EARTH;
+            //float gZ = event.values[2] / SensorManager.GRAVITY_EARTH;
+
+            if (Math.abs(gX) > SHAKE_THRESHOLD) {
+                sendBroadcast( MusicHelpers.quickIntentFromAction(AudioServiceAction.AUDIO_SERVICE_ACTION_TOGGLE_PLAY) );
+            }
+        }
+    }
 
     class MySeekBarChangeListener implements SeekBar.OnSeekBarChangeListener {
         int curVal = 0;
