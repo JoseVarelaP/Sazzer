@@ -238,7 +238,7 @@ public class DetailsActivity extends Activity implements SensorEventListener {
     public void onSensorChanged(SensorEvent sensorEvent) {
         if (sensorEvent.accuracy != SensorManager.SENSOR_STATUS_UNRELIABLE) {
             if (sensorEvent.sensor.getType() == Sensor.TYPE_ACCELEROMETER) {
-                Log.i("HERE","MOVE");
+                //Log.i("HERE","MOVE");
                 detectShake(sensorEvent);
             }
         }
@@ -272,10 +272,10 @@ public class DetailsActivity extends Activity implements SensorEventListener {
             return;
         }
 
+        String dateTime = DateFormat.getDateTimeInstance().
+                format(new Date()).replace(' ', '_').replace(':','-').replace(",","");
+        String format = String.format("/%s.mp3",dateTime);
         if (mediaRecorder == null) {
-            String dateTime = DateFormat.getDateTimeInstance().
-                    format(new Date()).replace(' ', '_').replace(':','-');
-            String format = String.format("/%s.mp3",dateTime);
             File folder = new File(Environment.getExternalStorageDirectory(), getString(R.string.app_name));
 
             if (!folder.exists()) {
@@ -311,6 +311,9 @@ public class DetailsActivity extends Activity implements SensorEventListener {
             mediaRecorder.stop();
             mediaRecorder.release();
             mediaRecorder = null;
+
+            EncryptorManager em = new EncryptorManager( getApplicationContext() );
+            em.CreateEncryptedFile( format );
             Toast.makeText(this,"Recording Finished...", Toast.LENGTH_LONG)
                     .show();
             Log.i("SUCCESS_AUDIO", fileAudio.getPath() + " --Finish");
