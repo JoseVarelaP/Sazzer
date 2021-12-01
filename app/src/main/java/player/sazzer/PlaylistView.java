@@ -81,14 +81,11 @@ public class PlaylistView extends Activity implements PlaylistRecyclerViewAdapte
         String newsongsStr = intent.getStringExtra("Audio.SongArray");
 
         if( newsongsStr != null && !newsongsStr.isEmpty() ) {
-            Gson gson = new Gson();
-
-            Type type = new TypeToken<List<Song>>(){}.getType();
-            List<Song> newsongs = gson.fromJson(newsongsStr, type);
+            ArrayList<Song> newsongs = MusicHelpers.ConvertJSONToTracks( newsongsStr );
 
             if( !newsongs.isEmpty() )
             {
-                songs = (ArrayList<Song>)newsongs;
+                songs = newsongs;
 
                 int position = intent.getIntExtra("position",-1);
                 if( position != -1 )

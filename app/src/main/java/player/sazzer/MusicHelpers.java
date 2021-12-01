@@ -16,12 +16,14 @@ import com.google.gson.reflect.TypeToken;
 
 import java.io.File;
 import java.io.FilenameFilter;
+import java.lang.reflect.Array;
 import java.lang.reflect.Type;
 import java.util.ArrayList;
 import java.util.Arrays;
 import java.util.List;
 import java.util.Locale;
 
+import player.sazzer.DataTypes.Album;
 import player.sazzer.DataTypes.Song;
 
 public class MusicHelpers {
@@ -201,13 +203,26 @@ public class MusicHelpers {
      * @see #ConvertSongsToJSONTable(ArrayList)
      * @see Gson
      */
-    public static List<Song> ConvertJSONToTracks(@NonNull String JSONData)
+    public static ArrayList<Song> ConvertJSONToTracks(@NonNull String JSONData)
     {
         if( JSONData.isEmpty() )
             return null;
 
         Gson gson = new Gson();
-        Type type = new TypeToken<List<Song>>(){}.getType();
+        Type type = new TypeToken<ArrayList<Song>>(){}.getType();
+
+        return gson.fromJson(JSONData, type);
+    }
+
+    //TODO: Puede convertir esto a un template, para convertir  the tipo de datos a cualquier
+    // tipo posible que puede convertir.
+    public static ArrayList<Album> ConvertJSONToAlbums(@NonNull String JSONData)
+    {
+        if( JSONData.isEmpty() )
+            return null;
+
+        Gson gson = new Gson();
+        Type type = new TypeToken<ArrayList<Album>>(){}.getType();
 
         return gson.fromJson(JSONData, type);
     }

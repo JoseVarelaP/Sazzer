@@ -11,6 +11,7 @@ import androidx.appcompat.app.AppCompatActivity;
 
 import java.lang.reflect.Array;
 import java.util.ArrayList;
+import java.util.Collection;
 import java.util.HashMap;
 import java.util.Map;
 
@@ -138,4 +139,9 @@ public class SongFinder extends AppCompatActivity {
 
     public void clearQueue() { masterSongList.clear(); }
     public ArrayList<Song> getList() { return masterSongList; }
+    public ArrayList<Album> getAlbums() {
+        Collection<Album> albumSet = masterAlbumList.values();
+        ArrayList<Album> ALAlbums = new ArrayList<>(albumSet);
+        return ALAlbums;
+    }
 }

@@ -13,6 +13,7 @@ import android.media.MediaPlayer;
 import android.net.Uri;
 import android.os.Binder;
 import android.os.Build;
+import android.os.Bundle;
 import android.os.Handler;
 import android.os.IBinder;
 import android.os.PowerManager;
@@ -283,7 +284,13 @@ public class AudioServiceBinder extends Service implements MediaPlayer.OnPrepare
 
     @Override
     public int onStartCommand(Intent intent, int flags, int startId) {
-        if( intent.getSerializableExtra("AUDIO_ACTION") != null )
+        Bundle Extras = intent.getExtras();
+        if( Extras == null )
+            return START_STICKY;
+        if( Extras.containsKey("AUDIO_ACTION") )
+            return START_STICKY;
+
+        //if( intent.getSerializableExtra("AUDIO_ACTION") != null )
         {
             AudioServiceAction Action = (AudioServiceAction) intent.getSerializableExtra("AUDIO_ACTION");
 
@@ -447,10 +454,27 @@ public class AudioServiceBinder extends Service implements MediaPlayer.OnPrepare
                     //songs = songFinder.FindMusicByArtist("whyetc");
                     break;
                 }
+                case AUDIO_SERVICE_ACTION_FETCH_ALBUMS:
+                {
+                    Log.d("AUDIO_SERVICE_ACTION_FETCH_SONGS","Fetching songs");
+                    songFinder.GenerateSongList();
+                    songFinder.getAlbums();
+                    //songs = songFinder.getList();
+                    break;
+                }
                 case AUDIO_SERVICE_ACTION_OBTAIN_SONGS_TO_DISPLAY:
                 {
                     Intent broadcastIntent = new Intent();
                     broadcastIntent.setAction(MainActivity.mBroadcasterMainActivity);
+                    broadcastIntent.putExtra("Audio.SongArray", MusicHelpers.ConvertSongsToJSONTable(songs) );
+                    getApplicationContext().sendBroadcast(broadcastIntent);
+                    break;
+                }
+
+                case AUDIO_SERVICE_ACTION_OBTAIN_ALBUMS_TO_DISPLAY:
+                {
+                    Intent broadcastIntent = new Intent();
+                    broadcastIntent.setAction(AllAlbumView.mBroadcasterMainActivity);
                     broadcastIntent.putExtra("Audio.SongArray", MusicHelpers.ConvertSongsToJSONTable(songs) );
                     getApplicationContext().sendBroadcast(broadcastIntent);
                     break;
