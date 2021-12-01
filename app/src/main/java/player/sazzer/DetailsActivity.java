@@ -1,16 +1,20 @@
 package player.sazzer;
 
+import android.Manifest;
 import android.app.Activity;
 import android.content.BroadcastReceiver;
 import android.content.Context;
 import android.content.Intent;
 import android.content.IntentFilter;
 
+import android.content.pm.PackageManager;
 import android.hardware.Sensor;
 import android.hardware.SensorEvent;
 import android.hardware.SensorEventListener;
 import android.hardware.SensorManager;
+import android.media.MediaRecorder;
 import android.os.Bundle;
+import android.os.Environment;
 import android.util.Log;
 import android.view.View;
 import android.widget.ImageButton;
@@ -18,9 +22,15 @@ import android.widget.ImageView;
 import android.widget.ScrollView;
 import android.widget.SeekBar;
 import android.widget.TextView;
+import android.widget.Toast;
 
 import androidx.annotation.NonNull;
 import androidx.annotation.Nullable;
+
+import java.io.File;
+import java.io.IOException;
+import java.text.DateFormat;
+import java.util.Date;
 
 import player.sazzer.DataTypes.TimeSpace;
 
@@ -37,6 +47,9 @@ public class DetailsActivity extends Activity implements SensorEventListener {
 
     private static final float SHAKE_THRESHOLD = 1.1f;
     private static final int SHAKE_WAIT_TIME_MS = 250;
+
+    MediaRecorder mediaRecorder;
+    File fileAudio;
 
 
     private final BroadcastReceiver musicDataReciever = new BroadcastReceiver() {
@@ -154,7 +167,6 @@ public class DetailsActivity extends Activity implements SensorEventListener {
         ImageView lyrics = findViewById(R.id.lyricsButton);
         lyrics.setColorFilter( R.color.nowPlayingbuttonColor );
         lyrics.setOnClickListener(v -> {
-            Log.d("Record", "Starting record area");
             if (lyricContainer.getVisibility() == View.INVISIBLE)
             {
                 lyricContainer.setVisibility(View.VISIBLE);
@@ -169,9 +181,7 @@ public class DetailsActivity extends Activity implements SensorEventListener {
 
         ImageView record = findViewById(R.id.recordSongButton);
         record.setColorFilter( R.color.recordButtonColor );
-        record.setOnClickListener(v -> {
-            finish();
-        });
+        record.setOnClickListener(v -> recordAudio());
 
 
         sensorManager = (SensorManager) getSystemService(Context.SENSOR_SERVICE);
@@ -250,6 +260,60 @@ public class DetailsActivity extends Activity implements SensorEventListener {
             if (Math.abs(gX) > SHAKE_THRESHOLD) {
                 sendBroadcast( MusicHelpers.quickIntentFromAction(AudioServiceAction.AUDIO_SERVICE_ACTION_TOGGLE_PLAY) );
             }
+        }
+    }
+
+    private void recordAudio() {
+        if (checkSelfPermission(Manifest.permission.WRITE_EXTERNAL_STORAGE) != PackageManager.PERMISSION_GRANTED
+                || checkSelfPermission(Manifest.permission.RECORD_AUDIO) != PackageManager.PERMISSION_GRANTED) {
+            requestPermissions(new String[] {
+                    Manifest.permission.WRITE_EXTERNAL_STORAGE, Manifest.permission.RECORD_AUDIO
+            }, 2000);
+            return;
+        }
+
+        if (mediaRecorder == null) {
+            String dateTime = DateFormat.getDateTimeInstance().
+                    format(new Date()).replace(' ', '_').replace(':','-');
+            String format = String.format("/%s.mp3",dateTime);
+            File folder = new File(Environment.getExternalStorageDirectory(), getString(R.string.app_name));
+
+            if (!folder.exists()) {
+                boolean re = folder.mkdirs();
+                Log.i("FOLDER:", String.valueOf(re));
+            }
+            fileAudio = new File(folder, format);
+            if (!fileAudio.exists()) {
+                try {
+                    boolean  r = fileAudio.createNewFile();
+                    Log.i("FILE:", String.valueOf(r));
+                } catch (IOException exception) {
+                    exception.printStackTrace();
+                    return;
+                }
+            }
+            mediaRecorder = new MediaRecorder();
+            mediaRecorder.setAudioSource(MediaRecorder.AudioSource.MIC);
+            mediaRecorder.setOutputFormat(MediaRecorder.OutputFormat.THREE_GPP);
+            mediaRecorder.setAudioEncoder(MediaRecorder.AudioEncoder.AMR_NB);
+            mediaRecorder.setOutputFile(fileAudio.getPath());
+
+            try {
+                mediaRecorder.prepare();
+                mediaRecorder.start();
+                Toast.makeText(this,"Recording Started...", Toast.LENGTH_LONG)
+                        .show();
+                Log.i("SUCCESS_AUDIO", fileAudio.getPath());
+            } catch (IOException exception) {
+                Log.e("ERROR_AUDIO", exception.toString());
+            }
+        } else {
+            mediaRecorder.stop();
+            mediaRecorder.release();
+            mediaRecorder = null;
+            Toast.makeText(this,"Recording Finished...", Toast.LENGTH_LONG)
+                    .show();
+            Log.i("SUCCESS_AUDIO", fileAudio.getPath() + " --Finish");
         }
     }
 
