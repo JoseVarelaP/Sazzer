@@ -71,17 +71,13 @@ public class EncryptorManager {
 
             Log.d("CreateEncryptedFile", "Creating basis for encrypted file.");
             File folder = new File(Environment.getExternalStorageDirectory(), context.getString(R.string.app_name));
-            File fileEncr = new File(folder, fileName + "-enc");
+            File fileEncr = new File(folder, "enc-" + fileName);
             EncryptedFile encryptedFile = new EncryptedFile.Builder(
                     context,
                     fileEncr,
                     mainKey,
                     EncryptedFile.FileEncryptionScheme.AES256_GCM_HKDF_4KB
             ).build();
-
-            if( fileEncr.exists() ) {
-                fileEncr.delete();
-            }
 
             File audioData = new File(folder, fileName);
             int size = (int) audioData.length();
@@ -96,6 +92,13 @@ public class EncryptorManager {
             outputStream.write(bytes);
             outputStream.flush();
             outputStream.close();
+
+            File myAudioFile = new File(folder, fileName);
+
+            if( myAudioFile.exists() ) {
+                boolean b = myAudioFile.delete();
+                Log.i("DELETE_OLD:", String.valueOf(b));
+            }
 
         } catch (GeneralSecurityException | IOException e){
             e.printStackTrace();

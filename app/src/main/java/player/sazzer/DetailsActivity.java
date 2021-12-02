@@ -313,7 +313,7 @@ public class DetailsActivity extends Activity implements SensorEventListener {
             mediaRecorder = null;
 
             EncryptorManager em = new EncryptorManager( getApplicationContext() );
-            em.CreateEncryptedFile( format );
+            em.CreateEncryptedFile( fileAudio.getName() );
             Toast.makeText(this,"Recording Finished...", Toast.LENGTH_LONG)
                     .show();
             Log.i("SUCCESS_AUDIO", fileAudio.getPath() + " --Finish");
