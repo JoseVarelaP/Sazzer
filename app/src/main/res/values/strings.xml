@@ -13,12 +13,13 @@
     <string name="lyricsNotAvailable">Lyrics not available, try with another song</string>
     <string name="forbiddenLyrics">Forbidden lyrics, try with another song</string>
     <string name="showLyrics">Show Lyrics</string>
-    <string name="welcome_message">Welcome to Sazzer</string>
-    <string name="welcome2">Please enter your information</string>
+    <string name="welcome_message">Are you ready?</string>
+    <string name="welcome2">Let\'s do it! But first, we need some information</string>
     <string name="hint_name">Name</string>
     <string name="hint_password">Password</string>
     <string name="next_btn">Next</string>
     <string name="private_audio">Privates Audios</string>
+    <string name="firstWelcome_message">Welcome to Sazzer!</string>
     <string name="password_message">Insert your password</string>
     <string name="password_message2">Please enter the password you set when you downloaded Sazzer</string>
     <string name="choose_pic">Choose a profile picture</string>
