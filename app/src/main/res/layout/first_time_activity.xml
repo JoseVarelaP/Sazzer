@@ -1,0 +1,63 @@
+<?xml version="1.0" encoding="utf-8"?>
+<LinearLayout xmlns:android="http://schemas.android.com/apk/res/android"
+    xmlns:tools="http://schemas.android.com/tools"
+    android:orientation="vertical"
+    android:gravity="center"
+    android:layout_width="match_parent"
+    android:layout_height="match_parent">
+
+    <TextView
+        android:layout_width="wrap_content"
+        android:text="@string/welcome_message"
+        android:layout_gravity="center"
+        android:textSize="25sp"
+        android:layout_height="wrap_content"/>
+
+    <TextView
+        android:layout_width="wrap_content"
+        android:layout_height="wrap_content"
+        android:layout_gravity="center"
+        android:text="@string/welcome2"
+        android:textSize="15sp"/>
+    <ImageView
+        android:id="@+id/profile_pic"
+        android:layout_margin="15dp"
+        android:src="@drawable/avatar"
+        android:layout_width="140dp"
+        android:layout_height="140dp"/>
+
+    <EditText
+        android:id="@+id/user_name"
+        android:layout_width="200dp"
+        android:layout_height="wrap_content"
+        android:layout_marginTop="10dp"
+        android:autofillHints="true"
+        android:hint="@string/hint_name"
+        android:inputType="text"
+        tools:ignore="LabelFor,TextFields" />
+
+    <EditText
+        android:id="@+id/user_password"
+        android:layout_marginTop="20dp"
+        android:layout_width="200dp"
+        android:layout_height="wrap_content"
+        android:autofillHints="true"
+        android:hint="@string/hint_password"
+        android:inputType="textPassword"
+        tools:ignore="LabelFor"/>
+
+    <Button
+        android:id="@+id/btn_choose_pic"
+        android:layout_width="200dp"
+        android:layout_height="wrap_content"
+        android:text="@string/choose_pic"
+        android:layout_marginTop="10dp"/>
+    <Button
+        android:id="@+id/btn_next"
+        android:layout_marginTop="15dp"
+        android:layout_width="wrap_content"
+        android:text="@string/next_btn"
+        android:layout_height="wrap_content"/>
+
+
+</LinearLayout>

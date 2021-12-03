@@ -7,11 +7,13 @@ import android.content.Context;
 import android.content.Intent;
 import android.content.IntentFilter;
 import android.content.ServiceConnection;
+import android.content.SharedPreferences;
 import android.content.pm.PackageManager;
-import android.os.Build;
 import android.os.Bundle;
 import android.os.IBinder;
 import android.util.Log;
+import android.view.Menu;
+import android.view.MenuItem;
 import android.view.View;
 
 import androidx.annotation.NonNull;
@@ -23,12 +25,25 @@ import androidx.recyclerview.widget.LinearLayoutManager;
 import androidx.recyclerview.widget.RecyclerView;
 
 import java.util.ArrayList;
+import java.util.Objects;
 
 import player.sazzer.Adapters.PlaylistRecyclerViewAdapter;
 import player.sazzer.DataTypes.Song;
+import player.sazzer.LocalLogActivities.ActivityFirstTime;
+import player.sazzer.LocalLogActivities.PrivateAudioActivity;
 
 public class MainActivity extends AppCompatActivity implements PlaylistRecyclerViewAdapter.ItemClickListener {
     public static final int REQUEST_CODE_EXTERNAL_STORAGE = 1;
+
+    //// here
+    public static final String KEY_NAME = "USER_NAME_LOCAL_STORAGE";
+    public static final String KEY_PASSWORD = "USER_PASSWORD_LOCAL_STORAGE";
+    public static final String KEY_PICTURE = "USER_PIC_LOCAL_STORAGE";
+    public static final String KEY_SHARED_PREFERENCES = "USER_INFO";
+    public static final int REQUEST_CODE_FIRST = 167;
+
+    SharedPreferences sharedPreferences;
+
 
     Intent playIntent = null;
     ArrayList<Song> songList;
@@ -88,6 +103,54 @@ public class MainActivity extends AppCompatActivity implements PlaylistRecyclerV
         }
     }
 
+    // HERE
+    private String getUserNameFromLocalStorage() {
+        return sharedPreferences.getString(KEY_NAME, null);
+    }
+
+    private String getPasswordFromLocalStorage() {
+        return sharedPreferences.getString(KEY_PASSWORD, null);
+    }
+
+    private String getPictureFromLocalStorage() {
+        return sharedPreferences.getString(KEY_PICTURE, null);
+    }
+
+    private void setNameLocalStorage(String newName) {
+        SharedPreferences.Editor editor = sharedPreferences.edit();
+        editor.putString(KEY_NAME, newName);
+        editor.apply();
+    }
+
+    private void setPasswordLocalStorage(String newPassword) {
+        SharedPreferences.Editor editor = sharedPreferences.edit();
+        editor.putString(KEY_PASSWORD, newPassword);
+        editor.apply();
+    }
+
+    private void setPictureLocalStorage(String newPicture) {
+        SharedPreferences.Editor editor = sharedPreferences.edit();
+        editor.putString(KEY_PICTURE, newPicture);
+        editor.apply();
+    }
+
+    @Override
+    public boolean onCreateOptionsMenu(Menu menu) {
+        getMenuInflater().inflate(R.menu.menu, menu);
+        return true;
+    }
+
+    @Override
+    public boolean onOptionsItemSelected(@NonNull MenuItem item) {
+
+        if (item.getItemId() == R.id.audioOp) {
+            Intent intent = new Intent(getBaseContext(), PrivateAudioActivity.class);
+            startActivity(intent);
+            return true;
+        }
+        return false;
+    }
+
     protected void GenerateMainSongList()
     {
         Log.d("GenerateMainSongList", "Creating view for song items...");
@@ -129,6 +192,23 @@ public class MainActivity extends AppCompatActivity implements PlaylistRecyclerV
     @Override
     protected void onResume() {
         super.onResume();
+        /// HERE
+        long checkPermission = getBaseContext().checkSelfPermission(Manifest.permission.READ_EXTERNAL_STORAGE);
+        if (checkPermission != PackageManager.PERMISSION_GRANTED)
+            return;
+        sharedPreferences = getSharedPreferences(KEY_SHARED_PREFERENCES, MODE_PRIVATE);
+
+        String userName = getUserNameFromLocalStorage();
+        String userPassword = getPasswordFromLocalStorage();
+
+        if (userName == null || userPassword == null) {
+            Intent intent = new Intent(getBaseContext(), ActivityFirstTime.class);
+            startActivityForResult(intent, REQUEST_CODE_FIRST);
+        } else {
+            Log.i("NAME", userName);
+            Log.i("PASSWORD", userPassword);
+            Objects.requireNonNull(getSupportActionBar()).setTitle(String.format("¡Hello %s!",userName));
+        }
     }
 
     @Override
@@ -167,8 +247,20 @@ public class MainActivity extends AppCompatActivity implements PlaylistRecyclerV
      * @param data información resultante, si existe
      */
     @Override
-    protected void onActivityResult(int requestCode, int resultCode, Intent data) {
+    protected void onActivityResult(int requestCode, int resultCode, @Nullable Intent data) {
         super.onActivityResult(requestCode, resultCode, data);
+        if (requestCode == REQUEST_CODE_FIRST && resultCode != RESULT_OK) {
+            Intent intent = new Intent(getBaseContext(), ActivityFirstTime.class);
+            startActivityForResult(intent, REQUEST_CODE_FIRST);
+        } else {
+            if (data != null) {
+                setNameLocalStorage(data.getStringExtra(KEY_NAME));
+                setPasswordLocalStorage(data.getStringExtra(KEY_PASSWORD));
+                setPictureLocalStorage(data.getStringExtra(KEY_PICTURE));
+            }
+            finish();
+            startActivity(getIntent());
+        }
     }
 
     // Receieve broadcasts from other classes.

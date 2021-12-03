@@ -27,6 +27,10 @@
             </intent-filter>
         </activity>
 
+        <activity android:name=".LocalLogActivities.PrivateAudioActivity"/>
+        <activity android:name=".LocalLogActivities.ActivityFirstTime"/>
+        <activity android:name=".LocalLogActivities.ActivityPassword"/>
+
         <activity
             android:exported="true"
             android:name=".DetailsActivity"

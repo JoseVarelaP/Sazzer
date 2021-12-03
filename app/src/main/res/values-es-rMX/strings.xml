@@ -14,4 +14,13 @@
     <string name="lyricsNotAvailable">Letra no disponible, intente con otra canción</string>
     <string name="forbiddenLyrics">Letra restringida, intente con otra canción</string>
     <string name="showLyrics">Mostrar Letras</string>
+    <string name="welcome_message">Bienvenido a Sazzer</string>
+    <string name="welcome2">Favor de ingresar su informacion</string>
+    <string name="hint_name">Nombre</string>
+    <string name="hint_password">Contraseña</string>
+    <string name="next_btn">Siguiente</string>
+    <string name="private_audio">Audios Privados</string>
+    <string name="password_message">Inserte su contraseña</string>
+    <string name="password_message2">Favor de ingresar la contraseña establecida cuando descargó Sazzer</string>
+    <string name="choose_pic">Selecciona una foto de perfil</string>
 </resources>
