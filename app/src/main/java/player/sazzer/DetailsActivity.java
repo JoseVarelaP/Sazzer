@@ -238,7 +238,7 @@ public class DetailsActivity extends Activity implements SensorEventListener {
     public void onSensorChanged(SensorEvent sensorEvent) {
         if (sensorEvent.accuracy != SensorManager.SENSOR_STATUS_UNRELIABLE) {
             if (sensorEvent.sensor.getType() == Sensor.TYPE_ACCELEROMETER) {
-                Log.i("HERE","MOVE");
+                //Log.i("HERE","MOVE");
                 detectShake(sensorEvent);
             }
         }

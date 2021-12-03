@@ -16,22 +16,21 @@ import androidx.recyclerview.widget.RecyclerView;
 
 import java.util.ArrayList;
 
+import player.sazzer.DataTypes.Album;
 import player.sazzer.R;
-import player.sazzer.DataTypes.Song;
 
-public class PlaylistRecyclerViewAdapter extends RecyclerView.Adapter<PlaylistRecyclerViewAdapter.ViewHolder> {
+public class AlbumViewRecyclerViewAdapter extends RecyclerView.Adapter<AlbumViewRecyclerViewAdapter.ViewHolder> {
 
-    private final ArrayList<Song> mData;
+    private final ArrayList<Album> mData;
     private final LayoutInflater mInflater;
     private ItemClickListener mClickListener;
-    private Song current;
+    //private Song current;
     private Context context;
 
     // data is passed into the constructor
-    public PlaylistRecyclerViewAdapter(Context context, ArrayList<Song> data, Song current) {
+    public AlbumViewRecyclerViewAdapter(Context context, ArrayList<Album> data) {
         this.mInflater = LayoutInflater.from(context);
         this.mData = data;
-        this.current = current;
         this.context = context;
     }
 
@@ -46,15 +45,10 @@ public class PlaylistRecyclerViewAdapter extends RecyclerView.Adapter<PlaylistRe
     // binds the data to the TextView in each row
     @Override
     public void onBindViewHolder(ViewHolder holder, int position) {
-        Song track = mData.get(position);
+        Album alb = mData.get(position);
 
         holder.playIcon.setVisibility(View.GONE);
         holder.container.setBackgroundColor( ContextCompat.getColor(context,R.color.colorBG)  );
-        if( track != null && track == current )
-        {
-            holder.container.setBackgroundColor( ContextCompat.getColor(context,R.color.colorPrimary)  );
-            holder.playIcon.setVisibility(View.VISIBLE);
-        }
 
         if( holder.albumLoaderThread != null )
             if( holder.albumLoaderThread.getStatus() == AsyncTask.Status.RUNNING ) {
@@ -64,11 +58,11 @@ public class PlaylistRecyclerViewAdapter extends RecyclerView.Adapter<PlaylistRe
 
         // Reset thread for a new action.
         holder.albumLoaderThread = new AlbumImageLoaderAsync( holder.albumListener );
-        holder.albumLoaderThread.execute(track.getAlbum());
+        holder.albumLoaderThread.execute(alb);
 
-        holder.songName.setText( track.getTitle() );
-        holder.songArtist.setText( track.getArtist() );
-        holder.songAlbum.setText( track.getAlbum().getTitle() );
+        holder.songName.setText( alb.getTitle() );
+        holder.songArtist.setText( alb.getArtist() );
+        //holder.songAlbum.setText( alb.getTitle() );
         holder.songArt.setImageResource(R.drawable.default_cover);
     }
 
@@ -78,7 +72,7 @@ public class PlaylistRecyclerViewAdapter extends RecyclerView.Adapter<PlaylistRe
         return mData.size();
     }
 
-    public void updateCurrentSong(Song newSong) { current = newSong; }
+    //public void updateCurrentSong(Song newSong) { current = newSong; }
 
 
     // stores and recycles views as they are scrolled off screen
@@ -116,7 +110,7 @@ public class PlaylistRecyclerViewAdapter extends RecyclerView.Adapter<PlaylistRe
             if (mClickListener != null) mClickListener.onItemClick(view, getAdapterPosition());
         }
     }
-    
+
     // allows clicks events to be caught
     public void setClickListener(ItemClickListener itemClickListener) {
         this.mClickListener = itemClickListener;

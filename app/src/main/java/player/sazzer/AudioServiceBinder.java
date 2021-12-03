@@ -13,8 +13,10 @@ import android.media.MediaPlayer;
 import android.net.Uri;
 import android.os.Binder;
 import android.os.Build;
+import android.os.Bundle;
 import android.os.Handler;
 import android.os.IBinder;
+import android.os.PowerManager;
 import android.provider.MediaStore;
 import android.text.TextUtils;
 import android.util.Log;
@@ -74,9 +76,8 @@ public class AudioServiceBinder extends Service implements MediaPlayer.OnPrepare
     void refresh(int mil)
     {
         final Handler handler = new Handler();
-        final Runnable runnable = this::updateContent;
 
-        handler.postDelayed(runnable,mil);
+        handler.postDelayed(this::updateContent,mil);
     }
 
     private Intent playIntent;
@@ -102,6 +103,7 @@ public class AudioServiceBinder extends Service implements MediaPlayer.OnPrepare
         this.registerReceiver(mReceiver,filter);
 
         audioPlayer = new MediaPlayer();
+        audioPlayer.setWakeMode(getApplicationContext(), PowerManager.PARTIAL_WAKE_LOCK);
         songFinder = new SongFinder( getApplicationContext() , MediaStore.Audio.Media.EXTERNAL_CONTENT_URI );
 
         am = (AudioManager) getApplicationContext().getSystemService(Context.AUDIO_SERVICE);
@@ -208,7 +210,7 @@ public class AudioServiceBinder extends Service implements MediaPlayer.OnPrepare
         audioPlayer.reset();
         //Log.d("AudioPlayerCheck",String.format("%s",audioPlayer));
         Song playSong = songs.get(songPosn);
-        Uri trackUri = Uri.fromFile( new File(playSong.getAlbumArt()) );
+        Uri trackUri = Uri.fromFile( new File(playSong.getSongPath()) );
 
         if( TextUtils.isEmpty(trackUri.toString()) )
             return;
@@ -282,7 +284,13 @@ public class AudioServiceBinder extends Service implements MediaPlayer.OnPrepare
 
     @Override
     public int onStartCommand(Intent intent, int flags, int startId) {
-        if( intent.getSerializableExtra("AUDIO_ACTION") != null )
+        Bundle Extras = intent.getExtras();
+        if( Extras == null )
+            return START_STICKY;
+        if( Extras.containsKey("AUDIO_ACTION") )
+            return START_STICKY;
+
+        //if( intent.getSerializableExtra("AUDIO_ACTION") != null )
         {
             AudioServiceAction Action = (AudioServiceAction) intent.getSerializableExtra("AUDIO_ACTION");
 
@@ -446,10 +454,27 @@ public class AudioServiceBinder extends Service implements MediaPlayer.OnPrepare
                     //songs = songFinder.FindMusicByArtist("whyetc");
                     break;
                 }
+                case AUDIO_SERVICE_ACTION_FETCH_ALBUMS:
+                {
+                    Log.d("AUDIO_SERVICE_ACTION_FETCH_SONGS","Fetching songs");
+                    songFinder.GenerateSongList();
+                    songFinder.getAlbums();
+                    //songs = songFinder.getList();
+                    break;
+                }
                 case AUDIO_SERVICE_ACTION_OBTAIN_SONGS_TO_DISPLAY:
                 {
                     Intent broadcastIntent = new Intent();
                     broadcastIntent.setAction(MainActivity.mBroadcasterMainActivity);
+                    broadcastIntent.putExtra("Audio.SongArray", MusicHelpers.ConvertSongsToJSONTable(songs) );
+                    getApplicationContext().sendBroadcast(broadcastIntent);
+                    break;
+                }
+
+                case AUDIO_SERVICE_ACTION_OBTAIN_ALBUMS_TO_DISPLAY:
+                {
+                    Intent broadcastIntent = new Intent();
+                    broadcastIntent.setAction(AllAlbumView.mBroadcasterMainActivity);
                     broadcastIntent.putExtra("Audio.SongArray", MusicHelpers.ConvertSongsToJSONTable(songs) );
                     getApplicationContext().sendBroadcast(broadcastIntent);
                     break;
@@ -463,7 +488,7 @@ public class AudioServiceBinder extends Service implements MediaPlayer.OnPrepare
                     Song track = songs.get(songPosn);
                     broadcastIntent.putExtra("songName", track.getTitle());
                     broadcastIntent.putExtra("songArtist", track.getArtist());
-                    broadcastIntent.putExtra("songArt", track.getAlbumArt());
+                    broadcastIntent.putExtra("songArt", track.getAlbum().getAlbumArt());
                     getApplicationContext().sendBroadcast(broadcastIntent);
                 }
             }
@@ -480,7 +505,7 @@ public class AudioServiceBinder extends Service implements MediaPlayer.OnPrepare
         Song track = songs.get(songPosn);
         broadcastIntent.putExtra("songName", track.getTitle());
         broadcastIntent.putExtra("songArtist", track.getArtist());
-        broadcastIntent.putExtra("songArt", track.getAlbumArt());
+        broadcastIntent.putExtra("songArt", track.getAlbum().getAlbumArt());
         getApplicationContext().sendBroadcast(broadcastIntent);
 
         // Update the playlist if it happens to be available and shown on the screen.

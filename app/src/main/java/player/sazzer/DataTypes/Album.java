@@ -1,32 +1,33 @@
 package player.sazzer.DataTypes;
 
+import android.graphics.Bitmap;
+
 import java.util.ArrayList;
 
 public class Album {
-    private final long id;
     private final String title;
     private final String artist;
     private final String albumArt;
+    private Bitmap generatedAlbumArt = null;
     private ArrayList<Song> songs;
 
-    public Album( long albumID, String albumTitle, String albumArtist ,String albumArt )
+    public Album(String albumTitle, String albumArtist ,String albumArt )
     {
-        this.id = albumID;
         this.title = albumTitle;
         this.artist = albumArtist;
         this.albumArt = albumArt;
     }
 
-    public Album(long albumID, String albumTitle, String albumArtist, String albumArt, ArrayList<Song> songs)
+    public Album(String albumTitle, String albumArtist, String albumArt, ArrayList<Song> songs)
     {
-        this.id = albumID;
         this.title = albumTitle;
         this.artist = albumArtist;
         this.albumArt = albumArt;
         this.songs = songs;
     }
 
-    long getId() { return this.id; }
+    public void setGeneratedAlbumArt( Bitmap data ) { this.generatedAlbumArt = data; }
+    public Bitmap getGeneratedAlbumArt() { return generatedAlbumArt; }
     public String getTitle() { return this.title; }
     public String getArtist() { return this.artist; }
     public String getAlbumArt() { return this.albumArt; }
