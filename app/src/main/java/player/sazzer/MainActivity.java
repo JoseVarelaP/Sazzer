@@ -281,7 +281,12 @@ public class MainActivity extends AppCompatActivity implements PlaylistRecyclerV
             if (data != null) {
                 setNameLocalStorage(data.getStringExtra(KEY_NAME));
                 setPasswordLocalStorage(data.getStringExtra(KEY_PASSWORD));
-                setPictureLocalStorage(getStringImage(Uri.parse(data.getStringExtra(KEY_PICTURE))));
+
+                String temp_pic = data.getStringExtra(KEY_PICTURE);
+                if (temp_pic != null) {
+                    setPictureLocalStorage(getStringImage(Uri.parse(temp_pic)));
+                }
+
             }
             finish();
             startActivity(getIntent());
