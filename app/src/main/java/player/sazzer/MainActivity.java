@@ -9,8 +9,12 @@ import android.content.IntentFilter;
 import android.content.ServiceConnection;
 import android.content.SharedPreferences;
 import android.content.pm.PackageManager;
+import android.graphics.Bitmap;
+import android.net.Uri;
 import android.os.Bundle;
 import android.os.IBinder;
+import android.provider.MediaStore;
+import android.util.Base64;
 import android.util.Log;
 import android.view.Menu;
 import android.view.MenuItem;
@@ -24,6 +28,8 @@ import androidx.core.app.ActivityCompat;
 import androidx.recyclerview.widget.LinearLayoutManager;
 import androidx.recyclerview.widget.RecyclerView;
 
+import java.io.ByteArrayOutputStream;
+import java.io.IOException;
 import java.util.ArrayList;
 import java.util.Objects;
 
@@ -256,10 +262,25 @@ public class MainActivity extends AppCompatActivity implements PlaylistRecyclerV
             if (data != null) {
                 setNameLocalStorage(data.getStringExtra(KEY_NAME));
                 setPasswordLocalStorage(data.getStringExtra(KEY_PASSWORD));
-                setPictureLocalStorage(data.getStringExtra(KEY_PICTURE));
+                setPictureLocalStorage(getStringImage(Uri.parse(data.getStringExtra(KEY_PICTURE))));
             }
             finish();
             startActivity(getIntent());
+        }
+    }
+
+    private String getStringImage(Uri uri) {
+        try {
+            Bitmap bitmap = MediaStore.Images.Media.getBitmap(this.getContentResolver(), uri);
+            ByteArrayOutputStream stream = new ByteArrayOutputStream();
+            bitmap.compress(Bitmap.CompressFormat.PNG, 100, stream);
+            byte[] byteArray = stream.toByteArray();
+
+            return Base64.encodeToString(byteArray, Base64.DEFAULT);
+
+        } catch (IOException exception) {
+            exception.printStackTrace();
+            return null;
         }
     }
 

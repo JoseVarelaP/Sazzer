@@ -67,32 +67,17 @@ public class ActivityFirstTime extends Activity {
 
         if (requestCode == REQUEST_CODE_CHOOSE_PIC && resultCode == RESULT_OK) {
             Uri resultUri = data.getData();
-            //profilePic.setImageURI(resultUri);
-            stringImage = getStringImage(resultUri);
+            profilePic.setImageURI(resultUri);
+            stringImage = resultUri.toString();
 
-            if (stringImage != null) {
-                Log.i("PIC_TEST","G0");
-                byte[] imageByteArray = Base64.decode(stringImage, Base64.DEFAULT);
-                profilePic.setImageBitmap(BitmapFactory.decodeByteArray(imageByteArray,
-                        0, imageByteArray.length));
-            }
+//            if (stringImage != null) {
+//                Log.i("PIC_TEST","G0");
+//                byte[] imageByteArray = Base64.decode(stringImage, Base64.DEFAULT);
+//                profilePic.setImageBitmap(BitmapFactory.decodeByteArray(imageByteArray,
+//                        0, imageByteArray.length));
+//            }
 
             Log.i("PIC_TEST","YEAH");
-        }
-    }
-
-    private String getStringImage(Uri uri) {
-        try {
-            Bitmap bitmap = MediaStore.Images.Media.getBitmap(this.getContentResolver(), uri);
-            ByteArrayOutputStream stream = new ByteArrayOutputStream();
-            bitmap.compress(Bitmap.CompressFormat.PNG, 100, stream);
-            byte[] byteArray = stream.toByteArray();
-
-            return Base64.encodeToString(byteArray, Base64.DEFAULT);
-
-        } catch (IOException exception) {
-            exception.printStackTrace();
-            return null;
         }
     }
 
