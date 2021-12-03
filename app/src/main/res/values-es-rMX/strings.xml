@@ -17,7 +17,8 @@
     <string name="welcome_message">¿Estás listo?</string>
     <string name="welcome2">¡Hagámoslo! Pero primero, necesitamos un poco de información</string>
     <string name="hint_name">Nombre</string>
-    <string name="hint_password">Contraseña</string>
+    <string name="hint_password">Crea una contraseña</string>
+    <string name="hint_password2">Contraseña</string>
     <string name="next_btn">Siguiente</string>
     <string name="private_audio">Audios Privados</string>
     <string name="firstWelcome_message">¡Bienvenido a Sazzer!</string>
