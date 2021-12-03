@@ -11,6 +11,7 @@ import android.content.SharedPreferences;
 import android.content.pm.PackageManager;
 import android.graphics.Bitmap;
 import android.net.Uri;
+import android.os.Build;
 import android.os.Bundle;
 import android.os.IBinder;
 import android.provider.MediaStore;
@@ -34,6 +35,7 @@ import java.util.ArrayList;
 import java.util.Objects;
 
 import player.sazzer.Adapters.PlaylistRecyclerViewAdapter;
+import player.sazzer.DataTypes.Album;
 import player.sazzer.DataTypes.Song;
 import player.sazzer.LocalLogActivities.ActivityFirstTime;
 import player.sazzer.LocalLogActivities.PrivateAudioActivity;
@@ -52,7 +54,7 @@ public class MainActivity extends AppCompatActivity implements PlaylistRecyclerV
 
 
     Intent playIntent = null;
-    ArrayList<Song> songList;
+    ArrayList<Song> songList = new ArrayList<>();
     private AudioServiceBinder musicSrv;
 
     private IntentFilter mIntentFilter;
@@ -89,6 +91,8 @@ public class MainActivity extends AppCompatActivity implements PlaylistRecyclerV
         AppCompatDelegate.setDefaultNightMode(AppCompatDelegate.MODE_NIGHT_FOLLOW_SYSTEM);
         setContentView(R.layout.activity_main);
 
+        MusicHelpers.setAppContext( getApplicationContext() );
+
         // Hay que pedir el elemento para cargar los audios.
         // Si no, entonces tendremos un error/choque debido a la estancia de acceso ilegal de archivos.
         grantPermission(Manifest.permission.READ_EXTERNAL_STORAGE, REQUEST_CODE_EXTERNAL_STORAGE);
@@ -99,14 +103,6 @@ public class MainActivity extends AppCompatActivity implements PlaylistRecyclerV
         mIntentFilter.addAction(mBroadcasterMainActivity);
 
         this.registerReceiver(musicDataReciever, mIntentFilter);
-
-        if (playIntent == null) {
-            Log.d("onCreate","Intent is null, starting service.");
-            playIntent = new Intent(this, AudioServiceBinder.class);
-            bindService(playIntent, musicConnection, Context.BIND_AUTO_CREATE);
-            startService(playIntent);
-            Log.d("onCreate","Done with setup of services.");
-        }
     }
 
     // HERE
@@ -168,6 +164,17 @@ public class MainActivity extends AppCompatActivity implements PlaylistRecyclerV
         PlaylistRecyclerViewAdapter listMusica = new PlaylistRecyclerViewAdapter(this, songList, null);
         listMusica.setClickListener(this);
         songView.setAdapter(listMusica);
+
+        View fds = findViewById(R.id.movesection);
+        fds.findViewById(R.id.button_image).setOnClickListener(v -> {
+            Intent ToAlbum = new Intent( this, AllAlbumView.class );
+            ToAlbum.setAction(AllAlbumView.mBroadcasterMainActivity);
+            ToAlbum.setFlags(Intent.FLAG_ACTIVITY_NEW_TASK | Intent.FLAG_ACTIVITY_SINGLE_TOP);
+            ToAlbum.putExtra("Audio.SongArray", MusicHelpers.ConvertSongsToJSONTable(songList));
+
+            startActivity(ToAlbum);
+        });
+
         Log.d("GenerateMainSongList", "Done.");
     }
 
@@ -175,6 +182,18 @@ public class MainActivity extends AppCompatActivity implements PlaylistRecyclerV
     protected void onStart() {
         Log.d("onStart","Starting");
         super.onStart();
+
+        if (playIntent == null) {
+            Log.d("onCreate","Intent is null, starting service.");
+            playIntent = new Intent(this, AudioServiceBinder.class);
+            bindService(playIntent, musicConnection, Context.BIND_AUTO_CREATE);
+            if (Build.VERSION.SDK_INT >= Build.VERSION_CODES.O) {
+                startForegroundService(playIntent);
+            } else {
+                startService(playIntent);
+            }
+            Log.d("onCreate","Done with setup of services.");
+        }
     }
 
     @Override
@@ -229,7 +248,7 @@ public class MainActivity extends AppCompatActivity implements PlaylistRecyclerV
         MusicHelpers.actionServicePlaySong(getApplicationContext(), position);
 
         Intent nt = MusicHelpers.sendToDetailedSongInfo(MainActivity.this, songList.get(position), musicSrv);
-        nt.setFlags(Intent.FLAG_ACTIVITY_NEW_TASK | Intent.FLAG_ACTIVITY_SINGLE_TOP);
+        //nt.setFlags(Intent.FLAG_ACTIVITY_NEW_TASK | Intent.FLAG_ACTIVITY_SINGLE_TOP);
         startActivity(nt);
     }
 
@@ -301,7 +320,7 @@ public class MainActivity extends AppCompatActivity implements PlaylistRecyclerV
 
                 if( newsongsStr != null && !newsongsStr.isEmpty() ) {
                     Log.d(mBroadcasterMainActivity, "List contains data! " + newsongsStr);
-                    songList = (ArrayList<Song>) MusicHelpers.ConvertJSONToTracks( newsongsStr );
+                    songList = MusicHelpers.ConvertJSONToTracks( newsongsStr );
 
                     // With song infomation created, we can now generate the song list safely.
                     GenerateMainSongList();

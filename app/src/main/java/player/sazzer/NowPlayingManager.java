@@ -91,7 +91,7 @@ public class NowPlayingManager extends Service {
         this.track = track;
 
         if( (image == null || forceAlbumImageRegen) )
-            image = MusicHelpers.getAlbumImage( this.track.getAlbumArt() );
+            image = MusicHelpers.getAlbumImage( this.track.getAlbum().getAlbumArt() );
 
         if( image == null )
             image = BitmapFactory.decodeResource(getResources(),R.drawable.default_cover);
@@ -119,7 +119,7 @@ public class NowPlayingManager extends Service {
                 )
                 .putString(
                         MediaMetadataCompat.METADATA_KEY_ALBUM,
-                        this.track.getAlbum()
+                        this.track.getAlbum().getTitle()
                 )
                 .putString(
                         MediaMetadataCompat.METADATA_KEY_TITLE,
@@ -172,7 +172,6 @@ public class NowPlayingManager extends Service {
 
         NotificationCompat.Builder builder = new NotificationCompat.Builder(this, CHANNEL_ID);
         builder
-                .setPriority(NotificationCompat.PRIORITY_LOW)
                 .setContentIntent(showSongIntent)
                 .setVisibility(NotificationCompat.VISIBILITY_PUBLIC)
                 .addAction(draw_prev, "Previous", PIPrevious)
@@ -184,6 +183,11 @@ public class NowPlayingManager extends Service {
                     )
                 )
                 .setSmallIcon(R.mipmap.ic_launcher);
+
+        if (Build.VERSION.SDK_INT < Build.VERSION_CODES.O)
+        {
+            builder.setPriority(NotificationCompat.PRIORITY_LOW);
+        }
 
         NotificationManagerCompat.from(this).notify(0, builder.build());
     }
