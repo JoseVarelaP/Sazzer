@@ -91,6 +91,8 @@ public class MainActivity extends AppCompatActivity implements PlaylistRecyclerV
         AppCompatDelegate.setDefaultNightMode(AppCompatDelegate.MODE_NIGHT_FOLLOW_SYSTEM);
         setContentView(R.layout.activity_main);
 
+        MusicHelpers.setAppContext( getApplicationContext() );
+
         // Hay que pedir el elemento para cargar los audios.
         // Si no, entonces tendremos un error/choque debido a la estancia de acceso ilegal de archivos.
         grantPermission(Manifest.permission.READ_EXTERNAL_STORAGE, REQUEST_CODE_EXTERNAL_STORAGE);

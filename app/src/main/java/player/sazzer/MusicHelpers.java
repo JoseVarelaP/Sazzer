@@ -1,15 +1,21 @@
 package player.sazzer;
 
+import android.app.Application;
 import android.content.Context;
 import android.content.Intent;
 import android.graphics.Bitmap;
 import android.graphics.BitmapFactory;
+import android.graphics.Canvas;
+import android.graphics.drawable.Drawable;
 import android.media.MediaMetadataRetriever;
 import android.os.AsyncTask;
+import android.os.Build;
 import android.util.Log;
 
 import androidx.annotation.NonNull;
 import androidx.annotation.Nullable;
+import androidx.core.content.ContextCompat;
+import androidx.core.graphics.drawable.DrawableCompat;
 
 import com.google.gson.Gson;
 import com.google.gson.reflect.TypeToken;
@@ -27,8 +33,18 @@ import player.sazzer.DataTypes.Album;
 import player.sazzer.DataTypes.Song;
 
 public class MusicHelpers {
+    private static Context appContext;
 
-    public static Bitmap findAlbumArtCoverFile( String path )
+    public static void setAppContext(Context ctx)
+    {
+        appContext = ctx;
+    }
+
+    public static Context getAppContext() {
+        return appContext;
+    }
+
+    public static Bitmap findAlbumArtCoverFile(String path )
     {
         int instancesfordot = path.lastIndexOf('.');
         if( instancesfordot > 0 ) {
@@ -157,6 +173,21 @@ public class MusicHelpers {
         intent.putExtra("Audio.SongID", position);
         context.sendBroadcast(intent);
         context.sendBroadcast( quickIntentFromAction(AudioServiceAction.AUDIO_SERVICE_ACTION_PLAY_SONG) );
+    }
+
+    public static Bitmap getBitmapFromVectorDrawable(int drawableId) {
+        Drawable drawable = ContextCompat.getDrawable(appContext, drawableId);
+        if (Build.VERSION.SDK_INT < Build.VERSION_CODES.LOLLIPOP) {
+            drawable = (DrawableCompat.wrap(drawable)).mutate();
+        }
+
+        Bitmap bitmap = Bitmap.createBitmap(drawable.getIntrinsicWidth(),
+                drawable.getIntrinsicHeight(), Bitmap.Config.ARGB_8888);
+        Canvas canvas = new Canvas(bitmap);
+        drawable.setBounds(0, 0, canvas.getWidth(), canvas.getHeight());
+        drawable.draw(canvas);
+
+        return bitmap;
     }
 
     /**
