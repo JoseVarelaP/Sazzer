@@ -1,7 +1,6 @@
-package Settings;
+package player.sazzer.Settings;
 
 import android.os.Bundle;
-
 import androidx.preference.PreferenceFragmentCompat;
 
 import player.sazzer.R;

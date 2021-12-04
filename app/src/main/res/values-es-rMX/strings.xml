@@ -33,4 +33,15 @@
     <string name="user_name_description">Actualizar nombre de usauario</string>
     <string name="pass_name_description">Actualizar su contraseña</string>
     <string name="settings_msg">Ajustes</string>
+    <string name="personal_inf">Informacion Personal</string>
+    <string name="custom_sett">Personalizacion</string>
+    <string name="new_password">Ingrese su nueva contraseña</string>
+    <string name="new_password_btn">Actualizar contraseña</string>
+    <string name="biometric_ms1">Inicio de sesion biometico Sazzer</string>
+    <string name="biometric_ms2">Inicie sesión con su credencial biométrica</string>
+    <string name="biometric_ms3">Usar su contraseña</string>
+    <string name="language_set">Idioma</string>
+    <string name="language_set_des">Cambia el idioma de Sazzer</string>
+    <string name="theme_set">Tema</string>
+    <string name="theme_set_des">Cambiar el tema de sazzer</string>
 </resources>

@@ -32,4 +32,15 @@
     <string name="user_name_description">Update user name</string>
     <string name="pass_name_description">Update your password</string>
     <string name="settings_msg">Settings</string>
+    <string name="personal_inf">Personal Information</string>
+    <string name="custom_sett">Personalization</string>
+    <string name="new_password">Enter your new password</string>
+    <string name="new_password_btn">Update password</string>
+    <string name="biometric_ms1">Biometric login Sazzer</string>
+    <string name="biometric_ms2">Log in using your biometric credential</string>
+    <string name="biometric_ms3">Use your user password</string>
+    <string name="language_set">Language</string>
+    <string name="language_set_des">Change the language of Sazzer</string>
+    <string name="theme_set">Theme</string>
+    <string name="theme_set_des">Change the theme of Sazzer</string>
 </resources>

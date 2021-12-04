@@ -41,7 +41,14 @@
         <activity android:name=".LocalLogActivities.PrivateAudioActivity"/>
         <activity android:name=".LocalLogActivities.ActivityFirstTime"/>
         <activity android:name=".LocalLogActivities.ActivityPassword"/>
-        <activity android:name="Settings.SettingsActivity"/>
+        <activity android:name="player.sazzer.Settings.SettingsActivity"/>
+        <activity android:name="player.sazzer.Settings.NewPasswordActivity"
+            android:exported="true">
+            <intent-filter>
+                <action android:name="NewPasswordActivity" />
+                <category android:name="android.intent.category.DEFAULT" />
+            </intent-filter>
+        </activity>
 
         <activity
             android:exported="true"

@@ -1,22 +1,41 @@
 <?xml version="1.0" encoding="utf-8"?>
-<PreferenceScreen xmlns:android="http://schemas.android.com/apk/res/android">
+<PreferenceScreen xmlns:android="http://schemas.android.com/apk/res/android"
+    xmlns:app="http://schemas.android.com/apk/res-auto">
 
     <PreferenceCategory
-        android:title="Personal Information">
+        android:title="@string/personal_inf">
         <EditTextPreference
             android:key="USER_NAME_LOCAL_STORAGE"
             android:title="@string/hint_name"
             android:icon="@drawable/ic_user_name"
             android:summary="@string/user_name_description"/>
 
-        <EditTextPreference
-            android:key="KEY_PASS"
+        <PreferenceScreen
             android:title="@string/hint_password2"
             android:icon="@drawable/ic_password"
-            android:summary="@string/pass_name_description"/>
+            android:summary="@string/pass_name_description">
+
+            <intent
+                android:action="NewPasswordActivity"
+                android:targetClass="player.sazzer.Settings.NewPasswordActivity"/>
+        </PreferenceScreen>
     </PreferenceCategory>
 
     <PreferenceCategory
-        android:title="Personalization">
+        android:title="@string/custom_sett">
+        <ListPreference
+            android:key="LANGUAGE_INFO"
+            android:entries="@array/array_names_languages"
+            android:entryValues="@array/array_values_languages"
+            app:title="@string/language_set"
+            android:icon="@drawable/ic_baseline_language"
+            android:summary="@string/language_set_des"/>
+
+        <ListPreference
+            android:key="THEME_INFO_STORAGE"
+            android:entries="@array/array_names_theme"
+            android:entryValues="@array/array_values_theme"
+            android:title="@string/theme_set"
+            android:summary="@string/theme_set_des"/>
     </PreferenceCategory>
 </PreferenceScreen>

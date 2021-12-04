@@ -10,6 +10,7 @@ import android.content.IntentFilter;
 import android.content.ServiceConnection;
 import android.content.SharedPreferences;
 import android.content.pm.PackageManager;
+import android.content.res.Configuration;
 import android.graphics.Bitmap;
 import android.net.Uri;
 import android.os.Build;
@@ -34,11 +35,11 @@ import androidx.recyclerview.widget.RecyclerView;
 import java.io.ByteArrayOutputStream;
 import java.io.IOException;
 import java.util.ArrayList;
+import java.util.Locale;
 import java.util.Objects;
 
-import Settings.SettingsActivity;
+import player.sazzer.Settings.SettingsActivity;
 import player.sazzer.Adapters.PlaylistRecyclerViewAdapter;
-import player.sazzer.DataTypes.Album;
 import player.sazzer.DataTypes.Song;
 import player.sazzer.LocalLogActivities.ActivityFirstTime;
 import player.sazzer.LocalLogActivities.PrivateAudioActivity;
@@ -52,6 +53,8 @@ public class MainActivity extends AppCompatActivity implements PlaylistRecyclerV
     public static final String KEY_PICTURE = "USER_PIC_LOCAL_STORAGE";
     public static final String KEY_SHARED_PREFERENCES = "USER_INFO";
     public static final int REQUEST_CODE_FIRST = 167;
+    public static final String KEY_LANGUAGE = "LANGUAGE_INFO";
+    public static final String KEY_THEME = "THEME_INFO_STORAGE";
 
     SharedPreferences sharedPreferences;
 
@@ -106,9 +109,58 @@ public class MainActivity extends AppCompatActivity implements PlaylistRecyclerV
         mIntentFilter.addAction(mBroadcasterMainActivity);
 
         this.registerReceiver(musicDataReciever, mIntentFilter);
+        language(getBaseContext(), getLanguagePreferencesDefault());
+        // theme(getThemePreferencesDefault());
     }
 
     // HERE
+
+    private String getLanguagePreferencesDefault() {
+        SharedPreferences prefs = PreferenceManager.getDefaultSharedPreferences(getBaseContext());
+        return prefs.getString(KEY_LANGUAGE, null);
+    }
+
+    private String getThemePreferencesDefault() {
+        SharedPreferences prefs = PreferenceManager.getDefaultSharedPreferences(getBaseContext());
+        return prefs.getString(KEY_THEME, null);
+    }
+
+    public static void language(Context context, String language) {
+        Locale location;
+        if (language == null) {
+            return;
+        }else if (language.equals("MX")) {
+            location = new Locale("es", "MX");
+        } else {
+            return;
+        }
+
+        Locale.setDefault(location);
+        Configuration config = new Configuration();
+        config.locale = location;
+        context.getResources().updateConfiguration(config, context.getResources().getDisplayMetrics());
+    }
+
+    private static void theme(String theme) {
+        if (theme == null) {
+            if (android.os.Build.VERSION.SDK_INT < Build.VERSION_CODES.Q) {
+                AppCompatDelegate.setDefaultNightMode(AppCompatDelegate.MODE_NIGHT_AUTO_BATTERY);
+            } else {
+                AppCompatDelegate.setDefaultNightMode(AppCompatDelegate.MODE_NIGHT_FOLLOW_SYSTEM);
+            }
+        }else if (theme.equals("LIGHT")) {
+            AppCompatDelegate.setDefaultNightMode(AppCompatDelegate.MODE_NIGHT_NO);
+        } else if (theme.equals("DARK")) {
+            AppCompatDelegate.setDefaultNightMode(AppCompatDelegate.MODE_NIGHT_YES);
+        } else {
+            if (android.os.Build.VERSION.SDK_INT < Build.VERSION_CODES.Q) {
+                AppCompatDelegate.setDefaultNightMode(AppCompatDelegate.MODE_NIGHT_AUTO_BATTERY);
+            } else {
+                AppCompatDelegate.setDefaultNightMode(AppCompatDelegate.MODE_NIGHT_FOLLOW_SYSTEM);
+            }
+        }
+    }
+
     private String getUserNameFromLocalStorage() {
         return sharedPreferences.getString(KEY_NAME, null);
     }
