@@ -3,7 +3,7 @@
     <string name="app_name">Sazzer</string>
     <string name="nameSong">Canción</string>
     <string name="nameArtist">Artista</string>
-    <string name="nameAlbum">Album</string>
+    <string name="nameAlbum">Álbum</string>
     <string name="playSong">Reproducir</string>
     <string name="prevSong">Canción Anterior</string>
     <string name="nextSong">Canción Siguiente</string>
@@ -16,7 +16,7 @@
     <string name="showLyrics">Mostrar Letras</string>
     <string name="welcome_message">¿Estás listo?</string>
     <string name="welcome2">¡Hagámoslo! Pero primero, necesitamos un poco de información</string>
-    <string name="hint_name">Nombre</string>
+    <string name="hint_name">Nombre de Usuario</string>
     <string name="hint_password">Crea una contraseña</string>
     <string name="hint_password2">Contraseña</string>
     <string name="next_btn">Siguiente</string>
@@ -25,4 +25,12 @@
     <string name="password_message">Inserte su contraseña</string>
     <string name="password_message2">Favor de ingresar la contraseña establecida cuando descargó Sazzer</string>
     <string name="choose_pic">Selecciona una foto de perfil</string>
+    <string name="hello_main">Hola</string>
+    <string name="good_morning">Buenos Días</string>
+    <string name="good_afternoon">Buenas Tardes</string>
+    <string name="good_night">Buenas Noches</string>
+    <string name="update_pic">Presione la foto para actualizar</string>
+    <string name="user_name_description">Actualizar nombre de usauario</string>
+    <string name="pass_name_description">Actualizar su contraseña</string>
+    <string name="settings_msg">Ajustes</string>
 </resources>

@@ -1,0 +1,22 @@
+<?xml version="1.0" encoding="utf-8"?>
+<PreferenceScreen xmlns:android="http://schemas.android.com/apk/res/android">
+
+    <PreferenceCategory
+        android:title="Personal Information">
+        <EditTextPreference
+            android:key="USER_NAME_LOCAL_STORAGE"
+            android:title="@string/hint_name"
+            android:icon="@drawable/ic_user_name"
+            android:summary="@string/user_name_description"/>
+
+        <EditTextPreference
+            android:key="KEY_PASS"
+            android:title="@string/hint_password2"
+            android:icon="@drawable/ic_password"
+            android:summary="@string/pass_name_description"/>
+    </PreferenceCategory>
+
+    <PreferenceCategory
+        android:title="Personalization">
+    </PreferenceCategory>
+</PreferenceScreen>

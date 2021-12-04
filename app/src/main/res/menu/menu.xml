@@ -5,4 +5,8 @@
         android:id="@+id/audioOp"
         android:title="@string/private_audio"/>
 
+    <item
+        android:id="@+id/settingsOp"
+        android:title="@string/settings_msg"/>
+
 </menu>

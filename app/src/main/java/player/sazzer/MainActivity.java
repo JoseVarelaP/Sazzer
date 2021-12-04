@@ -1,6 +1,7 @@
 package player.sazzer;
 
 import android.Manifest;
+import android.app.Activity;
 import android.content.BroadcastReceiver;
 import android.content.ComponentName;
 import android.content.Context;
@@ -26,6 +27,7 @@ import androidx.annotation.Nullable;
 import androidx.appcompat.app.AppCompatActivity;
 import androidx.appcompat.app.AppCompatDelegate;
 import androidx.core.app.ActivityCompat;
+import androidx.preference.PreferenceManager;
 import androidx.recyclerview.widget.LinearLayoutManager;
 import androidx.recyclerview.widget.RecyclerView;
 
@@ -34,6 +36,7 @@ import java.io.IOException;
 import java.util.ArrayList;
 import java.util.Objects;
 
+import Settings.SettingsActivity;
 import player.sazzer.Adapters.PlaylistRecyclerViewAdapter;
 import player.sazzer.DataTypes.Album;
 import player.sazzer.DataTypes.Song;
@@ -150,6 +153,11 @@ public class MainActivity extends AppCompatActivity implements PlaylistRecyclerV
             startActivity(intent);
             return true;
         }
+        if (item.getItemId() == R.id.settingsOp) {
+            Intent intent = new Intent(getBaseContext(), SettingsActivity.class);
+            startActivity(intent);
+            return true;
+        }
         return false;
     }
 
@@ -232,8 +240,25 @@ public class MainActivity extends AppCompatActivity implements PlaylistRecyclerV
         } else {
             Log.i("NAME", userName);
             Log.i("PASSWORD", userPassword);
-            Objects.requireNonNull(getSupportActionBar()).setTitle(String.format("¡Hello %s!",userName));
+
+            String temp = getNamePreferencesDefault();
+
+            if (temp == null) {
+                Log.i("NAME", "No esta");
+            } else {
+                if (!temp.equals(userName) && !temp.equals("")) {
+                    userName = temp;
+                    setNameLocalStorage(temp);
+                }
+            }
+            Objects.requireNonNull(getSupportActionBar()).
+                    setTitle(String.format("¡%s %s!",getString(R.string.hello_main),userName));
         }
+    }
+
+    private String getNamePreferencesDefault() {
+        SharedPreferences prefs = PreferenceManager.getDefaultSharedPreferences(getBaseContext());
+        return prefs.getString(KEY_NAME, null);
     }
 
     @Override
@@ -283,8 +308,12 @@ public class MainActivity extends AppCompatActivity implements PlaylistRecyclerV
                 setPasswordLocalStorage(data.getStringExtra(KEY_PASSWORD));
 
                 String temp_pic = data.getStringExtra(KEY_PICTURE);
+
                 if (temp_pic != null) {
-                    setPictureLocalStorage(getStringImage(Uri.parse(temp_pic)));
+                    String temp_image = getStringImage(Uri.parse(temp_pic), this);
+                    if (temp_image != null) {
+                        setPictureLocalStorage(temp_image);
+                    }
                 }
 
             }
@@ -293,9 +322,9 @@ public class MainActivity extends AppCompatActivity implements PlaylistRecyclerV
         }
     }
 
-    private String getStringImage(Uri uri) {
+    public static String getStringImage(Uri uri, Activity activity) {
         try {
-            Bitmap bitmap = MediaStore.Images.Media.getBitmap(this.getContentResolver(), uri);
+            Bitmap bitmap = MediaStore.Images.Media.getBitmap(activity.getContentResolver(), uri);
             ByteArrayOutputStream stream = new ByteArrayOutputStream();
             bitmap.compress(Bitmap.CompressFormat.PNG, 100, stream);
             byte[] byteArray = stream.toByteArray();

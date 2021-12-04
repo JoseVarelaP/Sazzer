@@ -15,7 +15,7 @@
     <string name="showLyrics">Show Lyrics</string>
     <string name="welcome_message">Are you ready?</string>
     <string name="welcome2">Let\'s do it! But first, we need some information</string>
-    <string name="hint_name">Name</string>
+    <string name="hint_name">User Name</string>
     <string name="hint_password">Create a password</string>
     <string name="hint_password2">Password</string>
     <string name="next_btn">Next</string>
@@ -24,4 +24,12 @@
     <string name="password_message">Insert your password</string>
     <string name="password_message2">Please enter the password you set when you downloaded Sazzer</string>
     <string name="choose_pic">Choose a profile picture</string>
+    <string name="hello_main">Hello</string>
+    <string name="good_morning">Good Morning</string>
+    <string name="good_afternoon">Good Afternoon</string>
+    <string name="good_night">Good Night</string>
+    <string name="update_pic">Click on the photo to update</string>
+    <string name="user_name_description">Update user name</string>
+    <string name="pass_name_description">Update your password</string>
+    <string name="settings_msg">Settings</string>
 </resources>
