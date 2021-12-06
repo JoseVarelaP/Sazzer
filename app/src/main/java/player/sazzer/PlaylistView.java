@@ -25,7 +25,7 @@ import java.util.Objects;
 import player.sazzer.Adapters.PlaylistRecyclerViewAdapter;
 import player.sazzer.DataTypes.Song;
 
-public class PlaylistView extends AppCompatActivity implements PlaylistRecyclerViewAdapter.ItemClickListener {
+public class PlaylistView extends Activity implements PlaylistRecyclerViewAdapter.ItemClickListener {
     private PlaylistRecyclerViewAdapter adapter;
     private LinearLayoutManager LLM;
     private ArrayList<Song> songs;
@@ -39,7 +39,7 @@ public class PlaylistView extends AppCompatActivity implements PlaylistRecyclerV
         super.onCreate(savedInstanceState);
         setContentView(R.layout.activity_playlistview);
 
-        Objects.requireNonNull(getSupportActionBar()).hide();
+        // Objects.requireNonNull(getSupportActionBar()).hide();
 
         // Time to setup the area.
         LLM = new LinearLayoutManager(this);
