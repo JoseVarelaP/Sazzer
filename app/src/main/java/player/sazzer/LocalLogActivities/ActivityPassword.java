@@ -9,11 +9,14 @@ import android.widget.EditText;
 import android.widget.Toast;
 
 import androidx.annotation.Nullable;
+import androidx.appcompat.app.AppCompatActivity;
+
+import java.util.Objects;
 
 import player.sazzer.MainActivity;
 import player.sazzer.R;
 
-public class ActivityPassword extends Activity {
+public class ActivityPassword extends AppCompatActivity {
 
     EditText password;
     Button button;
@@ -22,6 +25,8 @@ public class ActivityPassword extends Activity {
     protected void onCreate(@Nullable Bundle savedInstanceState) {
         super.onCreate(savedInstanceState);
         setContentView(R.layout.password_private_activity);
+
+        Objects.requireNonNull(getSupportActionBar()).hide();
 
         password = findViewById(R.id.user_password2);
         button = findViewById(R.id.btn_next2);

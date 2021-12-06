@@ -38,6 +38,7 @@ import java.util.ArrayList;
 import java.util.Locale;
 import java.util.Objects;
 
+import Utilities.Utils;
 import player.sazzer.Settings.SettingsActivity;
 import player.sazzer.Adapters.PlaylistRecyclerViewAdapter;
 import player.sazzer.DataTypes.Song;
@@ -94,7 +95,9 @@ public class MainActivity extends AppCompatActivity implements PlaylistRecyclerV
     @Override
     protected void onCreate(@Nullable Bundle savedInstanceState) {
         super.onCreate(savedInstanceState);
-        AppCompatDelegate.setDefaultNightMode(AppCompatDelegate.MODE_NIGHT_FOLLOW_SYSTEM);
+        //AppCompatDelegate.setDefaultNightMode(AppCompatDelegate.MODE_NIGHT_NO);
+        //theme(getThemePreferencesDefault());
+        Utils.theme(Utils.getThemePreferencesDefault(getBaseContext()));
         setContentView(R.layout.activity_main);
 
         MusicHelpers.setAppContext( getApplicationContext() );
@@ -110,7 +113,6 @@ public class MainActivity extends AppCompatActivity implements PlaylistRecyclerV
 
         this.registerReceiver(musicDataReciever, mIntentFilter);
         language(getBaseContext(), getLanguagePreferencesDefault());
-        // theme(getThemePreferencesDefault());
     }
 
     // HERE
@@ -131,6 +133,8 @@ public class MainActivity extends AppCompatActivity implements PlaylistRecyclerV
             return;
         }else if (language.equals("MX")) {
             location = new Locale("es", "MX");
+        } else if (language.equals("EN")){
+            location = new Locale("en", "UK");
         } else {
             return;
         }

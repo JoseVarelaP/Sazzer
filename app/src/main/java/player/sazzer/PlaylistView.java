@@ -10,6 +10,7 @@ import android.util.Log;
 import android.view.View;
 
 import androidx.annotation.Nullable;
+import androidx.appcompat.app.AppCompatActivity;
 import androidx.recyclerview.widget.LinearLayoutManager;
 import androidx.recyclerview.widget.RecyclerView;
 
@@ -19,11 +20,12 @@ import com.google.gson.reflect.TypeToken;
 import java.lang.reflect.Type;
 import java.util.ArrayList;
 import java.util.List;
+import java.util.Objects;
 
 import player.sazzer.Adapters.PlaylistRecyclerViewAdapter;
 import player.sazzer.DataTypes.Song;
 
-public class PlaylistView extends Activity implements PlaylistRecyclerViewAdapter.ItemClickListener {
+public class PlaylistView extends AppCompatActivity implements PlaylistRecyclerViewAdapter.ItemClickListener {
     private PlaylistRecyclerViewAdapter adapter;
     private LinearLayoutManager LLM;
     private ArrayList<Song> songs;
@@ -36,6 +38,8 @@ public class PlaylistView extends Activity implements PlaylistRecyclerViewAdapte
     protected void onCreate(@Nullable Bundle savedInstanceState) {
         super.onCreate(savedInstanceState);
         setContentView(R.layout.activity_playlistview);
+
+        Objects.requireNonNull(getSupportActionBar()).hide();
 
         // Time to setup the area.
         LLM = new LinearLayoutManager(this);

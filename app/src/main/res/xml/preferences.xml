@@ -36,6 +36,7 @@
             android:entries="@array/array_names_theme"
             android:entryValues="@array/array_values_theme"
             android:title="@string/theme_set"
+            android:icon="@drawable/ic_baseline_color_"
             android:summary="@string/theme_set_des"/>
     </PreferenceCategory>
 </PreferenceScreen>

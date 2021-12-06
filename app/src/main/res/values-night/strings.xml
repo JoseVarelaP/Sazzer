@@ -6,4 +6,5 @@
     <string name="playSong">Play</string>
     <string name="prevSong">Previous Song</string>
     <string name="nextSong">Next Song</string>
+    <string name="language_set_des">Change the language of Sazzer</string>
 </resources>

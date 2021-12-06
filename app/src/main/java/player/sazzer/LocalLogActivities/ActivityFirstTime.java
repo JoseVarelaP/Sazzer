@@ -14,14 +14,16 @@ import android.widget.EditText;
 import android.widget.ImageView;
 
 import androidx.annotation.Nullable;
+import androidx.appcompat.app.AppCompatActivity;
 
 import java.io.ByteArrayOutputStream;
 import java.io.IOException;
+import java.util.Objects;
 
 import player.sazzer.MainActivity;
 import player.sazzer.R;
 
-public class ActivityFirstTime extends Activity {
+public class ActivityFirstTime extends AppCompatActivity {
 
     EditText userName, passwordUser;
     Button btnNext, btnChoosePicture;
@@ -34,6 +36,8 @@ public class ActivityFirstTime extends Activity {
         super.onCreate(savedInstanceState);
 
         setContentView(R.layout.first_time_activity);
+
+        Objects.requireNonNull(getSupportActionBar()).hide();
 
         userName = findViewById(R.id.user_name);
         passwordUser = findViewById(R.id.user_password);

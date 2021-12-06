@@ -26,15 +26,17 @@ import android.widget.Toast;
 
 import androidx.annotation.NonNull;
 import androidx.annotation.Nullable;
+import androidx.appcompat.app.AppCompatActivity;
 
 import java.io.File;
 import java.io.IOException;
 import java.text.DateFormat;
 import java.util.Date;
+import java.util.Objects;
 
 import player.sazzer.DataTypes.TimeSpace;
 
-public class DetailsActivity extends Activity implements SensorEventListener {
+public class DetailsActivity extends AppCompatActivity implements SensorEventListener {
     SeekBar sbProgress;
     ImageButton button,prev,next;
     TextView curTime,totalTime,Nombre,Artista, lyric;
@@ -118,6 +120,7 @@ public class DetailsActivity extends Activity implements SensorEventListener {
         super.onCreate(savedInstanceState);
         Log.d("onCreate", "Creating new screen");
         setContentView(R.layout.activity_details);
+        Objects.requireNonNull(getSupportActionBar()).hide();
         curTime = findViewById(R.id.curTime);
         totalTime = findViewById(R.id.totalTime);
         Nombre = findViewById( R.id.songName );

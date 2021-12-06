@@ -2,11 +2,13 @@
 <resources>
     <string-array name="array_names_languages">
         <item>Spanish</item>
+        <item>English</item>
         <item>Default</item>
     </string-array>
 
     <string-array name="array_values_languages">
         <item>MX</item>
+        <item>EN</item>
         <item>DF</item>
     </string-array>
 
