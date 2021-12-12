@@ -27,6 +27,7 @@ import android.widget.Toast;
 import androidx.annotation.NonNull;
 import androidx.annotation.Nullable;
 import androidx.appcompat.app.AppCompatActivity;
+import androidx.room.Room;
 
 import java.io.File;
 import java.io.IOException;
@@ -34,6 +35,8 @@ import java.text.DateFormat;
 import java.util.Date;
 import java.util.Objects;
 
+import player.sazzer.DataBase.AppDataBase;
+import player.sazzer.DataBase.Song;
 import player.sazzer.DataTypes.TimeSpace;
 
 public class DetailsActivity extends AppCompatActivity implements SensorEventListener {
@@ -52,6 +55,8 @@ public class DetailsActivity extends AppCompatActivity implements SensorEventLis
 
     MediaRecorder mediaRecorder;
     File fileAudio;
+
+    AppDataBase database;
 
 
     private final BroadcastReceiver musicDataReciever = new BroadcastReceiver() {
@@ -134,6 +139,8 @@ public class DetailsActivity extends AppCompatActivity implements SensorEventLis
 
         onNewIntent(this.getIntent());
 
+        database = Room.databaseBuilder (this, AppDataBase.class, "mySongs").allowMainThreadQueries().build ();
+
         sbProgress = findViewById(R.id.sbProgress);
         sbProgress.setOnSeekBarChangeListener(new MySeekBarChangeListener());
 
@@ -175,8 +182,18 @@ public class DetailsActivity extends AppCompatActivity implements SensorEventLis
                 lyricContainer.setVisibility(View.VISIBLE);
                 if (!lyric.getText().toString().equals(""))
                     return;
+
+                String temp_ly = searchLyricInDB();
+
+                if (temp_ly != null) {
+                    lyric.setText(temp_ly);
+                    Log.i("DB", "Lyrics DB");
+                    return;
+                }
+
                 lyric.setText(getString(R.string.downloadingLyrics));
-                LyricSong lyricSong = new LyricSong(Nombre.getText().toString(), Artista.getText().toString());
+                LyricSong lyricSong = new LyricSong(Nombre.getText().toString().toLowerCase(),
+                        Artista.getText().toString().toLowerCase());
                 new DownloadLyrics(this, lyricSong).start();
             }
             else lyricContainer.setVisibility(View.INVISIBLE);
@@ -189,6 +206,14 @@ public class DetailsActivity extends AppCompatActivity implements SensorEventLis
 
         sensorManager = (SensorManager) getSystemService(Context.SENSOR_SERVICE);
         accelerometer = sensorManager.getDefaultSensor(Sensor.TYPE_ACCELEROMETER);
+    }
+
+    private String searchLyricInDB () {
+        Song song = database.songDao().findByTitleAndArtist(Nombre.getText().toString(), Artista.getText().toString());
+
+        if (song == null)
+            return null;
+        return song.lyric;
     }
 
     @Override

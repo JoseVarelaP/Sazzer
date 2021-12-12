@@ -11,6 +11,8 @@ import java.io.InputStreamReader;
 import java.net.HttpURLConnection;
 import java.net.URL;
 
+import player.sazzer.DataBase.Song;
+
 public class LyricSong {
     public static final String API_KEY_LABEL = "apikey=";
     public static final String API_KEY = "29aeabb2b877f655784dbbf82592d33d";
@@ -104,17 +106,19 @@ class DownloadLyrics extends Thread {
             if (ly_temp == null) {
                 context.lyric.setText("");
                 context.lyricContainer.setVisibility(View.INVISIBLE);
-                Toast.makeText(context, context.getString(R.string.lyricsNotAvailable), Toast.LENGTH_LONG).show();
+                Toast.makeText(context, context.getString(R.string.lyricsNotAvailable), Toast.LENGTH_SHORT).show();
                 return;
             }
             if (ly_temp.equals("")) {
                 context.lyric.setText("");
                 context.lyricContainer.setVisibility(View.INVISIBLE);
-                Toast.makeText(context, context.getString(R.string.forbiddenLyrics), Toast.LENGTH_LONG).show();
+                    Toast.makeText(context, context.getString(R.string.forbiddenLyrics), Toast.LENGTH_SHORT).show();
                 return;
             }
-            Toast.makeText(context, context.getString(R.string.successfulDownload), Toast.LENGTH_LONG).show();
             context.lyric.setText(ly_temp);
+            context.database.songDao().insertSong(
+                    new Song(lyricSong.getTrack_name().toLowerCase(), lyricSong.getArtist().toLowerCase(), ly_temp)
+            );
         });
     }
 }
