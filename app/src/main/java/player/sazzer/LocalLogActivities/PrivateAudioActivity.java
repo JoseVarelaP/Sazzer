@@ -41,6 +41,8 @@ public class PrivateAudioActivity extends AppCompatActivity {
         {
             Log.d("Files", "FileName:" + files[i].getName());
         }
+
+        // TODO: Show the audio files on a list.
     }
 
     @Override

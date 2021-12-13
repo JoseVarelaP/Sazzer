@@ -300,10 +300,10 @@ public class DetailsActivity extends AppCompatActivity implements SensorEventLis
             return;
         }
 
+        String dateTime = DateFormat.getDateTimeInstance().
+                format(new Date()).replace(' ', '_').replace(':','-').replace(",","");
+        String format = String.format("/%s.mp3",dateTime);
         if (mediaRecorder == null) {
-            String dateTime = DateFormat.getDateTimeInstance().
-                    format(new Date()).replace(' ', '_').replace(':','-');
-            String format = String.format("/%s.mp3",dateTime);
             File folder = new File(Environment.getExternalStorageDirectory(), getString(R.string.app_name));
 
             if (!folder.exists()) {
@@ -339,6 +339,9 @@ public class DetailsActivity extends AppCompatActivity implements SensorEventLis
             mediaRecorder.stop();
             mediaRecorder.release();
             mediaRecorder = null;
+
+            EncryptorManager em = new EncryptorManager( getApplicationContext() );
+            em.CreateEncryptedFile( fileAudio.getName() );
             Toast.makeText(this,"Recording Finished...", Toast.LENGTH_LONG)
                     .show();
             Log.i("SUCCESS_AUDIO", fileAudio.getPath() + " --Finish");
