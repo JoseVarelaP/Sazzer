@@ -1,37 +1,22 @@
 package player.sazzer;
 
-import android.app.Application;
 import android.content.Context;
 import android.os.Environment;
-import android.security.KeyPairGeneratorSpec;
-import android.security.keystore.KeyGenParameterSpec;
 import android.util.Log;
 
 import androidx.security.crypto.EncryptedFile;
 import androidx.security.crypto.MasterKey;
-import androidx.security.crypto.MasterKeys;
 
 import java.io.BufferedInputStream;
-import java.io.ByteArrayOutputStream;
 import java.io.DataInputStream;
 import java.io.File;
 import java.io.FileInputStream;
-import java.io.FileNotFoundException;
-import java.io.FileOutputStream;
 import java.io.IOException;
 import java.io.InputStream;
 import java.io.OutputStream;
 import java.security.GeneralSecurityException;
-import java.security.InvalidKeyException;
-import java.security.Key;
-import java.security.NoSuchAlgorithmException;
 
-import javax.crypto.Cipher;
-import javax.crypto.CipherInputStream;
-import javax.crypto.CipherOutputStream;
-import javax.crypto.KeyGenerator;
-import javax.crypto.KeyGeneratorSpi;
-import javax.crypto.NoSuchPaddingException;
+import org.apache.commons.io.FileUtils;
 
 public class EncryptorManager {
     private Context context;
@@ -56,8 +41,6 @@ public class EncryptorManager {
     {
         Log.d("CreateEncryptedFile", "Starting Operation.");
         try{
-            KeyGenParameterSpec keyGenParameterSpec = MasterKeys.AES256_GCM_SPEC;
-            //String mainKeyAlias = MasterKeys.getOrCreate(keyGenParameterSpec);
             MasterKey mainKey = new MasterKey.Builder(context)
                     .setKeyScheme(MasterKey.KeyScheme.AES256_GCM)
                     .build();
@@ -108,8 +91,9 @@ public class EncryptorManager {
     {
         Log.d("ReadEncryptedFile", "Starting Operation.");
         try{
-            KeyGenParameterSpec keyGenParameterSpec = MasterKeys.AES256_GCM_SPEC;
-            String mainKeyAlias = MasterKeys.getOrCreate(keyGenParameterSpec);
+            MasterKey mainKey = new MasterKey.Builder(context)
+                    .setKeyScheme(MasterKey.KeyScheme.AES256_GCM)
+                    .build();
 
             // Check first if the folder where the audios will be stored in exists.
             if( !VerifyAndCreateAppFolder() )
@@ -120,30 +104,23 @@ public class EncryptorManager {
 
             Log.d("ReadEncryptedFile", "Creating basis for encrypted file.");
             File folder = new File(Environment.getExternalStorageDirectory(), context.getString(R.string.app_name));
+            File EncFile = new File( folder , fileName );
             Log.d("ReadEncryptedFile", "Loading " + folder + "/" + fileName);
             EncryptedFile encryptedFile = new EncryptedFile.Builder(
-                    new File( folder , fileName ),
                     context,
-                    mainKeyAlias,
+                    EncFile,
+                    mainKey,
                     EncryptedFile.FileEncryptionScheme.AES256_GCM_HKDF_4KB
             ).build();
 
             InputStream inputStream = encryptedFile.openFileInput();
-            ByteArrayOutputStream byteArrayOutputStream = new ByteArrayOutputStream();
+            //ByteArrayOutputStream byteArrayOutputStream = new ByteArrayOutputStream();
 
             // create temp file that will hold byte array
-            File tempMp3 = File.createTempFile("sazzer", "mp3");
+            File tempMp3 = new File( Environment.getExternalStorageDirectory(), "Sazzer/Sazzer-temp" );
             tempMp3.deleteOnExit();
-            FileOutputStream fos = new FileOutputStream(tempMp3);
 
-            int nextByte = inputStream.read();
-            while( nextByte != -1 ) {
-                byteArrayOutputStream.write(nextByte);
-                nextByte = inputStream.read();
-            }
-            byteArrayOutputStream.writeTo(fos);
-
-            fos.close();
+            FileUtils.copyInputStreamToFile( inputStream, tempMp3 );
 
             return tempMp3.getPath();
         } catch (GeneralSecurityException | IOException e) {

@@ -52,4 +52,6 @@ dependencies {
     def room_version = "2.4.0-alpha03"
     implementation "androidx.room:room-runtime:$room_version"
     annotationProcessor "androidx.room:room-compiler:$room_version"
+
+    implementation group: 'commons-io', name: 'commons-io', version: '2.6'
 }

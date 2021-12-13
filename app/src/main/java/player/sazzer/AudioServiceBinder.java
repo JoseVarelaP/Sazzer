@@ -517,6 +517,7 @@ public class AudioServiceBinder extends Service implements MediaPlayer.OnPrepare
                         audioPlayer.reset();
                     }
                     songs.clear();
+                    songPosn = 0;
 
                     Log.d("SongPath", data);
 
@@ -558,7 +559,8 @@ public class AudioServiceBinder extends Service implements MediaPlayer.OnPrepare
         Song track = songs.get(songPosn);
         broadcastIntent.putExtra("songName", track.getTitle());
         broadcastIntent.putExtra("songArtist", track.getArtist());
-        broadcastIntent.putExtra("songArt", track.getAlbum().getAlbumArt());
+        if( track.getAlbum().getAlbumArt() != null )
+            broadcastIntent.putExtra("songArt", track.getAlbum().getAlbumArt());
         getApplicationContext().sendBroadcast(broadcastIntent);
 
         // Update the playlist if it happens to be available and shown on the screen.

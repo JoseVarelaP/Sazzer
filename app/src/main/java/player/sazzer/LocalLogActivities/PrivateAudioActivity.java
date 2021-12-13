@@ -136,7 +136,7 @@ public class PrivateAudioActivity extends AppCompatActivity implements PrivateAu
         Song audio = audioFiles.get(position);
 
         String audioPath = EM.ReadEncryptedFile( audio.getSongPath() );
-        if( audioPath.isEmpty() )
+        if( audioPath == null )
             return;
 
         Intent tm = MusicHelpers.quickIntentFromAction(AudioServiceAction.AUDIO_SERVICE_ACTION_LOAD_AUDIO_BYTE_ARRAY);
