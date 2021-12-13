@@ -4,6 +4,7 @@ import android.content.Intent;
 import android.os.Bundle;
 import android.os.Environment;
 import android.util.Log;
+import android.view.View;
 import android.widget.Toast;
 
 import androidx.annotation.NonNull;
@@ -11,14 +12,21 @@ import androidx.annotation.Nullable;
 import androidx.appcompat.app.AppCompatActivity;
 import androidx.biometric.BiometricPrompt;
 import androidx.core.content.ContextCompat;
+import androidx.recyclerview.widget.LinearLayoutManager;
+import androidx.recyclerview.widget.RecyclerView;
 
 import java.io.File;
+import java.util.ArrayList;
 import java.util.Objects;
 import java.util.concurrent.Executor;
 
+import player.sazzer.Adapters.PlaylistRecyclerViewAdapter;
+import player.sazzer.Adapters.PrivateAudioViewAdapter;
+import player.sazzer.DataTypes.Song;
+import player.sazzer.MusicHelpers;
 import player.sazzer.R;
 
-public class PrivateAudioActivity extends AppCompatActivity {
+public class PrivateAudioActivity extends AppCompatActivity implements PrivateAudioViewAdapter.ItemClickListener {
     Executor executor;
     private static final int REQUEST_CODE_LOGIN = 2021;
 
@@ -36,13 +44,22 @@ public class PrivateAudioActivity extends AppCompatActivity {
             return;
 
         File[] files = directory.listFiles();
+        ArrayList<Song> audioFiles = new ArrayList<>();
         Log.d("Files", "Size: "+ files.length);
         for (int i = 0; i < files.length; i++)
         {
+            Song temp = new Song(i, files[i].getPath(), files[i].getName(), "test", 0, 0);
+            audioFiles.add(temp);
             Log.d("Files", "FileName:" + files[i].getName());
         }
 
         // TODO: Show the audio files on a list.
+        RecyclerView songView = findViewById(R.id.audioFiles);
+        songView.setLayoutManager(new LinearLayoutManager(this));
+
+        PrivateAudioViewAdapter listMusica = new PrivateAudioViewAdapter(this, audioFiles, null);
+        listMusica.setClickListener( this );
+        songView.setAdapter(listMusica);
     }
 
     @Override
@@ -100,5 +117,10 @@ public class PrivateAudioActivity extends AppCompatActivity {
         if (requestCode == REQUEST_CODE_LOGIN && resultCode != RESULT_OK) {
             finish();
         }
+    }
+
+    @Override
+    public void onItemClick(View view, int position) {
+        Log.d("wooooo","yeah");
     }
 }
