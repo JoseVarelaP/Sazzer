@@ -2,6 +2,8 @@ package player.sazzer.LocalLogActivities;
 
 import android.content.Intent;
 import android.os.Bundle;
+import android.os.Environment;
+import android.util.Log;
 import android.widget.Toast;
 
 import androidx.annotation.NonNull;
@@ -10,6 +12,7 @@ import androidx.appcompat.app.AppCompatActivity;
 import androidx.biometric.BiometricPrompt;
 import androidx.core.content.ContextCompat;
 
+import java.io.File;
 import java.util.Objects;
 import java.util.concurrent.Executor;
 
@@ -19,10 +22,33 @@ public class PrivateAudioActivity extends AppCompatActivity {
     Executor executor;
     private static final int REQUEST_CODE_LOGIN = 2021;
 
+    protected void LoadAudioFiles()
+    {
+        String path = Environment.getExternalStorageDirectory().toString()+"/"+getString(R.string.app_name);
+        File directory = new File(path);
+
+        if( !directory.exists() ) {
+            Log.d("Files", "Directory does not exist!");
+            return;
+        }
+
+        if( !directory.isDirectory() )
+            return;
+
+        File[] files = directory.listFiles();
+        Log.d("Files", "Size: "+ files.length);
+        for (int i = 0; i < files.length; i++)
+        {
+            Log.d("Files", "FileName:" + files[i].getName());
+        }
+    }
+
     @Override
     protected void onCreate(@Nullable Bundle savedInstanceState) {
         super.onCreate(savedInstanceState);
         setContentView(R.layout.private_audio_activity);
+
+        LoadAudioFiles();
 
         Objects.requireNonNull(getSupportActionBar()).hide();
 
@@ -44,6 +70,7 @@ public class PrivateAudioActivity extends AppCompatActivity {
                         super.onAuthenticationSucceeded(result);
                         Toast.makeText(getApplicationContext(),
                                 "Authentication succeeded!", Toast.LENGTH_SHORT).show();
+                        LoadAudioFiles();
                     }
 
                     @Override
