@@ -104,7 +104,7 @@ public class EncryptorManager {
             e.printStackTrace();
         }
     }
-    public void ReadEncryptedFile( String fileName )
+    public String ReadEncryptedFile( String fileName )
     {
         Log.d("ReadEncryptedFile", "Starting Operation.");
         try{
@@ -115,13 +115,14 @@ public class EncryptorManager {
             if( !VerifyAndCreateAppFolder() )
             {
                 Log.e("CreateEncryptedFile","Folder for audios could not be created.");
-                return;
+                return null;
             }
 
             Log.d("ReadEncryptedFile", "Creating basis for encrypted file.");
             File folder = new File(Environment.getExternalStorageDirectory(), context.getString(R.string.app_name));
+            Log.d("ReadEncryptedFile", "Loading " + folder + "/" + fileName);
             EncryptedFile encryptedFile = new EncryptedFile.Builder(
-                    new File( folder , fileName + "-enc" ),
+                    new File( folder , fileName ),
                     context,
                     mainKeyAlias,
                     EncryptedFile.FileEncryptionScheme.AES256_GCM_HKDF_4KB
@@ -129,49 +130,26 @@ public class EncryptorManager {
 
             InputStream inputStream = encryptedFile.openFileInput();
             ByteArrayOutputStream byteArrayOutputStream = new ByteArrayOutputStream();
+
+            // create temp file that will hold byte array
+            File tempMp3 = File.createTempFile("sazzer", "mp3");
+            tempMp3.deleteOnExit();
+            FileOutputStream fos = new FileOutputStream(tempMp3);
+
             int nextByte = inputStream.read();
             while( nextByte != -1 ) {
                 byteArrayOutputStream.write(nextByte);
                 nextByte = inputStream.read();
             }
+            byteArrayOutputStream.writeTo(fos);
 
-            byte[] plaintext = byteArrayOutputStream.toByteArray();
-            /*
-            KeyGenerator keygen = KeyGenerator.getInstance("AES");
-            Key k = keygen.generateKey();
+            fos.close();
 
-            // Create the cypher which the will be converted to.
-            Cipher AES = Cipher.getInstance("AES/ECB/PKCS5Padding");
-            AES.init(Cipher.ENCRYPT_MODE, k);
-
-            // Load the file to encrypt.
-            Log.d("CreateEncryptedFile", "Opening File "+ fileNamePath);
-            FileOutputStream fs = new FileOutputStream(fileNamePath);
-            CipherOutputStream out = new CipherOutputStream(fs, AES);
-            out.write(fs.toString().getBytes());
-            out.flush();
-            out.close();
-
-            Log.d("CreateEncryptedFile", "File "+ fileNamePath + " Written.");
-
-            Cipher aes2 = Cipher.getInstance("AES/ECB/PKCS5Padding");
-            aes2.init(Cipher.DECRYPT_MODE, k);
-
-            FileInputStream fis = new FileInputStream(fileNamePath);
-            CipherInputStream in = new CipherInputStream(fis, aes2);
-            ByteArrayOutputStream baos = new ByteArrayOutputStream();
-
-            byte[] b = new byte[1024];
-            int bitsLeidos;
-            while( (bitsLeidos = in.read(b)) >= 0 )
-            {
-                baos.write(b, 0, bitsLeidos);
-            }
-            System.out.println(new String(baos.toByteArray()));
-
-             */
+            return tempMp3.getPath();
         } catch (GeneralSecurityException | IOException e) {
             e.printStackTrace();
         }
+
+        return null;
     }
 }

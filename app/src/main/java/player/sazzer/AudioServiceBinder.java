@@ -28,6 +28,7 @@ import com.google.gson.reflect.TypeToken;
 
 import java.io.File;
 import java.io.FileInputStream;
+import java.io.FileNotFoundException;
 import java.io.FileOutputStream;
 import java.io.IOException;
 import java.lang.reflect.Type;
@@ -206,33 +207,6 @@ public class AudioServiceBinder extends Service implements MediaPlayer.OnPrepare
     }
 
     boolean readingByteFile = false;
-    File tempMp3;
-    public void LoadFromByteArray( byte[] soundByteArray )
-    {
-        try{
-            tempMp3 = File.createTempFile("sazzer", "mp3", getCacheDir());
-            // Tell the File to delete itself.
-            // TODO: This deletes the file when the JVM is closed, not the app.
-            // There has to be a way to determine the location of the file to a temporary location.
-            tempMp3.deleteOnExit();
-            FileOutputStream fos = new FileOutputStream(tempMp3);
-            // Write to the temporary file to then directly play.
-            fos.write(soundByteArray);
-            fos.close();
-
-            // Restart music player.
-            // This is needed because we can run out of resources if this is not done.
-            audioPlayer.reset();
-            FileInputStream fis = new FileInputStream(tempMp3);
-            audioPlayer.setDataSource(fis.getFD());
-
-            readingByteFile = true;
-            audioPlayer.prepare();
-            audioPlayer.start();
-        } catch (IOException e) {
-            e.printStackTrace();
-        }
-    }
 
     public void setSong(int songIndex) {
         songPosn = songIndex;
@@ -536,8 +510,38 @@ public class AudioServiceBinder extends Service implements MediaPlayer.OnPrepare
                     {
                         Log.e("AudioService", "ByteArray is empty.");
                     }
-                    byte[] bytes = data.getBytes(StandardCharsets.UTF_8);
-                    LoadFromByteArray(bytes);
+
+                    // If anything is currently playing, stop.
+                    if( audioPlayer.isPlaying() ) {
+                        audioPlayer.stop();
+                        audioPlayer.reset();
+                    }
+                    songs.clear();
+
+                    Log.d("SongPath", data);
+
+                    // Add the temporary audio to the array.
+                    Song temp = new Song(0, data, "decrypted", "test", 0, 10);
+
+                    songs.add(temp);
+
+                    // Now play the audio.
+                    //Uri trackUri = Uri.fromFile( new File(temp.getSongPath()) );
+                    // Load the temporary file.
+                    File audioFile = new File( data );
+                    FileInputStream fis = null;
+                    try {
+                        fis = new FileInputStream(audioFile);
+                        audioPlayer.setDataSource(fis.getFD());
+
+                        //audioPlayer.setDataSource( getApplicationContext(), trackUri );
+                        audioPlayer.prepareAsync();
+                    } catch (IOException e) {
+                        e.printStackTrace();
+                    }
+
+                    //byte[] bytes = data.getBytes(StandardCharsets.UTF_8);
+                    //LoadFromByteArray(bytes);
                     break;
                 }
             }
@@ -576,7 +580,6 @@ public class AudioServiceBinder extends Service implements MediaPlayer.OnPrepare
         // Was the audio file that was just played a recording?
         if( readingByteFile )
         {
-            tempMp3.delete();
             readingByteFile = false;
             return;
         }

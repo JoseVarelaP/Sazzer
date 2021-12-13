@@ -16,19 +16,26 @@ import androidx.recyclerview.widget.LinearLayoutManager;
 import androidx.recyclerview.widget.RecyclerView;
 
 import java.io.File;
+import java.io.FileInputStream;
+import java.io.FileOutputStream;
+import java.io.IOException;
 import java.util.ArrayList;
 import java.util.Objects;
 import java.util.concurrent.Executor;
 
 import player.sazzer.Adapters.PlaylistRecyclerViewAdapter;
 import player.sazzer.Adapters.PrivateAudioViewAdapter;
+import player.sazzer.AudioServiceAction;
 import player.sazzer.DataTypes.Song;
+import player.sazzer.EncryptorManager;
 import player.sazzer.MusicHelpers;
 import player.sazzer.R;
 
 public class PrivateAudioActivity extends AppCompatActivity implements PrivateAudioViewAdapter.ItemClickListener {
     Executor executor;
     private static final int REQUEST_CODE_LOGIN = 2021;
+    ArrayList<Song> audioFiles;
+    EncryptorManager EM;
 
     protected void LoadAudioFiles()
     {
@@ -44,11 +51,11 @@ public class PrivateAudioActivity extends AppCompatActivity implements PrivateAu
             return;
 
         File[] files = directory.listFiles();
-        ArrayList<Song> audioFiles = new ArrayList<>();
+        //audioFiles = new ArrayList<>();
         Log.d("Files", "Size: "+ files.length);
         for (int i = 0; i < files.length; i++)
         {
-            Song temp = new Song(i, files[i].getPath(), files[i].getName(), "test", 0, 0);
+            Song temp = new Song(i, files[i].getName(), files[i].getName(), "test", 0, 0);
             audioFiles.add(temp);
             Log.d("Files", "FileName:" + files[i].getName());
         }
@@ -65,6 +72,8 @@ public class PrivateAudioActivity extends AppCompatActivity implements PrivateAu
     @Override
     protected void onCreate(@Nullable Bundle savedInstanceState) {
         super.onCreate(savedInstanceState);
+        audioFiles = new ArrayList<>();
+        EM = new EncryptorManager( getApplicationContext() );
         setContentView(R.layout.private_audio_activity);
 
         LoadAudioFiles();
@@ -122,5 +131,17 @@ public class PrivateAudioActivity extends AppCompatActivity implements PrivateAu
     @Override
     public void onItemClick(View view, int position) {
         Log.d("wooooo","yeah");
+
+        // When the file has been selected, begin the decrypt process.
+        Song audio = audioFiles.get(position);
+
+        String audioPath = EM.ReadEncryptedFile( audio.getSongPath() );
+        if( audioPath.isEmpty() )
+            return;
+
+        Intent tm = MusicHelpers.quickIntentFromAction(AudioServiceAction.AUDIO_SERVICE_ACTION_LOAD_AUDIO_BYTE_ARRAY);
+        tm.putExtra("Audio.ByteArray", audioPath);
+
+        sendBroadcast(tm);
     }
 }
