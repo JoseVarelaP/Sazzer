@@ -290,6 +290,8 @@ public class AudioServiceBinder extends Service implements MediaPlayer.OnPrepare
 
     @Override
     public int onStartCommand(Intent intent, int flags, int startId) {
+        if( intent == null )
+            return START_STICKY;
         Bundle Extras = intent.getExtras();
         if( Extras == null )
             return START_STICKY;
@@ -522,7 +524,7 @@ public class AudioServiceBinder extends Service implements MediaPlayer.OnPrepare
                     Log.d("SongPath", data);
 
                     // Add the temporary audio to the array.
-                    Song temp = new Song(0, data, "decrypted", "test", 0, 10);
+                    Song temp = new Song(1, data, "decrypted", "test", 0, 10);
 
                     songs.add(temp);
 
@@ -536,6 +538,7 @@ public class AudioServiceBinder extends Service implements MediaPlayer.OnPrepare
                         audioPlayer.setDataSource(fis.getFD());
 
                         //audioPlayer.setDataSource( getApplicationContext(), trackUri );
+                        readingByteFile = true;
                         audioPlayer.prepareAsync();
                     } catch (IOException e) {
                         e.printStackTrace();
@@ -559,7 +562,7 @@ public class AudioServiceBinder extends Service implements MediaPlayer.OnPrepare
         Song track = songs.get(songPosn);
         broadcastIntent.putExtra("songName", track.getTitle());
         broadcastIntent.putExtra("songArtist", track.getArtist());
-        if( track.getAlbum().getAlbumArt() != null )
+        if( track.getAlbum() != null )
             broadcastIntent.putExtra("songArt", track.getAlbum().getAlbumArt());
         getApplicationContext().sendBroadcast(broadcastIntent);
 
@@ -572,7 +575,8 @@ public class AudioServiceBinder extends Service implements MediaPlayer.OnPrepare
         am.requestAudioFocus(this, AudioManager.STREAM_MUSIC, AudioManager.AUDIOFOCUS_GAIN);
 
         mp.start();
-        manager.setPauseIcon( audioPlayer.isPlaying(), 0 );
+        if( !readingByteFile )
+            manager.setPauseIcon( audioPlayer.isPlaying(), 0 );
     }
 
     @Override

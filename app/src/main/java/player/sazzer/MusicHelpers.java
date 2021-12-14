@@ -152,6 +152,10 @@ public class MusicHelpers {
     {
         Intent intent = new Intent(context, DetailsActivity.class);
         intent.setFlags(Intent.FLAG_ACTIVITY_NEW_TASK | Intent.FLAG_ACTIVITY_SINGLE_TOP);
+
+        if( track == null )
+            return intent;
+
         intent.putExtra("songName", track.getTitle());
         intent.putExtra("songArtist", track.getArtist());
         intent.putExtra("songArt", track.getAlbum().getAlbumArt());
