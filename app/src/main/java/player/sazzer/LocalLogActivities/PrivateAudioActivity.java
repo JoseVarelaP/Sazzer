@@ -53,6 +53,8 @@ public class PrivateAudioActivity extends AppCompatActivity implements PrivateAu
         File[] files = directory.listFiles();
         //audioFiles = new ArrayList<>();
         Log.d("Files", "Size: "+ files.length);
+        if (audioFiles.size() > 0)
+            return;
         for (int i = 0; i < files.length; i++)
         {
             if( files[i].isDirectory() )
@@ -68,6 +70,8 @@ public class PrivateAudioActivity extends AppCompatActivity implements PrivateAu
 
         PrivateAudioViewAdapter listMusica = new PrivateAudioViewAdapter(this, audioFiles, null);
         listMusica.setClickListener( this );
+
+        Log.i("AAAA", String.valueOf(listMusica.getItemCount()));
         songView.setAdapter(listMusica);
     }
 
