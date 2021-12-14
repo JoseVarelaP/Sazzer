@@ -99,7 +99,7 @@ public class PrivateAudioActivity extends AppCompatActivity implements PrivateAu
 
         LoadAudioFiles();
 
-        Objects.requireNonNull(getSupportActionBar()).hide();
+        Objects.requireNonNull(getSupportActionBar()).setTitle(getString(R.string.private_audio));
 
         executor = ContextCompat.getMainExecutor(this);
         BiometricPrompt biometricPrompt = new BiometricPrompt(PrivateAudioActivity.this, executor,
