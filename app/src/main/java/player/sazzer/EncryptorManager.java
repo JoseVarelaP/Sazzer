@@ -117,7 +117,7 @@ public class EncryptorManager {
             //ByteArrayOutputStream byteArrayOutputStream = new ByteArrayOutputStream();
 
             // create temp file that will hold byte array
-            File tempMp3 = new File( Environment.getExternalStorageDirectory(), "Sazzer/Sazzer-temp" );
+            File tempMp3 = new File( Environment.getExternalStorageDirectory(), "Sazzer/temp_/temp" );
             tempMp3.deleteOnExit();
 
             FileUtils.copyInputStreamToFile( inputStream, tempMp3 );

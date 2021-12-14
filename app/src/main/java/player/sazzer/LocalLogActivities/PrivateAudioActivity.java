@@ -55,18 +55,35 @@ public class PrivateAudioActivity extends AppCompatActivity implements PrivateAu
         Log.d("Files", "Size: "+ files.length);
         for (int i = 0; i < files.length; i++)
         {
+            if( files[i].isDirectory() )
+                continue;
+
             Song temp = new Song(i, files[i].getName(), files[i].getName(), "test", 0, 0);
             audioFiles.add(temp);
             Log.d("Files", "FileName:" + files[i].getName());
         }
 
-        // TODO: Show the audio files on a list.
         RecyclerView songView = findViewById(R.id.audioFiles);
         songView.setLayoutManager(new LinearLayoutManager(this));
 
         PrivateAudioViewAdapter listMusica = new PrivateAudioViewAdapter(this, audioFiles, null);
         listMusica.setClickListener( this );
         songView.setAdapter(listMusica);
+    }
+
+    @Override
+    protected void onDestroy() {
+        super.onDestroy();
+
+        // Clean audio queue to make the temporary file safe to delete.
+        Intent tm = MusicHelpers.quickIntentFromAction(AudioServiceAction.AUDIO_SERVICE_ACTION_CLEAN_QUEUE);
+        sendBroadcast(tm);
+
+        // Delete the temporary file if available.
+        File toDelete = new File( Environment.getExternalStorageDirectory(), "Sazzer/temp_/temp+" );
+        if( toDelete.exists() )
+            toDelete.delete();
+
     }
 
     @Override
